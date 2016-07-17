@@ -1,0 +1,16 @@
+parameters:
+	devel: true
+	sentry:
+		dsn: #DSN klic v zavislosti na prostredi vygenerovany ze sentry
+		settings:
+			trace: true
+
+doctrine:
+	default:
+		host:
+		user:
+		password:
+		dbname:
+		charset: UTF8
+		driver: pdo_mysql
+		autoGenerateProxyClasses: true

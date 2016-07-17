@@ -1,0 +1,59 @@
+#
+# WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
+# https://nette.org/security-warning
+#
+parameters:
+	devel: true
+	sentry:
+		dsn: ''
+		settings:
+			trace: true
+
+php:
+	date.timezone: Europe/Prague
+
+application:
+	errorPresenter: Error
+	mapping:
+		*: App\*Module\Presenters\*Presenter
+
+
+session:
+	expiration: 14 days
+
+
+services:
+	router: App\Router\RouterFactory::createRouter
+
+
+extensions:
+	console: Kdyby\Console\DI\ConsoleExtension
+	events: Kdyby\Events\DI\EventsExtension
+	annotations: Kdyby\Annotations\DI\AnnotationsExtension
+	doctrine: Kdyby\Doctrine\DI\OrmExtension
+	monolog: Wunderman\Monolog\DI\MonologExtension
+
+monolog:
+	handlers:
+		raven: Monolog\Handler\RavenHandler(Raven_Client(%sentry.dsn%, %sentry.settings%))
+	name: TODO
+	registerFallback: true
+	processors:
+		- Monolog\Processor\MemoryPeakUsageProcessor
+		- Kdyby\Monolog\Processor\PriorityProcessor
+
+doctrine:
+	default:
+		host: 
+		user: 
+		password:
+		dbname: 
+		charset: UTF8
+		driver: pdo_mysql
+		entityDir: '%appDir%/entities'
+		proxyDir: '%tempDir%/proxies'
+		proxyNamespace: 'App\Entities\Proxies'
+		autoGenerateProxyClasses: true
+		debug: no
+		metadata:
+			App: %appDir%

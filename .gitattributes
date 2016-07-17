@@ -1,0 +1,2 @@
+#www/target/*.* -diff
+www/target/*.* merge=ours

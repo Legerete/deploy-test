@@ -1,0 +1,17 @@
+@import 'common/variables';
+@import 'common/fonts';
+@import 'common/mixins';
+
+// Automatically injected Bower dependencies via wiredep (never manually edit this block)
+// bower:scss
+@import '../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss';
+// endbower
+
+@import '../../www/assets/css/sprite.scss';
+
+h2 {
+  color: darkblue;
+  border: 1px black solid;
+  padding: 20px;
+  border-radius: 10px;
+}

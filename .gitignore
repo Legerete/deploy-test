@@ -1,0 +1,10 @@
+app/config/config.local.neon
+vendor/*
+!vendor/other
+log
+temp
+node_modules
+bower_components
+npm-debug.log
+.idea
+nbproject
