@@ -207,7 +207,14 @@ gulp.task('sass-lint', function() {
 	sasslint = sasslint || require('gulp-sass-lint');
 	var sassSources = [pathSASS+'/**/*.scss', '!'+pathSASS+'/libs/*.*'];
 	return gulp.src(sassSources)
-		.pipe(sasslint())
+		.pipe(sasslint({
+			rules: {
+				'no-ids': 1,
+				'no-mergeable-selectors': 0,
+				'clean-import-paths': 0,
+				'no-color-keywords': 0
+			}
+		}))
 		.pipe(sasslint.format())
 		.pipe(sasslint.failOnError());
 });
