@@ -289,7 +289,7 @@ gulp.task('coffeeLint', function () {
 gulp.task('watch', function () {
     if (!argv.production && argv.watch !== false) {
         gulp.watch(pathSpriteSources + '/**/*', ['sprite']);
-        gulp.watch([pathSASS + '/**/*.scss'], ['sass']);
+        gulp.watch([pathSASS + '/**/*.scss', './bower.json'], ['sass']);
         gulp.watch([pathCoffee + '/**/*.coffee'], ['coffeeLint', 'coffee']);
         // for watching imagemin it is necessary to have assets and target directory, or it will end up with infinite loop.
         gulp.watch(pathImages + '/*', ['imagemin']);

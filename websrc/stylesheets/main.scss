@@ -3,6 +3,8 @@
 @import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_variables.scss';
 @import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_mixins.scss';
 @import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_utilities.scss';
+@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_normalize.scss';
+@import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_type.scss';
 // endbower
 
 @import 'common/variables';
@@ -11,12 +13,10 @@
 
 @import 'sprite';
 
-$black: #000000;
-$white: #FFF;
+$black: lighten(#000000, 25);
 
 h2 {
-  border: 1px solid $black;
   border-radius: 10px;
-  color: #fff;
+  color: $black;
   padding: 20px;
 }

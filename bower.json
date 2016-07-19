@@ -29,6 +29,8 @@
 				"./assets/stylesheets/bootstrap/_variables.scss",
 				"./assets/stylesheets/bootstrap/_mixins.scss",
 				"./assets/stylesheets/bootstrap/_utilities.scss",
+				"./assets/stylesheets/bootstrap/_normalize.scss",
+				"./assets/stylesheets/bootstrap/_type.scss",
 				"./assets/fonts/bootstrap/glyphicons-halflings-regular.eot",
 				"./assets/fonts/bootstrap/glyphicons-halflings-regular.svg",
 				"./assets/fonts/bootstrap/glyphicons-halflings-regular.ttf",
