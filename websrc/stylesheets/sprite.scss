@@ -18,26 +18,26 @@ $icon-default-offset-x: 0px;
 $icon-default-offset-y: 0px;
 $icon-default-width: 16px;
 $icon-default-height: 16px;
-$icon-default-total-width: 32px;
+$icon-default-total-width: 42px;
 $icon-default-total-height: 16px;
-$icon-default-image: 'www/assets/images/sprite.png';
-$icon-default: (0px, 0px, 0px, 0px, 16px, 16px, 32px, 16px, 'www/assets/images/sprite.png', 'icon-default', );
+$icon-default-image: 'www/assets/images/sprite.png?v=0.0.1';
+$icon-default: (0px, 0px, 0px, 0px, 16px, 16px, 42px, 16px, 'www/assets/images/sprite.png?v=0.0.1', 'icon-default', );
 $icon-unbranded-name: 'icon-unbranded';
-$icon-unbranded-x: 16px;
+$icon-unbranded-x: 26px;
 $icon-unbranded-y: 0px;
-$icon-unbranded-offset-x: -16px;
+$icon-unbranded-offset-x: -26px;
 $icon-unbranded-offset-y: 0px;
 $icon-unbranded-width: 16px;
 $icon-unbranded-height: 16px;
-$icon-unbranded-total-width: 32px;
+$icon-unbranded-total-width: 42px;
 $icon-unbranded-total-height: 16px;
-$icon-unbranded-image: 'www/assets/images/sprite.png';
-$icon-unbranded: (16px, 0px, -16px, 0px, 16px, 16px, 32px, 16px, 'www/assets/images/sprite.png', 'icon-unbranded', );
-$spritesheet-width: 32px;
+$icon-unbranded-image: 'www/assets/images/sprite.png?v=0.0.1';
+$icon-unbranded: (26px, 0px, -26px, 0px, 16px, 16px, 42px, 16px, 'www/assets/images/sprite.png?v=0.0.1', 'icon-unbranded', );
+$spritesheet-width: 42px;
 $spritesheet-height: 16px;
-$spritesheet-image: 'www/assets/images/sprite.png';
+$spritesheet-image: 'www/assets/images/sprite.png?v=0.0.1';
 $spritesheet-sprites: ($icon-default, $icon-unbranded, );
-$spritesheet: (32px, 16px, 'www/assets/images/sprite.png', $spritesheet-sprites, );
+$spritesheet: (42px, 16px, 'www/assets/images/sprite.png?v=0.0.1', $spritesheet-sprites, );
 
 /*
 The provided mixins are intended to be used with the array-like variables

@@ -6,7 +6,8 @@
 4. Go to root of the project and run `# composer install`
 5. Install Node.JS dependencies and modules by `# npm install`
 6. Install Gulp and Bower dependencies and modules by `# npm run build`
-7. Run Grunt to compile Less files `# gulp`
+7. To compile source files run Gulp `# gulp --no-watch`
+8. To automatic Gulp watch task run `# gulp` only
 
 ## How to add custom packages to Bootstrap
 1. Edit file `bower.json` on root of the project
