@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "e618ddc32d024a9bd581019da439c153",
-    "content-hash": "098eb07a9f16da7b15a054605e298f75",
+    "hash": "ca005f433385871d86b37839b52c253c",
+    "content-hash": "4cc0ae2dcb7dcdab3cf1cccadeac077b",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2368,34 +2368,38 @@
             "time": "2012-12-21 11:40:51"
         },
         {
-            "name": "raven/raven",
-            "version": "0.13.0",
+            "name": "sentry/sentry",
+            "version": "0.22.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/getsentry/raven-php.git",
-                "reference": "1d5be07afc001df98a3528d1f928eeb2241afce6"
+                "url": "https://github.com/getsentry/sentry-php.git",
+                "reference": "49d4c0c4f2c298c9f15a07416debb5352a209b79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/raven-php/zipball/1d5be07afc001df98a3528d1f928eeb2241afce6",
-                "reference": "1d5be07afc001df98a3528d1f928eeb2241afce6",
+                "url": "https://api.github.com/repos/getsentry/sentry-php/zipball/49d4c0c4f2c298c9f15a07416debb5352a209b79",
+                "reference": "49d4c0c4f2c298c9f15a07416debb5352a209b79",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
+                "monolog/monolog": "*",
                 "php": ">=5.2.4"
             },
+            "conflict": {
+                "raven/raven": "*"
+            },
             "require-dev": {
-                "fabpot/php-cs-fixer": "^1.8.0",
+                "friendsofphp/php-cs-fixer": "^1.8.0",
                 "phpunit/phpunit": "^4.6.6"
             },
             "bin": [
-                "bin/raven"
+                "bin/sentry"
             ],
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.13.x-dev"
+                    "dev-master": "0.22.x-dev"
                 }
             },
             "autoload": {
@@ -2405,7 +2409,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD"
+                "BSD-3-Clause"
             ],
             "authors": [
                 {
@@ -2419,8 +2423,7 @@
                 "log",
                 "logging"
             ],
-            "abandoned": "sentry/sentry",
-            "time": "2015-09-09 18:12:58"
+            "time": "2016-06-23 19:41:24"
         },
         {
             "name": "symfony/console",

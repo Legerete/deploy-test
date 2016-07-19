@@ -31,7 +31,7 @@ extensions:
 	events: Kdyby\Events\DI\EventsExtension
 	annotations: Kdyby\Annotations\DI\AnnotationsExtension
 	doctrine: Kdyby\Doctrine\DI\OrmExtension
-	monolog: Wunderman\Monolog\DI\MonologExtension
+	monolog: App\Monolog\DI\MonologExtension
 
 monolog:
 	handlers:
@@ -44,10 +44,10 @@ monolog:
 
 doctrine:
 	default:
-		host: 
-		user: 
+		host:
+		user:
 		password:
-		dbname: 
+		dbname:
 		charset: UTF8
 		driver: pdo_mysql
 		entityDir: '%appDir%/entities'

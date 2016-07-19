@@ -29,8 +29,8 @@
 		"tracy/tracy": "^2.4",
 		"kdyby/doctrine": "~3.1.0",
 		"kdyby/monolog": "~1.1.0",
-		"raven/raven": "~0.13.0",
-		"phpmailer/phpmailer": "v5.2.9"
+		"phpmailer/phpmailer": "v5.2.9",
+		"sentry/sentry": "^0.22.0"
 	},
 	"autoload": {
 		"psr-4": {
