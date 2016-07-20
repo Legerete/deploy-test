@@ -25,6 +25,8 @@ var fs = require('fs'),
 	targetPathImages = targetPath + '/images',
 	targetPathFonts = targetPath + '/fonts',
 
+    sassMainSource = pathSass + '/main.scss',
+
 	gutil = require('gulp-util'),
 	gulp = require('gulp'),
 	argv = require('yargs').argv,
@@ -174,7 +176,9 @@ gulp.task('sprite', function () {
  */
 gulp.task('sass-lint', function () {
 	sassLint = sassLint || require('gulp-sass-lint');
-	var sassSources = [pathSass + '/**/*.scss', '!' + pathSass + '/libs/*.*', '!' + pathSass + '/sprite.scss'];
+	var sassSources = [pathSass + '/**/*.scss',
+        '!' + pathSass + '/libs/*.*',
+        '!' + pathSass + '/sprite.scss'];
 
 	return gulp.src(sassSources)
 		.pipe(sassLint({
@@ -189,8 +193,6 @@ gulp.task('sass-lint', function () {
 		.pipe(sassLint.failOnError())
 		.pipe(notify({ message: 'SASS lint task complete' }));
 });
-
-var sassMainSource = pathSass + '/main.scss';
 
 /**
  * SASS import
@@ -217,7 +219,7 @@ gulp.task('wiredep', function () {
  * - pick only main.scss, that includes all necessary dependencies
  * - if in production mode, minify target file
  */
-gulp.task('sass', ['sprite', 'wiredep', 'sass-lint'], function () {
+gulp.task('sass', ['sprite', 'sass-lint'], function () {
 	sass = sass || require('gulp-sass');
 	rename = rename || require('gulp-rename');
 	cssmin = cssmin || require('gulp-cssmin');
@@ -289,10 +291,7 @@ gulp.task('coffeeLint', function () {
  */
 gulp.task('browserSync', function () {
 	browserSync = browserSync || require('browser-sync').create();
-	browserSync.init(/*{
-		port: 8088,
-		proxy: 'localhost/legerete/skeleton/www'
-	}*/ require('./bs-config'));
+	browserSync.init(require('./bs-config'));
 
 	gulp.watch('app/**/*.latte').on('change', browserSync.reload);
 	gulp.watch(targetPathJs + '/**/*.js').on('change', browserSync.reload);
@@ -306,11 +305,12 @@ gulp.task('browserSync', function () {
  */
 gulp.task('watch', function () {
 	if (!argv.production && argv.watch !== false) {
+        gulp.watch('./bower.json', ['wiredep']);
 		gulp.watch(pathSpriteSources + '/**/*', ['sprite']);
 		gulp.watch([pathSass + '/**/*.scss', './bower.json'], ['sass']);
 		gulp.watch([pathCoffee + '/**/*.coffee'], ['coffeeLint', 'coffee']);
 		// for watching imagemin it is necessary to have assets and target directory, or it will end up with infinite loop.
-		gulp.watch(pathImages + '/*', ['imagemin']);
+		gulp.watch(pathImages + '/**/*', ['imagemin']);
 	}
 });
 
@@ -328,3 +328,4 @@ gulp.task('clean', function() {
  *  --no-watch: only disable changes watching
  */
 gulp.task('default', ['sass', 'coffeeLint', 'coffee', 'imagemin', 'fonts', 'browserSync', 'watch']);
+
