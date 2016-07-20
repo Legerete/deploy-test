@@ -1,0 +1,4 @@
+{
+  "port": 8088,
+  "proxy": "localhost/legerete/skeleton/www"
+}
