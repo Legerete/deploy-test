@@ -1,7 +1,7 @@
 app/config/config.local.neon
 bs-config.json
-vendor/*
 !vendor/other
+vendor/
 log
 temp
 node_modules
