@@ -7,11 +7,13 @@
 5. Install Node.JS dependencies and modules by `# npm install`
 6. Install Gulp and Bower dependencies and modules by `# npm run build`
 7. To compile source files run Gulp `# gulp --no-watch`
-8. To automatic Gulp watch task run `# gulp` only
+8. Copy file `PROJECT_ROOT/bs-config.json.example` as `PROJECT_ROOT/bs-config.json`
+9. Change settings for BrowserSync to correspond your server
+10. To automatic Gulp watch task run `# gulp` only
 
 ## How to add custom packages to Bootstrap
-1. Edit file `bower.json` on root of the project
+1. Edit file `PROJECT_ROOT/bower.json` on root of the project
 2. Find section `overrides` -> `bootstrap-sass` -> `main`
 3. Add someone CSS or JavaScript of Bootstrap components into list
 
-_Note:_ Never edit `wiredep` in file `bower.json`!
+_Note:_ Never edit `wiredep` in file `PROJECT_ROOT/bower.json`!

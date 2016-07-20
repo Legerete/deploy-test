@@ -1,4 +1,5 @@
 app/config/config.local.neon
+bs-config.json
 vendor/*
 !vendor/other
 log

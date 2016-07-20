@@ -289,10 +289,10 @@ gulp.task('coffeeLint', function () {
  */
 gulp.task('browserSync', function () {
 	browserSync = browserSync || require('browser-sync').create();
-	browserSync.init({
+	browserSync.init(/*{
 		port: 8088,
 		proxy: 'localhost/legerete/skeleton/www'
-	});
+	}*/ require('./bs-config'));
 
 	gulp.watch('app/**/*.latte').on('change', browserSync.reload);
 	gulp.watch(targetPathJs + '/**/*.js').on('change', browserSync.reload);
@@ -328,4 +328,3 @@ gulp.task('clean', function() {
  *  --no-watch: only disable changes watching
  */
 gulp.task('default', ['sass', 'coffeeLint', 'coffee', 'imagemin', 'fonts', 'browserSync', 'watch']);
-
