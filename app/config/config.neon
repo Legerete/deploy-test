@@ -9,6 +9,10 @@ parameters:
 		settings:
 			trace: true
 
+latte:
+	macros:
+		- App\Utils\Latte\Macros
+
 php:
 	date.timezone: Europe/Prague
 
