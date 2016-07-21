@@ -55,7 +55,10 @@ var fs = require('fs'),
 	coffeeLint = null,
 	del = null,
 	browserSync = null,
-	modifyCssUrls = null;
+	modifyCssUrls = null,
+	esLint = null,
+
+	lintedWithError = false;
 
 /**
  * Fonts
@@ -81,43 +84,97 @@ gulp.task('fonts', function () {
 /**
  * Javascript
  * Concatenate vendor dependencies from bower
- * - concatenate to libs/vendor.js
+ * - concatenate to libs/all.vendor.js
  */
-gulp.task('bower-js-files', function () {
-	console.info('Concatenate vendor javascript files');
+gulp.task('bowerJsFiles', function () {
 	gulpBowerFiles = gulpBowerFiles || require('gulp-main-bower-files');
 	gulpFilter = gulpFilter || require('gulp-filter');
-	var filterJs = gulpFilter(['**/*.js', '!**/netteforms.js'], {restore: true}); //remove, if netteforms is required
+	var filterJs = gulpFilter(['**/*.js', '!**/netteforms.js'], {restore: true}); // remove, if netteforms is required
 
 	return gulp.src('./bower.json')
-		.pipe(gulpBowerFiles()) //can be overwritten - see documentation
+		.pipe(gulpBowerFiles()) // can be overwritten - see documentation
 		.pipe(filterJs)
-		.pipe(concat('vendor.js'))
-		.pipe(gulp.dest(targetPathJs))
+		.pipe(concat('all.vendor.js'))
+		.pipe(gulp.dest(pathJs))
 		.pipe(notify({ message: 'Bower JS files task complete' }));
 });
 
 /**
  * Javascript
+ * Linting of JavaScript source files.
+ * Set lintedWithError variable, which is used in js task
+ */
+gulp.task('jsLint', function () {
+	lintedWithError = false;
+	esLint = esLint || require('gulp-eslint');
+
+	return gulp
+		.src([
+			pathJs + '/**/*.js',
+			'!' + pathJs + '/**/*.coffee',
+			'!' + pathJs + '/all.vendor.js',
+			'!' + pathJs + '/all.coffee.js'
+		])
+		.pipe(esLint({
+			'extends': 'standard', // installed by 'eslint-config-standard'
+			'rules': {
+				'quotes': [2, 'single'], // single quotes
+				'semi': [2, 'always'], // force semicolons
+				'indent': [2, 'tab'], // tab for indent
+				'no-extra-semi': 2,
+				'valid-jsdoc': [1, {
+					'prefer': {
+						'return': 'returns'
+					}
+				}],
+				'array-callback-return': 1
+			},
+			'env': {
+				'browser': true,
+				'node': false,
+				'jquery': true,
+				'es6': false
+			}
+			/*
+			 There is trouble with indent fixing when tabs and spaces mixed, uncomment only if it is
+			 ensured, that no such mixing will not happen.
+
+			 ,'fix': true //fix all fixable issues
+			 */
+		}))
+		.pipe(esLint.format())
+		// Brick on failure to be super strict
+		.pipe(esLint.failAfterError())
+		.on('error', handleError)
+		.pipe(gulp.dest(pathJs))
+		.pipe(notify({ message: 'Lint of pure JS files task complete' }));
+
+});
+function handleError() {
+	lintedWithError = true;
+	notify('Occure error while linting JS files');
+}
+
+/**
+ * Javascript
  * Concatenation and minification
- * - concatenate vendor.js add main.js files to target file
+ * - concatenate all.vendor.js add main.js files to target file
  * - run only if not linted with error (is dependent on js-lint)
  * - if in production mode, remove debug calls and minify target file (call with --production option)
  **/
-var jsSources = [
-	targetPathJs + '/vendor.js',
-	pathJs + '/main.js'
-];
-
-var lintedWithError = false;
-
-gulp.task('js', ['bower-js-files'], function () {
-	if (lintedWithError) return;
+gulp.task('js', ['coffeeLint', 'coffee', 'bowerJsFiles', 'jsLint'], function () {
+	if (lintedWithError) {
+		return;
+	}
 
 	uglify = uglify || require('gulp-uglify');
 	stripDebug = stripDebug || require('gulp-strip-debug');
 
-	return gulp.src(jsSources)
+	return gulp.src([
+			pathJs + '/all.vendor.js',
+			pathJs + '/**/*.js',
+			pathJs + '/all.coffee.js'
+		])
 		.pipe(gulpif(argv.production, stripDebug()))
 		.pipe(gulpif(!argv.debug, uglify()))
 		.pipe(concat('all.min.js'))
@@ -175,7 +232,7 @@ gulp.task('sprite', function () {
  * SASS
  * Linter - walk all SCSS files in stylesheets directory and lint them (only libs path ignored)
  */
-gulp.task('sass-lint', function () {
+gulp.task('sassLint', function () {
 	sassLint = sassLint || require('gulp-sass-lint');
 	var sassSources = [pathSass + '/**/*.scss',
         '!' + pathSass + '/libs/*.*',
@@ -220,7 +277,7 @@ gulp.task('wiredep', function () {
  * - pick only main.scss, that includes all necessary dependencies
  * - if in production mode, minify target file
  */
-gulp.task('sass', ['sprite', 'sass-lint'], function () {
+gulp.task('sass', ['sprite', 'sassLint'], function () {
 	sass = sass || require('gulp-sass');
 	rename = rename || require('gulp-rename');
 	cssmin = cssmin || require('gulp-cssmin');
@@ -275,7 +332,8 @@ gulp.task('coffee', function () {
 
 	return gulp.src(pathCoffee + '/**/*.coffee')
 		.pipe(coffee({bare: true}).on('error', gutil.log))
-		.pipe(gulp.dest(targetPathJs))
+		.pipe(concat('all.coffee.js'))
+		.pipe(gulp.dest(pathJs))
 		.pipe(notify({ message: 'Coffee task complete' }));
 });
 
@@ -319,11 +377,13 @@ gulp.task('watch', function () {
 	}
 });
 
+/**
+ * Clean all compiled assets
+ */
 gulp.task('clean', function() {
 	del = del || require('del');
 
-	return del([targetPath])
-		.pipe(notify({ message: 'Clean task complete' }));
+	return del([targetPath]);
 });
 
 /**
@@ -332,5 +392,12 @@ gulp.task('clean', function() {
  *  --production: do minification and strip js debug calls. Also disable changes watching
  *  --no-watch: only disable changes watching
  */
-gulp.task('default', ['sass', 'coffeeLint', 'coffee', 'imagemin', 'fonts', 'browserSync', 'watch']);
+gulp.task('default', ['sass', /*'coffeeLint', 'coffee',*/ 'js', 'imagemin', 'fonts', 'browserSync', 'watch']);
+
+/**
+ * Build task
+ *
+ * This task compile SASS, CoffeeScripts and linting them.
+ */
+gulp.task('build', ['sass', /*'coffeeLint', 'coffee',*/ 'js', 'imagemin', 'fonts']);
 
