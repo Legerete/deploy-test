@@ -392,12 +392,12 @@ gulp.task('clean', function() {
  *  --production: do minification and strip js debug calls. Also disable changes watching
  *  --no-watch: only disable changes watching
  */
-gulp.task('default', ['sass', /*'coffeeLint', 'coffee',*/ 'js', 'imagemin', 'fonts', 'browserSync', 'watch']);
+gulp.task('default', ['sass', 'js', 'imagemin', 'fonts', 'browserSync', 'watch']);
 
 /**
  * Build task
  *
  * This task compile SASS, CoffeeScripts and linting them.
  */
-gulp.task('build', ['sass', /*'coffeeLint', 'coffee',*/ 'js', 'imagemin', 'fonts']);
+gulp.task('build', ['sass', 'js', 'imagemin', 'fonts']);
 
