@@ -10,13 +10,20 @@
 @import 'common/variables';
 //@import 'common/fonts';
 //@import 'common/mixins';
-
 @import 'sprite';
 
 $black: lighten(#000, 25);
 
 h2 {
-  border-radius: 10px;
-  color: $black;
-  padding: 20px;
+	border-radius: 10px;
+	color: $black;
+	padding: 20px;
+}
+
+.icon-home {
+	@include sprite($icon-default);
+}
+
+.test {
+	background: transparent url('/assets/test.jpg') no-repeat 0 0;
 }

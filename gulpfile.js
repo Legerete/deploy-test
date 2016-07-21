@@ -54,7 +54,8 @@ var fs = require('fs'),
 	coffee = null,
 	coffeeLint = null,
 	del = null,
-	browserSync = null;
+	browserSync = null,
+	modifyCssUrls = null;
 
 /**
  * Fonts
@@ -148,7 +149,7 @@ gulp.task('sprite', function () {
 			.pipe(sprite({
 				imgName: 'sprite.png',
 				cssName: 'sprite.scss',
-				imgPath: targetPathImages + '/sprite.png?v=' + packageJson.version,
+				imgPath: targetPathImages + '/sprite.png',
 				padding: 10
 			}));
 
@@ -224,6 +225,7 @@ gulp.task('sass', ['sprite', 'sass-lint'], function () {
 	rename = rename || require('gulp-rename');
 	cssmin = cssmin || require('gulp-cssmin');
 	autoPrefixer = autoPrefixer || require('gulp-autoprefixer');
+	modifyCssUrls = modifyCssUrls || require('gulp-modify-css-urls');
 
 	return gulp.src(sassMainSource)
 		.pipe(sass())
@@ -236,6 +238,9 @@ gulp.task('sass', ['sprite', 'sass-lint'], function () {
 				'ie >= 9'
 			],
 			cascade: false
+		}))
+		.pipe(modifyCssUrls({
+			append: '?v=' + packageJson.version
 		}))
 		.pipe(gulpif(!argv.debug, cssmin()))
 		.pipe(rename('all.min.css'))
@@ -298,7 +303,7 @@ gulp.task('browserSync', function () {
 	gulp.watch(targetPathCss + '/**/*.css').on('change', browserSync.reload);
 	gulp.watch(targetPathImages + '/**/*').on('change', browserSync.reload);
 	gulp.watch(targetPathFonts + '/**/*').on('change', browserSync.reload);
-})
+});
 
 /**
  * Watch changes of source files
