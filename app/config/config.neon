@@ -9,12 +9,15 @@ parameters:
 		settings:
 			trace: true
 
+
 latte:
 	macros:
 		- App\Utils\Latte\Macros
 
+
 php:
 	date.timezone: Europe/Prague
+
 
 application:
 	errorPresenter: Error
@@ -37,6 +40,7 @@ extensions:
 	doctrine: Kdyby\Doctrine\DI\OrmExtension
 	monolog: App\Monolog\DI\MonologExtension
 
+
 monolog:
 	handlers:
 		raven: Monolog\Handler\RavenHandler(Raven_Client(%sentry.dsn%, %sentry.settings%))
@@ -46,6 +50,7 @@ monolog:
 		- Monolog\Processor\MemoryPeakUsageProcessor
 		- Kdyby\Monolog\Processor\PriorityProcessor
 
+
 doctrine:
 	default:
 		host:
@@ -54,9 +59,9 @@ doctrine:
 		dbname:
 		charset: UTF8
 		driver: pdo_mysql
-		entityDir: '%appDir%/entities'
-		proxyDir: '%tempDir%/proxies'
-		proxyNamespace: 'App\Entities\Proxies'
+		#entityDir: '%appDir%/entities'
+		#proxyDir: '%tempDir%/proxies'
+		#proxyNamespace: 'App\Entities\Proxies'
 		autoGenerateProxyClasses: true
 		debug: no
 		metadata:
