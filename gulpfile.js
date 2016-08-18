@@ -19,18 +19,20 @@ var fs = require('fs'),
 	pathSpriteSources = pathImages + '/sprite',
 	pathFonts = sourcePath + '/fonts',
 
-	targetPath = 'www/assets',
+	targetWwwPath = 'www',
+	targetAssetsPath = 'assets',
+	targetPath = targetWwwPath + '/' + targetAssetsPath,
 	targetPathJs = targetPath + '/js',
 	targetPathCss = targetPath + '/css',
 	targetPathImages = targetPath + '/images',
 	targetPathFonts = targetPath + '/fonts',
 
     sassMainSource = pathSass + '/main.scss',
+	targetSpriteImageFullPath = '/' + targetAssetsPath + '/images/sprite.png',
 
 	gutil = require('gulp-util'),
 	gulp = require('gulp'),
 	argv = require('yargs').argv,
-	notify = require('gulp-notify'),
 
 	// dependencies are lazy loaded only if they are required (because of performance)
 	concat = require('gulp-concat'),
@@ -77,8 +79,7 @@ gulp.task('fonts', function () {
 		.pipe(gulpBowerFiles()) //can be overwritten - see documentation
 		.pipe(filterFonts)
 		.pipe(flatten())
-		.pipe(gulp.dest(targetPathFonts))
-		.pipe(notify({ message: 'Fonts task complete' }));
+		.pipe(gulp.dest(targetPathFonts));
 });
 
 /**
@@ -95,8 +96,7 @@ gulp.task('bowerJsFiles', function () {
 		.pipe(gulpBowerFiles()) // can be overwritten - see documentation
 		.pipe(filterJs)
 		.pipe(concat('all.vendor.js'))
-		.pipe(gulp.dest(pathJs))
-		.pipe(notify({ message: 'Bower JS files task complete' }));
+		.pipe(gulp.dest(pathJs));
 });
 
 /**
@@ -146,13 +146,11 @@ gulp.task('jsLint', function () {
 		// Brick on failure to be super strict
 		.pipe(esLint.failAfterError())
 		.on('error', handleError)
-		.pipe(gulp.dest(pathJs))
-		.pipe(notify({ message: 'Lint of pure JS files task complete' }));
+		.pipe(gulp.dest(pathJs));
 
 });
 function handleError() {
 	lintedWithError = true;
-	notify('Occure error while linting JS files');
 }
 
 /**
@@ -178,8 +176,7 @@ gulp.task('js', ['coffeeLint', 'coffee', 'bowerJsFiles', 'jsLint'], function () 
 		.pipe(gulpif(argv.production, stripDebug()))
 		.pipe(gulpif(!argv.debug, uglify()))
 		.pipe(concat('all.min.js'))
-		.pipe(gulp.dest(targetPathJs))
-		.pipe(notify({ message: 'JS files task complete' }));
+		.pipe(gulp.dest(targetPathJs));
 });
 
 /**
@@ -206,7 +203,7 @@ gulp.task('sprite', function () {
 			.pipe(sprite({
 				imgName: 'sprite.png',
 				cssName: 'sprite.scss',
-				imgPath: targetPathImages + '/sprite.png',
+				imgPath: targetSpriteImageFullPath,
 				padding: 10
 			}));
 
@@ -223,8 +220,7 @@ gulp.task('sprite', function () {
 			svgoPlugins: [{removeViewBox: false}],
 			use: [pngquant({quality: '75-90', speed: 1})] //causes lossy compression
 		}))
-		.pipe(gulp.dest(targetPathImages))
-		.pipe(notify({ message: 'Sprites task complete' })); // output path for the sprite
+		.pipe(gulp.dest(targetPathImages)); // output path for the sprite
 
 });
 
@@ -239,17 +235,9 @@ gulp.task('sassLint', function () {
         '!' + pathSass + '/sprite.scss'];
 
 	return gulp.src(sassSources)
-		.pipe(sassLint({
-			rules: {
-				'no-ids': 1,
-				'no-mergeable-selectors': 0,
-				'clean-import-paths': 0,
-				'no-color-keywords': 0
-			}
-		}))
+		.pipe(sassLint({'config': '.sass-lint.yml'}))
 		.pipe(sassLint.format())
-		.pipe(sassLint.failOnError())
-		.pipe(notify({ message: 'SASS lint task complete' }));
+		.pipe(sassLint.failOnError());
 });
 
 /**
@@ -267,8 +255,7 @@ gulp.task('wiredep', function () {
 		.pipe(changed(pathSass, {
 			hasChanged: changed.compareSha1Digest
 		}))
-		.pipe(gulp.dest(pathSass))
-		.pipe(notify({ message: 'Wiredep task complete' }));
+		.pipe(gulp.dest(pathSass));
 });
 
 /**
@@ -301,8 +288,7 @@ gulp.task('sass', ['sprite', 'sassLint'], function () {
 		}))
 		.pipe(gulpif(!argv.debug, cssmin()))
 		.pipe(rename('all.min.css'))
-		.pipe(gulp.dest(targetPathCss))
-		.pipe(notify({ message: 'SASS task complete' }));
+		.pipe(gulp.dest(targetPathCss));
 });
 
 /**
@@ -320,8 +306,7 @@ gulp.task('imagemin', function () {
 			svgoPlugins: [{removeViewBox: false}],
 			//use: [pngquant({quality: '75-90', speed: 1})] //causes lossy compression
 		}))
-		.pipe(gulp.dest(targetPathImages))
-		.pipe(notify({ message: 'ImageMin task complete' }));
+		.pipe(gulp.dest(targetPathImages));
 });
 
 /**
@@ -333,8 +318,7 @@ gulp.task('coffee', function () {
 	return gulp.src(pathCoffee + '/**/*.coffee')
 		.pipe(coffee({bare: true}).on('error', gutil.log))
 		.pipe(concat('all.coffee.js'))
-		.pipe(gulp.dest(pathJs))
-		.pipe(notify({ message: 'Coffee task complete' }));
+		.pipe(gulp.dest(pathJs));
 });
 
 /**
@@ -345,8 +329,7 @@ gulp.task('coffeeLint', function () {
 
 	return gulp.src(pathCoffee + '/**/*.coffee')
 		.pipe(coffeeLint())
-		.pipe(coffeeLint.reporter())
-		.pipe(notify({ message: 'Coffee lint task complete' }));
+		.pipe(coffeeLint.reporter());
 });
 
 /**
