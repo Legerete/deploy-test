@@ -4,7 +4,7 @@
   "description": "Skeleton",
   "main": "www/index.php",
   "scripts": {
-    "build": "bower install && gulp --no-watch"
+    "build": "bower install && gulp build"
   },
   "author": "Legerete s.r.o.",
   "devDependencies": {
