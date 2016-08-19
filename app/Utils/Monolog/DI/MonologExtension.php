@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Monolog\DI;
+namespace App\Utils\Monolog\DI;
 
 use Nette\PhpGenerator as Code,
 	Tracy\Debugger;

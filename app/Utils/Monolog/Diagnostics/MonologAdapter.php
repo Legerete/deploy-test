@@ -8,7 +8,7 @@
  * For the full copyright and license information, please view the file license.md that was distributed with this source code.
  */
 
-namespace App\Monolog\Diagnostics;
+namespace App\Utils\Monolog\Diagnostics;
 
 use Monolog,
 	Tracy\Debugger,

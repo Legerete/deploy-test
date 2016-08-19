@@ -1,3 +1,9 @@
+# Prerequisities
+
+1. Download Node.js
+1. Download Gulp and Bower via npm globally so that they can be accessible in command line
+1. Install EditorConfig plugin to your IDE
+
 # How to run the project
 
 1. Clone repository
@@ -10,6 +16,18 @@
 1. Copy file `PROJECT_ROOT/bs-config.json.example` as `PROJECT_ROOT/bs-config.json`
 1. Change settings for BrowserSync to correspond your server
 1. To automatic Gulp watch task run `$ gulp` only
+
+# Preprocessing web sources
+
+[Sprites, image minification](./readme/IMAGES)
+[Stylesheets, SASS](./readme/STYLESHEETS)
+[JavaScript](./readme/SCRIPTS)
+[Versioning of web sources](./readme/VERSIONING)
+
+# Code Standards
+
+There are some coding standars that should be followed. There are described CS for each language and how it is tested:
+[Coding standards, settings](./readme/CODE_STANDARDS)
 
 ## How to add custom packages to Bootstrap
 1. Edit file `PROJECT_ROOT/bower.json` on root of the project
@@ -29,6 +47,3 @@ _Important note:_ Never edit `wiredep` in file `PROJECT_ROOT/bower.json`!
    _Tip_: use parameter `--filter="entity_name"` and change destination path for better location of each entity
 1. Fix namespace of entity, add getters and setters
 1. For detailed help run `$ ../vendor/bin/doctrine orm:convert:mapping --help`
-
-### Notes
-1. Install Bower and Node.js as global, please.

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace App\Monolog\Processor;
+namespace App\Utils\Monolog\Processor;
 
 /**
  * Injects Git branch and Git commit SHA in all records

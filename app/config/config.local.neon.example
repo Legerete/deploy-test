@@ -1,7 +1,7 @@
 parameters:
 	devel: true
 	sentry:
-		dsn: #DSN klic v zavislosti na prostredi vygenerovany ze sentry
+		dsn: #DSN key generated in Sentry, depends on environment
 		settings:
 			trace: true
 

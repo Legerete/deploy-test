@@ -13,8 +13,8 @@ var fs = require('fs'),
 	sourcePath = 'websrc',
 	pathSass = sourcePath + '/stylesheets',
 	pathJs = sourcePath + '/scripts',
-	pathCoffee = pathJs + '/coffee',
 	pathJsLibs = pathJs + '/libs', // for static vendor sources that are not downloaded by bower
+	pathJsStandalone = pathJs + '/standalone', //for files, that should be only copied and linked manually
 	pathImages = sourcePath + '/images',
 	pathSpriteSources = pathImages + '/sprite',
 	pathFonts = sourcePath + '/fonts',
@@ -53,8 +53,6 @@ var fs = require('fs'),
 	wiredep = null,
 	changed = null,
 	flatten = null,
-	coffee = null,
-	coffeeLint = null,
 	del = null,
 	browserSync = null,
 	modifyCssUrls = null,
@@ -72,7 +70,7 @@ gulp.task('fonts', function () {
 	flatten = flatten || require('gulp-flatten');
 
 	var filterFonts = gulpFilter(['**/*.eot', '**/*.svg', '**/*.ttf', '**/*.woff', '**/*.woff2'], {restore: true});
-	gulp.src(pathFonts + '*.*')
+	gulp.src(pathFonts + '/**/*.*')
 		.pipe(gulp.dest(targetPathFonts));
 
 	return gulp.src('./bower.json')
@@ -111,9 +109,8 @@ gulp.task('jsLint', function () {
 	return gulp
 		.src([
 			pathJs + '/**/*.js',
-			'!' + pathJs + '/**/*.coffee',
 			'!' + pathJs + '/all.vendor.js',
-			'!' + pathJs + '/all.coffee.js'
+			'!' + pathJs + '/libs/**/*.js'
 		])
 		.pipe(esLint({
 			'extends': 'standard', // installed by 'eslint-config-standard'
@@ -160,7 +157,7 @@ function handleError() {
  * - run only if not linted with error (is dependent on js-lint)
  * - if in production mode, remove debug calls and minify target file (call with --production option)
  **/
-gulp.task('js', ['coffeeLint', 'coffee', 'bowerJsFiles', 'jsLint'], function () {
+gulp.task('js', ['bowerJsFiles', 'jsLint'], function () {
 	if (lintedWithError) {
 		return;
 	}
@@ -170,8 +167,8 @@ gulp.task('js', ['coffeeLint', 'coffee', 'bowerJsFiles', 'jsLint'], function () 
 
 	return gulp.src([
 			pathJs + '/all.vendor.js',
-			pathJs + '/**/*.js',
-			pathJs + '/all.coffee.js'
+			'!' + pathJsStandalone + '/**/*.js',
+			pathJs + '/main.js'
 		])
 		.pipe(gulpif(argv.production, stripDebug()))
 		.pipe(gulpif(!argv.debug, uglify()))
@@ -264,7 +261,7 @@ gulp.task('wiredep', function () {
  * - pick only main.scss, that includes all necessary dependencies
  * - if in production mode, minify target file
  */
-gulp.task('sass', ['sprite', 'sassLint'], function () {
+gulp.task('sass', ['sprite', 'wiredep', 'sassLint'], function () {
 	sass = sass || require('gulp-sass');
 	rename = rename || require('gulp-rename');
 	cssmin = cssmin || require('gulp-cssmin');
@@ -300,36 +297,13 @@ gulp.task('imagemin', function () {
 	imagemin = imagemin || require('gulp-imagemin');
 	pngquant = pngquant || require('imagemin-pngquant');
 
-	return gulp.src(pathImages + '/*.*')
+	return gulp.src([pathImages + '/**/*.*', '!'+pathImages+'/sprite/*.*'])
 		.pipe(imagemin({
 			progressive: true,
 			svgoPlugins: [{removeViewBox: false}],
 			//use: [pngquant({quality: '75-90', speed: 1})] //causes lossy compression
 		}))
 		.pipe(gulp.dest(targetPathImages));
-});
-
-/**
- * Compile CoffeeScript files
- */
-gulp.task('coffee', function () {
-	coffee = coffee || require('gulp-coffee');
-
-	return gulp.src(pathCoffee + '/**/*.coffee')
-		.pipe(coffee({bare: true}).on('error', gutil.log))
-		.pipe(concat('all.coffee.js'))
-		.pipe(gulp.dest(pathJs));
-});
-
-/**
- * Lint CoffeeScript files using Gulp and CoffeeLint
- */
-gulp.task('coffeeLint', function () {
-	coffeeLint = coffeeLint || require('gulp-coffeelint');
-
-	return gulp.src(pathCoffee + '/**/*.coffee')
-		.pipe(coffeeLint())
-		.pipe(coffeeLint.reporter());
 });
 
 /**
@@ -351,10 +325,11 @@ gulp.task('browserSync', function () {
  */
 gulp.task('watch', function () {
 	if (!argv.production && argv.watch !== false) {
-        gulp.watch('./bower.json', ['wiredep']);
+		gulp.watch('./bower.json', ['wiredep']);
+		gulp.watch('./package.json', ['sass']);
 		gulp.watch(pathSpriteSources + '/**/*', ['sprite']);
 		gulp.watch([pathSass + '/**/*.scss', './bower.json'], ['sass']);
-		gulp.watch([pathCoffee + '/**/*.coffee'], ['coffeeLint', 'coffee']);
+		gulp.watch([pathJs + '/**/*.js'], ['js']);
 		// for watching imagemin it is necessary to have assets and target directory, or it will end up with infinite loop.
 		gulp.watch(pathImages + '/**/*', ['imagemin']);
 	}
@@ -380,7 +355,7 @@ gulp.task('default', ['sass', 'js', 'imagemin', 'fonts', 'browserSync', 'watch']
 /**
  * Build task
  *
- * This task compile SASS, CoffeeScripts and linting them.
+ * This task compile SASS, JavaScripts and linting them.
  */
 gulp.task('build', ['sass', 'js', 'imagemin', 'fonts']);
 
