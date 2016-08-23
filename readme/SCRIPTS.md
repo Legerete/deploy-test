@@ -1,7 +1,7 @@
 # Processing JavaScript
 
 You can use plain javascript (CoffeeScript is not supported). You can add dependencies via Bower or when no Bower package is available, you can put some external
-scripts into special directory `websrc/scripts/libs
+scripts into special directory `websrc/scripts/libs`
 
 # Bower dependencies
 
