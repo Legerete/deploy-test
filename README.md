@@ -19,15 +19,15 @@
 
 # Preprocessing web sources
 
-[Sprites, image minification](./readme/IMAGES)
-[Stylesheets, SASS](./readme/STYLESHEETS)
-[JavaScript](./readme/SCRIPTS)
-[Versioning of web sources](./readme/VERSIONING)
+[Sprites, image minification](/readme/IMAGES.md)
+[Stylesheets, SASS](/readme/STYLESHEETS.md)
+[JavaScript](/readme/SCRIPTS.md)
+[Versioning of web sources](/readme/VERSIONING.md)
 
 # Code Standards
 
 There are some coding standars that should be followed. There are described CS for each language and how it is tested:
-[Coding standards, settings](./readme/CODE_STANDARDS)
+[Coding standards, settings](/readme/CODE_STANDARDS.md)
 
 ## How to add custom packages to Bootstrap
 1. Edit file `PROJECT_ROOT/bower.json` on root of the project
