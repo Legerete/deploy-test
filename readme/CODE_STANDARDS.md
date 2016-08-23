@@ -16,7 +16,7 @@ Actually there is not any CS checker available, it depends only on GIT server.
 
 ## JavaScript
 
-Javascript code standard is based on "StandardJS" `http://standardjs.com/rules.html` with some modifications that are:
+Javascript code standard is based on ["StandardJS"](http://standardjs.com/rules.html "JavaScript standards") with some modifications that are:
 - Always use semicolon
 - Single quotes over standard quotes
 - Tabs over two spaces
