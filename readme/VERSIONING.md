@@ -4,8 +4,8 @@ There is possible to change version of web sources (js, css, images) when it is 
 When watch is enabled, then it automatically recompile SASS and update image URLs with new version.
 
 ## How to change version?
-1. Go to `package.json` and modify `version` parameter. This parameter appears in web resources URLs when they are linked as a query parameter ?v=X.Y.Z
+1. Go to `package.json` and modify `version` parameter. This parameter appears in web resources URLs when they are linked as a query parameter `?v=X.Y.Z`
 
 ## What resources are versioned?
-1. Compiled CSS and JS resources included in @layout.latte
+1. Compiled CSS and JS resources included in `@layout.latte`
 1. All URLs in css are versioned. They are modified every time when Gulp SASS task is performed.
