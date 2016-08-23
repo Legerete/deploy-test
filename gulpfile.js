@@ -57,6 +57,10 @@ var fs = require('fs'),
 	browserSync = null,
 	modifyCssUrls = null,
 	esLint = null,
+	sourcemaps = null,
+	source = null,
+	babelify = null,
+	browserify = null,
 
 	lintedWithError = false;
 
@@ -83,17 +87,19 @@ gulp.task('fonts', function () {
 /**
  * Javascript
  * Concatenate vendor dependencies from bower
- * - concatenate to libs/all.vendor.js
+ * - concatenate to all.vendor.js
  */
-gulp.task('bowerJsFiles', function () {
+gulp.task('bower-js-deps', function () {
 	gulpBowerFiles = gulpBowerFiles || require('gulp-main-bower-files');
 	gulpFilter = gulpFilter || require('gulp-filter');
-	var filterJs = gulpFilter(['**/*.js', '!**/netteforms.js'], {restore: true}); // remove, if netteforms is required
+	var filterJs = gulpFilter(['**/*.js'], {restore: true});
+	uglify = uglify || require('gulp-uglify');
 
 	return gulp.src('./bower.json')
 		.pipe(gulpBowerFiles()) // can be overwritten - see documentation
 		.pipe(filterJs)
 		.pipe(concat('all.vendor.js'))
+		.pipe(gulpif(!argv.debug, uglify()))
 		.pipe(gulp.dest(pathJs));
 });
 
@@ -102,7 +108,7 @@ gulp.task('bowerJsFiles', function () {
  * Linting of JavaScript source files.
  * Set lintedWithError variable, which is used in js task
  */
-gulp.task('jsLint', function () {
+gulp.task('js-lint', function () {
 	lintedWithError = false;
 	esLint = esLint || require('gulp-eslint');
 
@@ -112,33 +118,7 @@ gulp.task('jsLint', function () {
 			'!' + pathJs + '/all.vendor.js',
 			'!' + pathJs + '/libs/**/*.js'
 		])
-		.pipe(esLint({
-			'extends': 'standard', // installed by 'eslint-config-standard'
-			'rules': {
-				'quotes': [2, 'single'], // single quotes
-				'semi': [2, 'always'], // force semicolons
-				'indent': [2, 'tab'], // tab for indent
-				'no-extra-semi': 2,
-				'valid-jsdoc': [1, {
-					'prefer': {
-						'return': 'returns'
-					}
-				}],
-				'array-callback-return': 1
-			},
-			'env': {
-				'browser': true,
-				'node': false,
-				'jquery': true,
-				'es6': false
-			}
-			/*
-			 There is trouble with indent fixing when tabs and spaces mixed, uncomment only if it is
-			 ensured, that no such mixing will not happen.
-
-			 ,'fix': true //fix all fixable issues
-			 */
-		}))
+		.pipe(esLint('.eslintrc'))
 		.pipe(esLint.format())
 		// Brick on failure to be super strict
 		.pipe(esLint.failAfterError())
@@ -156,8 +136,8 @@ function handleError() {
  * - concatenate all.vendor.js add main.js files to target file
  * - run only if not linted with error (is dependent on js-lint)
  * - if in production mode, remove debug calls and minify target file (call with --production option)
- **/
-gulp.task('js', ['bowerJsFiles', 'jsLint'], function () {
+ *
+gulp.task('js', function () {
 	if (lintedWithError) {
 		return;
 	}
@@ -167,12 +147,48 @@ gulp.task('js', ['bowerJsFiles', 'jsLint'], function () {
 
 	return gulp.src([
 			pathJs + '/all.vendor.js',
-			'!' + pathJsStandalone + '/**/*.js',
+			'!' + pathJsStandalone + '/***.js',
 			pathJs + '/main.js'
 		])
+		.pipe(stripDebug())
+		.pipe(uglify())
+		.pipe(concat('all.min.js'))
+		.pipe(gulp.dest(targetPathJs));
+});*/
+
+gulp.task('js', ['es6'], function () {
+	sourcemaps = sourcemaps || require('gulp-sourcemaps');
+
+	return gulp.src([pathJs+'/all.vendor.js', targetPathJs+'/temp.js'])
+		.pipe(sourcemaps.init({loadMaps: true}))
+		.pipe(concat('all.min.js'))
+		.pipe(sourcemaps.write('./'))
+		.pipe(gulp.dest(targetPathJs))
+});
+
+
+gulp.task('es6', ['js-lint'], function () {
+	browserify = browserify || require('browserify');
+	babelify = babelify || require('babelify');
+	buffer = buffer || require('vinyl-buffer');
+	uglify = uglify || require('gulp-uglify');
+	stripDebug = stripDebug || require('gulp-strip-debug');
+	source = source || require('vinyl-source-stream');
+	sourcemaps = sourcemaps || require('gulp-sourcemaps');
+
+	return browserify(pathJs + '/main.js', {debug: true}).transform(babelify, {
+			presets: ["es2015"],
+			ignore: /libs|all\.vendor\.js/,
+			sourceMaps: false
+		})
+		.bundle()
+		//.pipe(exorcist(targetPathJs+'/all.min.js.map'))
+		.pipe(source('temp.js'))
+		.pipe(buffer())
+		.pipe(sourcemaps.init({loadMaps: true}))
 		.pipe(gulpif(argv.production, stripDebug()))
 		.pipe(gulpif(!argv.debug, uglify()))
-		.pipe(concat('all.min.js'))
+		.pipe(sourcemaps.write('./'))
 		.pipe(gulp.dest(targetPathJs));
 });
 
@@ -225,7 +241,7 @@ gulp.task('sprite', function () {
  * SASS
  * Linter - walk all SCSS files in stylesheets directory and lint them (only libs path ignored)
  */
-gulp.task('sassLint', function () {
+gulp.task('sass-lint', function () {
 	sassLint = sassLint || require('gulp-sass-lint');
 	var sassSources = [pathSass + '/**/*.scss',
         '!' + pathSass + '/libs/*.*',
@@ -243,7 +259,7 @@ gulp.task('sassLint', function () {
  * Bower dependencies wired into styles
  * https://github.com/taptapship/wiredep
  */
-gulp.task('wiredep', function () {
+gulp.task('bower-css-deps', function () {
 	wiredep = wiredep || require('wiredep').stream;
 	changed = changed || require('gulp-changed');
 
@@ -261,7 +277,7 @@ gulp.task('wiredep', function () {
  * - pick only main.scss, that includes all necessary dependencies
  * - if in production mode, minify target file
  */
-gulp.task('sass', ['sprite', 'wiredep', 'sassLint'], function () {
+gulp.task('sass', ['sprite', 'bower-css-deps', 'sass-lint'], function () {
 	sass = sass || require('gulp-sass');
 	rename = rename || require('gulp-rename');
 	cssmin = cssmin || require('gulp-cssmin');
@@ -309,7 +325,7 @@ gulp.task('imagemin', function () {
 /**
  * BrowserSync
  */
-gulp.task('browserSync', function () {
+gulp.task('browser-sync', function () {
 	browserSync = browserSync || require('browser-sync').create();
 	browserSync.init(require('./bs-config'));
 
@@ -325,11 +341,11 @@ gulp.task('browserSync', function () {
  */
 gulp.task('watch', function () {
 	if (!argv.production && argv.watch !== false) {
-		gulp.watch('./bower.json', ['wiredep']);
+		gulp.watch('./bower.json', ['wiredep', 'bowerJsFiles']);
 		gulp.watch('./package.json', ['sass']);
 		gulp.watch(pathSpriteSources + '/**/*', ['sprite']);
 		gulp.watch([pathSass + '/**/*.scss', './bower.json'], ['sass']);
-		gulp.watch([pathJs + '/**/*.js'], ['js']);
+		gulp.watch([pathJs + '/*.js'], ['js']);
 		// for watching imagemin it is necessary to have assets and target directory, or it will end up with infinite loop.
 		gulp.watch(pathImages + '/**/*', ['imagemin']);
 	}
@@ -350,7 +366,11 @@ gulp.task('clean', function() {
  *  --production: do minification and strip js debug calls. Also disable changes watching
  *  --no-watch: only disable changes watching
  */
-gulp.task('default', ['sass', 'js', 'imagemin', 'fonts', 'browserSync', 'watch']);
+gulp.task('default', function () {
+	var colors = require('colors/safe'); // does not alter string prototype
+	console.log(colors.red("Use 'npm run build' for project initialization instead. For watch use 'gulp watch'."));
+	return true;
+});
 
 /**
  * Build task
@@ -359,3 +379,9 @@ gulp.task('default', ['sass', 'js', 'imagemin', 'fonts', 'browserSync', 'watch']
  */
 gulp.task('build', ['sass', 'js', 'imagemin', 'fonts']);
 
+/**
+ * Build task
+ *
+ * This task compile SASS, JavaScripts and linting them.
+ */
+gulp.task('prebuild', ['bower-css-deps', 'bower-js-deps']);

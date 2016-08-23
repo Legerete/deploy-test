@@ -1,4 +1,4 @@
-$(document).ready(function(){
-	console.log("STANDALONE TEST");
+$(document).ready(function () {
+	console.log('STANDALONE TEST');
 });
 

@@ -1,0 +1,39 @@
+{
+  //"extends": "standard", // installed by "eslint-config-standard"
+  "extends": "standard",
+  "rules": {
+	"quotes": [2, "single"], // single quotes
+	"semi": [2, "always"], // force semicolons
+	"indent": [2, "tab"], // tab for indent
+	"no-extra-semi": 2,
+	"valid-jsdoc": [1, {
+	  "prefer": {
+		"return": "returns"
+	  }
+	}],
+	"require-jsdoc": [2, {
+	  "require": {
+		"FunctionDeclaration": true,
+		"MethodDefinition": true,
+		"ClassDeclaration": true
+	  }
+	}],
+	"array-callback-return": 1
+  },
+  "env": {
+	"browser": true,
+	"node": false,
+	"jquery": true,
+	"es6": true
+  },
+  "parserOptions": {
+	"ecmaVersion": 6,
+	"sourceType": "module"
+  }
+  /*
+   There is trouble with indent fixing when tabs and spaces mixed, uncomment only if it is
+   ensured, that no such mixing will not happen.
+
+   ,"fix": true //fix all fixable issues
+   */
+}

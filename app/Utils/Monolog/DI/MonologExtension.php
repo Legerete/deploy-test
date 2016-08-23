@@ -71,7 +71,7 @@ class MonologExtension extends \Kdyby\Monolog\DI\MonologExtension
 
 		// Tracy adapter
 		$builder->addDefinition($this->prefix('adapter'))
-			->setClass('App\Monolog\Diagnostics\MonologAdapter', [$this->prefix('@logger')])
+			->setClass('App\Utils\Monolog\Diagnostics\MonologAdapter', [$this->prefix('@logger')])
 			->addTag('logger');
 
 		if ($builder->hasDefinition('tracy.logger')) { // since Nette 2.3
