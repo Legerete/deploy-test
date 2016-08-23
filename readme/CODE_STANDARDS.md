@@ -7,7 +7,7 @@ There is also some code standard specifications for PHP, JavaScript and SASS tha
 
 ## PHP
 
-PHP sources should follow Nette Conding Standard `https://nette.org/en/coding-standard` that is modified PSR-1 and PSR-2 standard.
+PHP sources should follow [Nette Conding Standard](https://nette.org/en/coding-standard "Nette coding standards") that is modified PSR-1 and PSR-2 standard.
 There are only two modifications:
 - tabs are used for indenting
 - PHP constants TRUE, FALSE and NULL are in upper case
