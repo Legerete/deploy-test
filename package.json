@@ -4,7 +4,7 @@
   "description": "Skeleton",
   "main": "www/index.php",
   "scripts": {
-    "build": "bower install && gulp prebuild && gulp build"
+    "build": "npm install && bower install && gulp build-dependencies && gulp build"
   },
   "author": "Legerete s.r.o.",
   "devDependencies": {

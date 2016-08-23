@@ -89,7 +89,7 @@ gulp.task('fonts', function () {
  * Concatenate vendor dependencies from bower
  * - concatenate to all.vendor.js
  */
-gulp.task('bower-js-deps', function () {
+gulp.task('bower-js-dependencies', function () {
 	gulpBowerFiles = gulpBowerFiles || require('gulp-main-bower-files');
 	gulpFilter = gulpFilter || require('gulp-filter');
 	var filterJs = gulpFilter(['**/*.js'], {restore: true});
@@ -259,7 +259,7 @@ gulp.task('sass-lint', function () {
  * Bower dependencies wired into styles
  * https://github.com/taptapship/wiredep
  */
-gulp.task('bower-css-deps', function () {
+gulp.task('bower-css-dependencies', function () {
 	wiredep = wiredep || require('wiredep').stream;
 	changed = changed || require('gulp-changed');
 
@@ -277,7 +277,7 @@ gulp.task('bower-css-deps', function () {
  * - pick only main.scss, that includes all necessary dependencies
  * - if in production mode, minify target file
  */
-gulp.task('sass', ['sprite', 'bower-css-deps', 'sass-lint'], function () {
+gulp.task('sass', ['sprite', 'bower-css-dependencies', 'sass-lint'], function () {
 	sass = sass || require('gulp-sass');
 	rename = rename || require('gulp-rename');
 	cssmin = cssmin || require('gulp-cssmin');
@@ -384,4 +384,4 @@ gulp.task('build', ['sass', 'js', 'imagemin', 'fonts']);
  *
  * This task compile SASS, JavaScripts and linting them.
  */
-gulp.task('prebuild', ['bower-css-deps', 'bower-js-deps']);
+gulp.task('build-dependencies', ['bower-css-dependencies', 'bower-js-dependencies']);
