@@ -1,7 +1,7 @@
 version: '2'
 services:
   web:
-    image: legerete/nginx-php7:1.0.0
+    image: legerete/nginx-php7-build:1.0.0
     container_name: porta-invest-crm-web
     ports:
       - 8005:80
