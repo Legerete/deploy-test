@@ -1,7 +1,7 @@
 {
-  "name": "legerete-skeleton",
+  "name": "porta-invest-sro-crm",
   "version": "0.0.1",
-  "description": "Skeleton",
+  "description": "",
   "main": "www/index.php",
   "scripts": {
     "build": "npm install && bower --allow-root install && gulp build-dependencies && gulp build"

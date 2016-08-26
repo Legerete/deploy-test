@@ -1,7 +1,7 @@
 {
-	"name": "legerete/skeleton",
+	"name": "porta-invest-sro-crm",
 	"version": "0.0.1",
-	"description": "Skeleton",
+	"description": "Porta Invest s.r.o. - CRM",
 	"main": "www/index.php",
 	"dependencies": {
 		"jquery": "~2.1.1",

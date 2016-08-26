@@ -1,12 +1,12 @@
 {
-	"name": "TODO",
-	"description": "TODO",
+	"name": "Porta Invest s.r.o. - CRM",
+	"description": "",
 	"homepage": "http://www.legerete.cz",
 	"type": "project",
 	"license": ["BSD-3-Clause", "GPL-2.0", "GPL-3.0"],
 	"authors": [
 		{
-			"name": "Legerete",
+			"name": "Legerete s.r.o.",
 			"homepage": "http://www.legerete.cz"
 		}
 	],
