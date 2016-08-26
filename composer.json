@@ -28,7 +28,8 @@
 		"phpmailer/phpmailer": "v5.2.9",
 		"sentry/sentry": "^0.22.0",
 		"kdyby/console": "^2.6",
-		"cboden/ratchet": "^0.3.5"
+		"cboden/ratchet": "^0.3.5",
+		"kdyby/translation": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {

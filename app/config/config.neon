@@ -39,7 +39,10 @@ extensions:
 	annotations: Kdyby\Annotations\DI\AnnotationsExtension
 	doctrine: Kdyby\Doctrine\DI\OrmExtension
 	monolog: App\Utils\Monolog\DI\MonologExtension
+	translation: Kdyby\Translation\DI\TranslationExtension
 
+translation:
+	default: en
 
 monolog:
 	handlers:
