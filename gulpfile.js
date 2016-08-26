@@ -264,7 +264,23 @@ gulp.task('bower-css-dependencies', function () {
 	changed = changed || require('gulp-changed');
 
 	return gulp.src(sassMainSource)
-		.pipe(wiredep())
+		.pipe(wiredep({
+			fileTypes: {
+				scss: {
+					block: /(([ \t]*)\/\/\s*bower:*(\S*))(\n|\r|.)*?(\/\/\s*endbower)/gi,
+					detect: {
+						css: /@import\s['"](.+css)['"]/gi,
+						sass: /@import\s['"](.+sass)['"]/gi,
+						scss: /@import\s['"](.+scss)['"]/gi
+					},
+					replace: {
+						css: '@import \'{{filePath}}\';',
+						sass: '@import \'{{filePath}}\';',
+						scss: '@import \'{{filePath}}\';'
+					}
+				}
+			}
+		}))
 		.pipe(changed(pathSass, {
 			hasChanged: changed.compareSha1Digest
 		}))
