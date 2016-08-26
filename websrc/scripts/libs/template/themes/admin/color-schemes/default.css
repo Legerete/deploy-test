@@ -1,0 +1,59 @@
+/* Default color scheme */
+
+@import url(http://fonts.googleapis.com/css?family=Montserrat);
+
+/* General */
+
+body {
+    font-family: "Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    font-weight: 300;
+    font-size: 13px;
+    overflow-x: hidden;
+    color: #3e4855;
+    background-color: #F4F5F7;
+    line-height: 1.42857143;
+}
+
+#sidebar-menu li.header,
+h1, h2, h3, h4, h5, h6,
+#page-title > h2,
+#page-title > p {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Header */
+
+#page-header {
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.05);
+}
+
+#header-logo {
+    background: rgba(0,0,0,0.22);
+}
+
+/* Sidebar */
+
+#page-sidebar {
+    background: #272634;
+}
+
+#page-sidebar .divider {
+    background: rgba(255,255,255,0.1);
+}
+
+#page-sidebar li a .glyph-icon {
+    background: rgba(0, 0, 0, 0.31);
+}
+
+#sidebar-menu li.header {
+    color: rgba(255,255,255,0.5);
+}
+
+/* Sidebar sub-menu */
+
+#sidebar-menu li .sidebar-submenu {
+    background: rgba(0, 0, 0, 0.31);
+}

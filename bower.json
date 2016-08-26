@@ -5,7 +5,8 @@
 	"main": "www/index.php",
 	"dependencies": {
 		"jquery": "~2.1.1",
-		"bootstrap-sass": "~3.3.6"
+		"bootstrap-sass": "~3.3.6",
+		"modernizr": "3.3.1"
 	},
 	"devDependencies": {},
 	"scripts": {
@@ -31,6 +32,11 @@
 				"./assets/stylesheets/bootstrap/_utilities.scss",
 				"./assets/stylesheets/bootstrap/_normalize.scss",
 				"./assets/stylesheets/bootstrap/_type.scss",
+				"./assets/javascripts/bootstrap/button.js",
+				"./assets/javascripts/bootstrap/dropdown.js",
+				"./assets/javascripts/bootstrap/tooltip.js",
+				"./assets/javascripts/bootstrap/popover.js",
+				"./assets/javascripts/bootstrap/collapse.js",
 				"./assets/fonts/bootstrap/glyphicons-halflings-regular.eot",
 				"./assets/fonts/bootstrap/glyphicons-halflings-regular.svg",
 				"./assets/fonts/bootstrap/glyphicons-halflings-regular.ttf",

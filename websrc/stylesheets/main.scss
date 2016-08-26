@@ -12,18 +12,94 @@
 //@import 'common/mixins';
 @import 'sprite';
 
-$black: lighten(#000, 25);
-
-h2 {
-	border-radius: 10px;
-	color: $black;
-	padding: 20px;
-}
-
-.icon-home {
-	@include sprite($icon-default);
-}
-
-.test {
-	background: transparent url('/assets/test.jpg') no-repeat 0 0;
-}
+@import '../template/helpers/animate';
+@import '../template/helpers/boilerplate';
+@import '../template/helpers/border-radius';
+@import '../template/helpers/grid';
+@import '../template/helpers/page-transitions';
+@import '../template/helpers/spacing';
+@import '../template/helpers/typography';
+@import '../template/helpers/utils';
+@import '../template/helpers/colors';
+@import '../template/material/ripple';
+@import '../template/elements/badges';
+@import '../template/elements/buttons';
+@import '../template/elements/content-box';
+@import '../template/elements/dashboard-box';
+@import '../template/elements/forms';
+@import '../template/elements/images';
+@import '../template/elements/info-box';
+@import '../template/elements/invoice';
+@import '../template/elements/loading-indicators';
+@import '../template/elements/menus';
+@import '../template/elements/panel-box';
+@import '../template/elements/response-messages';
+@import '../template/elements/responsive-tables';
+@import '../template/elements/ribbon';
+@import '../template/elements/social-box';
+@import '../template/elements/tables';
+@import '../template/elements/tile-box';
+@import '../template/elements/timeline';
+@import '../template/icons/fontawesome/fontawesome';
+@import '../template/icons/linecons/linecons';
+@import '../template/icons/spinnericon/spinnericon';
+@import '../template/widgets/accordion-ui/accordion';
+@import '../template/widgets/calendar/calendar';
+@import '../template/widgets/carousel/carousel';
+@import '../template/widgets/charts/justgage/justgage';
+@import '../template/widgets/charts/morris/morris';
+@import '../template/widgets/charts/piegage/piegage';
+@import '../template/widgets/charts/xcharts/xcharts';
+@import '../template/widgets/chosen/chosen';
+@import '../template/widgets/colorpicker/colorpicker';
+@import '../template/widgets/datatable/datatable';
+@import '../template/widgets/datepicker/datepicker';
+@import '../template/widgets/datepicker-ui/datepicker';
+@import '../template/widgets/daterangepicker/daterangepicker';
+@import '../template/widgets/dialog/dialog';
+@import '../template/widgets/dropdown/dropdown';
+@import '../template/widgets/dropzone/dropzone';
+@import '../template/widgets/file-input/fileinput';
+@import '../template/widgets/input-switch/inputswitch';
+@import '../template/widgets/input-switch/inputswitch-alt';
+@import '../template/widgets/ionrangeslider/ionrangeslider';
+@import '../template/widgets/jcrop/jcrop';
+@import '../template/widgets/jgrowl-notifications/jgrowl';
+@import '../template/widgets/loading-bar/loadingbar';
+@import '../template/widgets/maps/vector-maps/vectormaps';
+@import '../template/widgets/markdown/markdown';
+@import '../template/widgets/modal/modal';
+@import '../template/widgets/multi-select/multiselect';
+@import '../template/widgets/multi-upload/fileupload';
+@import '../template/widgets/nestable/nestable';
+@import '../template/widgets/noty-notifications/noty';
+@import '../template/widgets/popover/popover';
+@import '../template/widgets/pretty-photo/prettyphoto';
+@import '../template/widgets/progressbar/progressbar';
+@import '../template/widgets/range-slider/rangeslider';
+@import '../template/widgets/slidebars/slidebars';
+@import '../template/widgets/slider-ui/slider';
+@import '../template/widgets/summernote-wysiwyg/summernote-wysiwyg';
+@import '../template/widgets/tabs-ui/tabs';
+@import '../template/widgets/timepicker/timepicker';
+@import '../template/widgets/tocify/tocify';
+@import '../template/widgets/tooltip/tooltip';
+@import '../template/widgets/touchspin/touchspin';
+@import '../template/widgets/uniform/uniform';
+@import '../template/widgets/wizard/wizard';
+@import '../template/widgets/xeditable/xeditable';
+@import '../template/snippets/chat';
+@import '../template/snippets/files-box';
+@import '../template/snippets/login-box';
+@import '../template/snippets/notification-box';
+@import '../template/snippets/progress-box';
+@import '../template/snippets/todo';
+@import '../template/snippets/user-profile';
+@import '../template/snippets/mobile-navigation';
+@import '../template/applications/mailbox';
+@import '../template/themes/admin/layout';
+@import '../template/themes/admin/color-schemes/default';
+@import '../template/themes/components/default';
+@import '../template/themes/components/border-radius';
+@import '../template/helpers/responsive-elements';
+@import '../template/helpers/admin-responsive';

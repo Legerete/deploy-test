@@ -1,22 +1,36 @@
+import './libs/nette.ajax.js';
+import {WOW} from './libs/template/wow/wow.js';
 
-// import './libs/nette.ajax.js';
-// import './main2.js';
-/**
- * Created by Nick Nemame on 17.07.2016.
- */
+import './libs/js-core/jquery-ui-core.js';
+import './libs/js-core/jquery-ui-widget.js';
+import './libs/js-core/jquery-ui-mouse.js';
+import './libs/js-core/jquery-ui-position.js';
+import './libs/js-core/transition.js';
+import './libs/template/widgets/progressbar/progressbar.js';
+import './libs/template/widgets/superclick/superclick.js';
+import './libs/template/widgets/input-switch/inputswitch-alt.js';
+import './libs/template/widgets/slimscroll/slimscroll.js';
+import './libs/template/widgets/slidebars/slidebars.js';
+import './libs/template/widgets/slidebars/slidebars-demo.js';
+import './libs/template/widgets/charts/piegage/piegage.js';
+import './libs/template/widgets/charts/piegage/piegage-demo.js';
+import './libs/template/widgets/screenfull/screenfull.js';
+import './libs/template/widgets/content-box/contentbox.js';
+import './libs/template/widgets/material/material.js';
+import './libs/template/widgets/material/ripples.js';
+import './libs/template/widgets/overlay/overlay.js';
 
-var xs = 1;
+import './libs/template/themes/admin/layout.js';
+import './widgets-init.js';
 
-if (xs === 1) {
-	alert('ALERT Z main.js');
-}
+$(window).load(function () {
+	setTimeout(function () {
+		$('#loading').fadeOut(400, 'linear');
+	}, 300);
+});
 
-$('h2').after('<p>Skeleton\'s first paragraph. Feel free to change this message!</p>');
-
-var x = (_color) => {
-	let color = _color;
-	color = color.trim();
-	$('body').css('background', color);
-};
-
-x('red ');
+var wow = new WOW({
+	animateClass: 'animated',
+	offset: 100
+});
+wow.init();
