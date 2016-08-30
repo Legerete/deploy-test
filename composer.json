@@ -29,12 +29,17 @@
 		"sentry/sentry": "^0.22.0",
 		"kdyby/console": "^2.6",
 		"cboden/ratchet": "^0.3.5",
-		"kdyby/translation": "dev-master"
+		"kdyby/translation": "dev-master",
+		"ublaboo/mailing": "^1.1"
 	},
 	"autoload": {
 		"psr-4": {
 			"App\\": "app/"
-		}
+		},
+		"classmap": [
+			"app/",
+			"vendor-dev/"
+		]
 	},
 	"require-dev": {
 		"nette/tester": "^1.6"

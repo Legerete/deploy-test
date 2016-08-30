@@ -1,9 +1,7 @@
 {* This is the welcome page, you can delete it *}
 
 {block content}
-<div id="content">
-	<h2>Skeleton default page</h2>
-</div>
+	<a n:href=":Legerete:User:Sign:in">Sign In</a>
 {/block}
 
 {block scripts}
@@ -12,4 +10,13 @@
 
 
 {block head}
+	<style>
+		#loading .svg-icon-loader { position: absolute;top: 50%;left: 50%;margin: -50px 0 0 -50px;}
+
+		html,body {
+			height: 100%;
+			background: #fff;
+			overflow: hidden;
+		}
+	</style>
 {/block}

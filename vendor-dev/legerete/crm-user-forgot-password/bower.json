@@ -1,0 +1,18 @@
+{
+	"name": "legerete-crm-sign-in",
+	"description": "Legerete s.r.o. Project CRM sign-in component assets",
+	"main": [
+		"bower-src/javascript/crm-sign-in.js",
+		"bower-src/sass/crm-sign-in.scss"
+	],
+	"authors": [
+		"Petr Besir Horacek <sirbesir@gmail.com>"
+	],
+	"license": "MIT",
+	"homepage": "http://legerete.cz",
+	"private": false,
+	"dependencies": {
+		"wowjs": "~1.1.2",
+		"jquery": "~2.1.1"
+	}
+}

@@ -1,5 +1,4 @@
 import './libs/nette.ajax.js';
-import {WOW} from './libs/template/wow/wow.js';
 
 import './libs/js-core/jquery-ui-core.js';
 import './libs/js-core/jquery-ui-widget.js';
@@ -23,14 +22,29 @@ import './libs/template/widgets/overlay/overlay.js';
 import './libs/template/themes/admin/layout.js';
 import './widgets-init.js';
 
-$(window).load(function () {
-	setTimeout(function () {
-		$('#loading').fadeOut(400, 'linear');
-	}, 300);
+$('form a[data-show]').on('click', function (e) {
+	var $el = $(e.currentTarget);
+
+	if ($el.data('show')) {
+		e.preventDefault();
+
+		if (history.pushState && typeof history.pushState === 'function') {
+			history.pushState({}, $el.attr('title'), $el.attr('href'));
+		}
+
+		$('#' + $el.data('hide')).fadeOut(300, function () {
+			$('#' + $el.data('show')).fadeIn();
+		});
+	}
 });
 
-var wow = new WOW({
-	animateClass: 'animated',
-	offset: 100
+$(function () {
+	window.wsConnection = wsConnection = new WebSocket('ws://localhost:8006');
+	wsConnection.onopen = function (e) {
+		console.log('Connection established!');
+	};
+
+	wsConnection.onmessage = function (e) {
+		console.log(e.data);
+	};
 });
-wow.init();

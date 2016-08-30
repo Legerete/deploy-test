@@ -1,0 +1,8 @@
+in:
+	form:
+		header: Member Area
+		header-small: Login to your account.
+		button-sign-in: Sing In
+		input-email: Enter e-mail
+		input-password: Password
+		forgot-password: Forgot Your Password?

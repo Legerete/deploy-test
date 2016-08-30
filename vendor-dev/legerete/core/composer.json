@@ -1,0 +1,35 @@
+{
+	"name": "legerete/core",
+	"type": "library",
+	"description": "Legerete s.r.o. Project core",
+	"license": "GNU GPL v3",
+	"support": {
+		"issues": ""
+	},
+	"authors": [
+		{
+			"name": "Petr Besir Horáček",
+			"email": "sirbesir@gmail.com"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"Legerete\\": "nette-src/"
+		}
+	},
+	"require": {
+		"nette/di" : "^2.4",
+		"nette/application" : "^2.4"
+	},
+	"minimum-stability": "dev",
+	"require-dev": {
+		"codeception/codeception": "^2.1"
+	},
+	"archive": {
+		"exclude": [
+			"bower.json",
+			"bower-src",
+			"tests"
+		]
+	}
+}

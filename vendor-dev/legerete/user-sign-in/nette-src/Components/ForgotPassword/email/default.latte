@@ -1,0 +1,29 @@
+{extends '../../../../templates/MailLayoutDefault.latte'}
+{block content}
+<table width="570" cellpadding="0" cellspacing="0" border="0" align="center">
+	<tbody>
+	<tr>
+		<td height="15"></td>
+	</tr>
+	<tr>
+		<td>
+			<p style="margin-bottom: 15px">
+				Vážený kliente, <br>
+				&nbsp;&nbsp;na našem e-shopu <a href="http://www.skisportmelnik.cz">skisportmelnik.cz</a> bylo požádáno
+				o resetování hesla k Vašemu účtu. Nové heslo si můžete vytvořit po kliknutí na odkaz níže. Pokud jste
+				o nové heslo nežádali tak tento e-mail ignorujte.
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<p style="margin-bottom: 15px">
+				Odkaz pro resetování hesla: <a href="{$confirmLink}">{$confirmLink}</a><br><br>
+				Platnost odkazu do: {$validTo|date:'Y-m-d h:i:s'}<br><br>
+
+				V případě, že nelze na odkaz kliknout, tak jej zkopírujte a vložte do adresní řádky Vašeho internetového prohlížeče.
+			</p>
+		</td>
+	</tr>
+	</tbody>
+</table>

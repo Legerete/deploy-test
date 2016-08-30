@@ -1,0 +1,22 @@
+{
+	"name": "legerete-core",
+	"description": "Legerete s.r.o. Project core assets",
+	"main": [
+		"bower-src/javascript/core.js"
+	],
+	"authors": [
+		"Petr Besir Horacek <sirbesir@gmail.com>"
+	],
+	"license": "MIT",
+	"homepage": "http://legerete.cz",
+	"private": false,
+	"dependencies": {
+		"wowjs": "~1.1.2",
+		"jquery": "~2.1.1"
+	},
+	"ignore": [
+		"composer.json",
+		"nette-src",
+		"tests"
+	]
+}

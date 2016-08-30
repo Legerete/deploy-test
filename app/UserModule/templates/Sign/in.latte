@@ -1,0 +1,52 @@
+{var $robots = noindex}
+
+{block #content}
+<div id="loading">
+	<div class="svg-icon-loader">
+		<img src="{$basePath}/assets/images/svg-loaders/bars.svg" width="40" alt="">
+	</div>
+</div>
+
+<img src="{$basePath}/assets/images/blurred-bg/blurred-bg-3.jpg" class="login-img wow fadeIn" alt="">
+
+<div class="center-vertical">
+	<div class="center-content">
+
+		<div class="col-md-3 center-margin">
+
+			<form method="post" action="">
+				<div class="content-box wow bounceInDown modal-content">
+					<h3 class="content-box-header content-box-header-alt bg-default">
+							<span class="header-wrapper">
+                            {_sign.in.form.header}
+								<small>{_sign.in.form.header-small}</small>
+                        </span>
+					</h3>
+					<div class="content-box-wrapper">
+						<div class="form-group">
+							<div class="input-group">
+								<input type="email" class="form-control" id="exampleInputEmail1" placeholder="{_sign.in.form.input-email}">
+								<span class="input-group-addon bg-blue">
+                                    <i class="glyph-icon icon-envelope-o"></i>
+                                </span>
+							</div>
+						</div>
+						<div class="form-group">
+							<div class="input-group">
+								<input type="password" class="form-control" id="exampleInputPassword1" placeholder="{_sign.in.form.input-password}">
+								<span class="input-group-addon bg-blue">
+                                    <i class="glyph-icon icon-unlock-alt"></i>
+                                </span>
+							</div>
+						</div>
+						<div class="form-group">
+							<a n:href=":User:LostPassword:" title="Recover password">{_sign.in.form.forgot-password}</a>
+						</div>
+						<button class="btn btn-success btn-block">{_sign.in.form.button-sign-in}</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+	</div>
+</div>

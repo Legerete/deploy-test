@@ -1,0 +1,3 @@
+services:
+	BasePresenter: Legerete\Presenters\BasePresenter
+	- Legerete\UIForm\FormFactory

@@ -1,0 +1,23 @@
+in:
+	form:
+		header: Member Area
+		headerSmall: Login to your account.
+		buttonSignIn: Sing In
+		inputEmail: Enter e-mail
+		inputPassword: Password
+		forgotPassword: Forgot Your Password?
+		error:
+			fillEmailInCorrectFormat: Fill E-mail in correct format.
+			emailNotFilled: 'Please, fill your e-mail.'
+			passwordNotFilled: 'Please, fill your password.'
+
+forgotPassword:
+	form:
+		header: Password reset
+		headerSmall: For password reset eneter your e-mail. We will send you reset link.
+		inputEmail: Enter e-mail
+		buttonResetPassword: Reset password
+		signIn: Sign in
+		error:
+			fillEmailInCorrectFormat: Fill E-mail in correct format.
+			emailNotFilled: 'Please, fill your e-mail.'

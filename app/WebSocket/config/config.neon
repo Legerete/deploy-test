@@ -1,0 +1,6 @@
+services:
+	http.requestFactory:
+		class: App\WebSocket\Request\WebSocketRequestFactory
+		autowired: yes
+
+session.save_path: %tempDir%

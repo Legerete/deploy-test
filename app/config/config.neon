@@ -8,38 +8,58 @@ parameters:
 		dsn: ''
 		settings:
 			trace: true
-
+	smtp:
+		host:
+		username:
+		password:
+		secure: 'ssl'
+		port: 465
 
 latte:
 	macros:
 		- App\Utils\Latte\Macros
 
-
 php:
 	date.timezone: Europe/Prague
-
 
 application:
 	errorPresenter: Error
 	mapping:
 		*: App\*Module\Presenters\*Presenter
 
-
 session:
 	expiration: 14 days
-
-
-services:
-	router: App\Router\RouterFactory::createRouter
-
 
 extensions:
 	console: Kdyby\Console\DI\ConsoleExtension
 	events: Kdyby\Events\DI\EventsExtension
 	annotations: Kdyby\Annotations\DI\AnnotationsExtension
 	doctrine: Kdyby\Doctrine\DI\OrmExtension
-	monolog: App\Utils\Monolog\DI\MonologExtension
 	translation: Kdyby\Translation\DI\TranslationExtension
+	monolog: App\Utils\Monolog\DI\MonologExtension
+	mailing: Ublaboo\Mailing\DI\MailingExtension
+	core: Legerete\DI\CoreExtension
+	LeSecurity: Legerete\Security\DI\SecurityExtension
+	signIn: Legerete\UserModule\DI\SignInExtension
+
+core:
+	pageTitle: 'Porta Invest s.r.o. - CRM'
+
+signIn:
+	allowForgotPassword: TRUE
+
+LeSecurity:
+	roles:
+		- guest
+		- [client, guest]
+		- [admin, client]
+	resources:
+		- Public
+		- ['User:Sign', Public]
+	privileges:
+		allow:
+			- [guest, 'User:Sign']
+		deny:
 
 translation:
 	default: en
@@ -53,6 +73,18 @@ monolog:
 		- Monolog\Processor\MemoryPeakUsageProcessor
 		- Kdyby\Monolog\Processor\PriorityProcessor
 
+mailing:
+	do: both # log|send|both
+	mails:
+		defaultSender: info@legerete.cz
+
+mail:
+	smtp: true
+	host: %smtp.host%
+	username: %smtp.username%
+	password: %smtp.password%
+	secure: 'ssl'
+	port: %smtp.port%
 
 doctrine:
 	default:
@@ -69,3 +101,6 @@ doctrine:
 		debug: no
 		metadata:
 			App: %appDir%
+
+services:
+	router: App\Router\RouterFactory::createRouter

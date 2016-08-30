@@ -5,6 +5,7 @@
 @import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_utilities.scss';
 @import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_normalize.scss';
 @import '../../bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_type.scss';
+@import '../../bower_components/legerete-crm-sign-in/src/sass/crm-sign-in.scss';
 // endbower
 
 @import 'common/variables';
@@ -103,3 +104,38 @@
 @import '../template/themes/components/border-radius';
 @import '../template/helpers/responsive-elements';
 @import '../template/helpers/admin-responsive';
+
+#loading {
+  .svg-icon-loader {
+    left: 50%;
+    margin: -50px 0 0 -50px;
+    position: absolute;
+    top: 50%;
+  }
+}
+
+html {
+  &.sign,
+  &.forgot-password {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  &.sign {
+    #forgot-password-form-container {
+      display: none;
+    }
+  }
+
+  &.forgot-password {
+    #sign-in-form-container {
+      display: none;
+    }
+  }
+
+  body {
+    height: 100%;
+    overflow: hidden;
+
+  }
+}

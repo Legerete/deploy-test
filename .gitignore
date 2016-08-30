@@ -11,3 +11,4 @@ npm-debug.log
 nbproject
 websrc/scripts/all.*.js
 mariadb
+www/assets/js/temp*

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d3519ef4e6553a745c539475acfd9ab9",
-    "content-hash": "3544af4629768bdcb9a1137f85835c01",
+    "hash": "437c0c5fdc36c3224e2d34533a9437a0",
+    "content-hash": "b93cc598654cc79bf2243f256d04f688",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -3373,6 +3373,59 @@
                 "nette"
             ],
             "time": "2016-07-31 16:43:38"
+        },
+        {
+            "name": "ublaboo/mailing",
+            "version": "v1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ublaboo/mailing.git",
+                "reference": "8fc5a8fda928886b17514f34dab15540faae65bc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ublaboo/mailing/zipball/8fc5a8fda928886b17514f34dab15540faae65bc",
+                "reference": "8fc5a8fda928886b17514f34dab15540faae65bc",
+                "shasum": ""
+            },
+            "require": {
+                "latte/latte": "~2.3|~2.4",
+                "nette/application": "~2.3|~2.4",
+                "nette/di": "~2.3|~2.4",
+                "nette/mail": "~2.3|~2.4",
+                "nette/utils": "~2.3|~2.4"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "nette/tester": "~1.6.1",
+                "tracy/tracy": "^2.3|^2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ublaboo\\Mailing\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pavel Janda",
+                    "homepage": "http://paveljanda.com"
+                }
+            ],
+            "description": "Extension for Nette Framework: Easy & object-oriented way of sending & logging mails",
+            "homepage": "http://ublaboo.paveljanda.com/mailing",
+            "keywords": [
+                "extension",
+                "log",
+                "mail",
+                "mailing",
+                "nette"
+            ],
+            "time": "2016-08-14 08:19:14"
         }
     ],
     "packages-dev": [

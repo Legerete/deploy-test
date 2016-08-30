@@ -1,0 +1,9 @@
+services:
+	# Authenticator
+	#
+	authenticator: Legerete\Security\DatabaseAuthenticator
+
+	# Authorizator
+	#
+	- Legerete\Security\AuthorizatorFactory
+	authorizator: @Legerete\Security\AuthorizatorFactory::create
