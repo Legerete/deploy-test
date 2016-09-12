@@ -36,7 +36,7 @@ extensions:
 	annotations: Kdyby\Annotations\DI\AnnotationsExtension
 	doctrine: Kdyby\Doctrine\DI\OrmExtension
 	translation: Kdyby\Translation\DI\TranslationExtension
-	monolog: App\Utils\Monolog\DI\MonologExtension
+#	monolog: App\Utils\Monolog\DI\MonologExtension
 	mailing: Ublaboo\Mailing\DI\MailingExtension
 	core: Legerete\DI\CoreExtension
 	LeSecurity: Legerete\Security\DI\SecurityExtension
@@ -64,14 +64,14 @@ LeSecurity:
 translation:
 	default: en
 
-monolog:
-	handlers:
-		raven: Monolog\Handler\RavenHandler(Raven_Client(%sentry.dsn%, %sentry.settings%))
-	name: TODO
-	registerFallback: true
-	processors:
-		- Monolog\Processor\MemoryPeakUsageProcessor
-		- Kdyby\Monolog\Processor\PriorityProcessor
+#monolog:
+#	handlers:
+#		raven: Monolog\Handler\RavenHandler(Raven_Client(%sentry.dsn%, %sentry.settings%))
+#	name: TODO
+#	registerFallback: true
+#	processors:
+#		- Monolog\Processor\MemoryPeakUsageProcessor
+#		- Kdyby\Monolog\Processor\PriorityProcessor
 
 mailing:
 	do: both # log|send|both

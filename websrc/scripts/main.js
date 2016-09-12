@@ -22,6 +22,8 @@ import './libs/template/widgets/overlay/overlay.js';
 import './libs/template/themes/admin/layout.js';
 import './widgets-init.js';
 
+import './libs/nette.websocket';
+
 $('form a[data-show]').on('click', function (e) {
 	var $el = $(e.currentTarget);
 
@@ -39,12 +41,23 @@ $('form a[data-show]').on('click', function (e) {
 });
 
 $(function () {
-	window.wsConnection = wsConnection = new WebSocket('ws://localhost:8006');
-	wsConnection.onopen = function (e) {
-		console.log('Connection established!');
-	};
+	// var WebSocketConnection;
+	// window.WebSocketConnection = WebSocketConnection = new WebSocket('ws://localhost:8006');
+	// WebSocketConnection.onopen = function (e) {
+	// 	console.log('Connection established!');
+	// };
+	//
+	// WebSocketConnection.onmessage = function (e) {
+	// 	console.log(e.data);
+	// };
 
-	wsConnection.onmessage = function (e) {
-		console.log(e.data);
-	};
+	$.nette.ext('WebSocket', {
+		init: function () {
+			/* global LeWebSocket, window */
+			window.ws = new LeWebSocket('localhost', 8006);
+			console.log(window.ws.getPort());
+		}
+	});
+
+	$.nette.init();
 });

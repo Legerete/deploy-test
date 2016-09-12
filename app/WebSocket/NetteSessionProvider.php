@@ -50,9 +50,9 @@ class NetteSessionProvider implements MessageComponentInterface, WsServerInterfa
 	/**
 	 * {@inheritdoc}
 	 */
-	function onMessage(ConnectionInterface $from, $msg)
+	function onMessage(ConnectionInterface $from, $message)
 	{
-		return $this->app->onMessage($from, $msg);
+		return $this->app->onMessage($from, $message);
 	}
 
 	/**

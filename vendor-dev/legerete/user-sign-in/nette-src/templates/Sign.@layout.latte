@@ -14,12 +14,14 @@
 </head>
 
 <body>
-<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
+	<div id="app-content">
+		<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 
-{include content}
+		{include content}
 
-{block scripts}
-	<script src="{$basePath}/assets/js/all.min.js{resourceVersion}"></script>
-{/block}
+		{block scripts}
+			<script src="{$basePath}/assets/js/all.min.js{resourceVersion}"></script>
+		{/block}
+	</div>
 </body>
 </html>

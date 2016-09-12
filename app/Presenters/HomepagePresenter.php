@@ -11,7 +11,16 @@ class HomepagePresenter extends BasePresenter
 
 	public function renderDefault()
 	{
+		\Tracy\Debugger::log(__METHOD__);
 		$this->template->anyVariable = 'any value';
+		$this->getTemplate()->foo = 'foo';
+	}
+
+	public function handleTest()
+	{
+		\Tracy\Debugger::log(__METHOD__);
+		$this->getTemplate()->foo = 'bar';
+		$this->redrawControl();
 	}
 
 	/**

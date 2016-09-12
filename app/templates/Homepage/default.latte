@@ -2,6 +2,16 @@
 
 {block content}
 	<a n:href=":Legerete:User:Sign:in">Sign In</a>
+	<br><br><br>
+	<a n:href="test!" class="ajax">Ajax do test</a><hr>
+	<a n:href=":Legerete:User:Sign:in" class="web-socket">WS Sign:in</a><br>
+	<a n:href="test!" class="web-socket">WS do test</a><br>
+
+
+
+	{snippet test}
+		{$foo}
+	{/snippet}
 {/block}
 
 {block scripts}

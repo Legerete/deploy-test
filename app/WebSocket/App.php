@@ -1,7 +1,12 @@
 <?php
 	namespace App\WebSocket;
 
-	use Nette\Application\Application;
+	use App\WebSocket\Request\WebSocketRequestFactory;
+	use Legerete\Websocket\Application\Application;
+	use Nette\DI\Container;
+	use Nette\Http\UrlScript;
+	use Nette\Utils\Arrays;
+	use Nette\Utils\Json;
 	use Ratchet\MessageComponentInterface;
 	use Ratchet\ConnectionInterface;
 
@@ -18,9 +23,17 @@
 		 */
 		private $application;
 
-		public function __construct(Application $application) {
+		private $requestFactory;
+
+		private $container;
+
+		private $message;
+
+		public function __construct(Application $application, WebSocketRequestFactory $requestFactory, Container $container) {
 			$this->clients = new \SplObjectStorage;
 			$this->application = $application;
+			$this->requestFactory = $requestFactory;
+			$this->container = $container;
 		}
 
 		public function onOpen(ConnectionInterface $conn) {
@@ -31,21 +44,30 @@
 			echo "New connection! ({$conn->resourceId})\n";
 		}
 
-		public function onMessage(ConnectionInterface $from, $msg) {
+		public function onMessage(ConnectionInterface $from, $message) {
+			$this->message = $message;
+
+			$message = Json::decode($this->message, Json::FORCE_ARRAY);
+			$request = Arrays::get($message, 'request', 'http://localhost:8005/');
 
 			ob_start();
-				$this->application->run();
-			$result = ob_flush();
-
+				try {
+					$httpRequest = $this->requestFactory->setUrl($request)->createHttpRequest();
+					$this->application->setHttpRequest($httpRequest);
+					$this->application->run();
+				} catch (\Exception $e) {
+					\Tracy\Debugger::log($e);
+				}
+			$result = ob_get_clean();
 
 			$numRecv = count($this->clients) - 1;
 			echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-				, $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
+				, $from->resourceId, $message, $numRecv, $numRecv == 1 ? '' : 's');
 
 			foreach ($this->clients as $client) {
 				if ($from !== $client) {
 					// The sender is not the receiver, send to each client connected
-					$client->send($result);
+					$client->send($from->session->getId());
 				} else {
 					$client->send($result);
 				}
@@ -64,4 +86,5 @@
 
 			$conn->close();
 		}
+
 	}
