@@ -8,7 +8,9 @@
 namespace Legerete\Websocket\Response;
 
 use Nette;
+use Nette\Http\Helpers;
 use Nette\Http\IResponse;
+use Nette\Http\Url;
 use Nette\Utils\DateTime;
 use Nette\Utils\Json;
 
@@ -86,8 +88,8 @@ class Response implements IResponse
 
 	/**
 	 * Sends a HTTP header and replaces a previous one.
-	 * @param  string  header name
-	 * @param  string  header value
+	 * @param  string $name header name
+	 * @param  string $value header value
 	 * @return self
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
@@ -107,8 +109,8 @@ class Response implements IResponse
 
 	/**
 	 * Adds HTTP header.
-	 * @param  string  header name
-	 * @param  string  header value
+	 * @param  string $name header name
+	 * @param  string $valueheader value
 	 * @return self
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
@@ -122,8 +124,8 @@ class Response implements IResponse
 
 	/**
 	 * Sends a Content-type HTTP header.
-	 * @param  string  mime-type
-	 * @param  string  charset
+	 * @param  string $type mime-type
+	 * @param  string $charset charset
 	 * @return self
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
@@ -136,14 +138,14 @@ class Response implements IResponse
 
 	/**
 	 * Redirects to a new URL. Note: call exit() after it.
-	 * @param  string  URL
-	 * @param  int     HTTP code
+	 * @param  string $url URL
+	 * @param  int $code HTTP code
 	 * @return void
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
 	public function redirect($url, $code = self::S302_FOUND)
 	{
-		echo Json::encode(['redirect' => $url]);
+		echo Json::encode(['redirect' => $url, 'code' => $code]);
 	}
 
 
@@ -269,10 +271,10 @@ class Response implements IResponse
 
 	/**
 	 * Deletes a cookie.
-	 * @param  string name of the cookie.
-	 * @param  string
-	 * @param  string
-	 * @param  bool
+	 * @param  string $name name of the cookie.
+	 * @param  string $path
+	 * @param  string $domain
+	 * @param  bool $secure
 	 * @return void
 	 * @throws Nette\InvalidStateException  if HTTP headers have been sent
 	 */
@@ -284,9 +286,7 @@ class Response implements IResponse
 
 	private function checkHeaders()
 	{
-		if (PHP_SAPI === 'cli') {
-
-		} elseif (headers_sent($file, $line)) {
+		if (headers_sent($file, $line)) {
 			throw new Nette\InvalidStateException('Cannot send header after HTTP headers have been sent' . ($file ? " (output started at $file:$line)." : '.'));
 
 		} elseif ($this->warnOnBuffer && ob_get_length() && !array_filter(ob_get_status(TRUE), function ($i) { return !$i['chunk_size']; })) {

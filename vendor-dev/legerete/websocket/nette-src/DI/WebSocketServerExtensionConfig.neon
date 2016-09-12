@@ -1,9 +1,6 @@
 services:
-	wsApp:
-		class: App\WebSocket\App
 	sessionProvider:
 		class: App\Websocket\NetteSessionProvider
-#		parameters: [@wsApp]
 		autowired: false
 	webSocketServer:
 		class: Ratchet\WebSocket\WsServer

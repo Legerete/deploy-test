@@ -1,7 +1,4 @@
-services:
-	http.requestFactory:
-		class: App\WebSocket\Request\WebSocketRequestFactory
-		autowired: yes
+
 
 #session.save_path: %tempDir%
 
@@ -14,3 +11,7 @@ extensions:
 
 WSE:
 	port: 8006
+
+services:
+	wsApp:
+		class: App\WebSocket\App

@@ -103,7 +103,7 @@ LeWebSocket = function (host, port, selectors) {
 		},
 
 		/**
-		 * Set-up
+		 * Handling WebSocket connection events onMessage, onError, onClose
 		 */
 		handleWebSocket: function () {
 			inner.conn.onmessage = function (message) {
@@ -111,13 +111,14 @@ LeWebSocket = function (host, port, selectors) {
 			};
 			inner.conn.onerror = function (message) {
 				console.log(message);
-				console.log('WebSocket connection was closed after error.');
+				console.info('WebSocket connection was closed after error.');
 				$.trigger('message', {'state': 'close'}); // @todo
 				inner.tryReconnect();
 			};
 			inner.conn.onclose = function (message) {
 				console.log(message);
-				console.log('WebSocket connection was closed.');
+				console.info('WebSocket connection was closed.');
+				// @todo zjistit zda ma vubec smysl, popripade za jakych okolnosti
 				inner.tryReconnect();
 			};
 		},
@@ -132,6 +133,10 @@ LeWebSocket = function (host, port, selectors) {
 			}, inner.reconnectTimeout);
 		},
 
+		/**
+		 *
+		 * @param e
+		 */
 		constructMessage: function (e) {
 			// console.log(e.currentTarget.href);
 			var request = {
@@ -147,19 +152,14 @@ LeWebSocket = function (host, port, selectors) {
 		 * @param {JSON|html} message
 		 */
 		parseMessage: function (message) {
-			console.log(message);
+			var body;
 			try {
-				message = JSON.parse(message);
-				message = {
-					type: 'json',
-					body: message.data
-				}
+				body = JSON.parse(message.data);
+				message.parsedBody = body;
+				message.bodyType = 'json';
 			} catch (e) {
-				// @todo detekce zda se jedna o HTML
-				message = {
-					type: 'html',
-					body: message.data
-				};
+				message.parsedBody = message.data;
+				message.bodyType = 'html';
 			}
 
 			return message;
@@ -170,24 +170,33 @@ LeWebSocket = function (host, port, selectors) {
 		 * @param message
 		 */
 		processMessage: function (message) {
-			if (message.type === 'json') {
-				$.nette.ext('snippets').updateSnippets(message.body);
+			if (message.bodyType === 'json') {
+				inner.applyJsonMessage(message.parsedBody);
 			}
-			if (message.type === 'html') {
+			if (message.bodyType === 'html') {
 				var $messageBody = $(message.body).find('#app-content');
-				console.log($messageBody);
-				console.log($messageBody.html());
 				$('#app-content').html($messageBody.html());
 			}
 		},
 
 		/**
-		 *
+		 * Propagate payload to all json processors
+		 * @param payload
+		 */
+		applyJsonMessage: function(payload) {
+			for (var processor in inner.jsonProcessors) {
+				if (typeof inner.jsonProcessors[processor] == 'function') {
+					inner.jsonProcessors[processor](payload);
+				} // @todo doplnit logovani do sentry o tom ze processor neni funkce
+			}
+		},
+
+		/**
+		 * Listen clciks, forms sends etc. and start propagation of event to the server
 		 * @param {object} e jQuery event
 		 */
 		requestHandler: function (e) {
 			e.preventDefault();
-
 			inner.conn.send(inner.constructMessage(e));
 			e.stopPropagation();
 		},
@@ -219,7 +228,12 @@ LeWebSocket = function (host, port, selectors) {
 				'formSelector' : 'form.web-socket',
 				'buttonSelector' : 'input.web-socket[type="submit"], button.web-socket[type="submit"], input.web-socket[type="image"]'
 			};
-		}
+		},
+
+		/**
+		 * Callbacks for json messages
+		 */
+		jsonProcessors: {}
 
 	};
 
@@ -256,6 +270,19 @@ LeWebSocket = function (host, port, selectors) {
 	};
 
 	/**
+	 * Add processor for json messages
+	 * @param {string} selector
+	 * @param {callback} callback
+	 */
+	this.addJsonProcessor = function(selector, callback) {
+		if (inner.jsonProcessors[selector] !== undefined)
+		{
+			throw 'Cannot override already registered websocket extension ' + selector + '.';
+		}
+		inner.jsonProcessors[selector] = callback;
+	};
+
+	/**
 	 * WebSocket extension constructor
 	 * @param host
 	 * @param port
@@ -271,6 +298,15 @@ LeWebSocket = function (host, port, selectors) {
 
 		inner.init();
 	}
+
+	/***************************
+	 * Default JSON processors *
+	 **************************/
+	this.addJsonProcessor('snippets', function(payload) {
+		if (payload.snippets) {
+			$.nette.ext('snippets').updateSnippets(payload.snippets);
+		}
+	});
 
 	/**
 	 * Auto construct

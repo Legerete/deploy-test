@@ -2,11 +2,12 @@
 
 namespace Legerete\Websocket\DI;
 
-use App\WebSocket\Request\WebSocketRequestFactory;
+use Legerete\Websocket\Request\WebSocketRequestFactory;
 use Legerete\Websocket\Application\Application;
 use Legerete\Websocket\Response\Response;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
+use Nette\DI\ContainerBuilder;
 
 class WebSocketServerExtension extends CompilerExtension
 {

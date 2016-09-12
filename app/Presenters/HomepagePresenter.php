@@ -13,13 +13,16 @@ class HomepagePresenter extends BasePresenter
 	{
 		\Tracy\Debugger::log(__METHOD__);
 		$this->template->anyVariable = 'any value';
-		$this->getTemplate()->foo = 'foo';
+		if (!isset($this->getTemplate()->foo))
+		{
+			$this->getTemplate()->foo = 'foo';
+		}
 	}
 
 	public function handleTest()
 	{
 		\Tracy\Debugger::log(__METHOD__);
-		$this->getTemplate()->foo = 'bar';
+		$this->getTemplate()->foo = microtime();
 		$this->redrawControl();
 	}
 

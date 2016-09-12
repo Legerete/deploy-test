@@ -1,16 +1,19 @@
 <?php
 	namespace App\WebSocket;
 
-	use App\WebSocket\Request\WebSocketRequestFactory;
+	use Legerete\Websocket\Request\WebSocketRequestFactory;
 	use Legerete\Websocket\Application\Application;
 	use Nette\DI\Container;
-	use Nette\Http\UrlScript;
 	use Nette\Utils\Arrays;
 	use Nette\Utils\Json;
 	use Ratchet\MessageComponentInterface;
 	use Ratchet\ConnectionInterface;
+	use Tracy\ILogger;
 
 	class App implements MessageComponentInterface {
+
+		const WEBSOCKET_INFO_FILE = 'WebSocketInfo';
+
 		protected $clients;
 
 		/**
@@ -23,17 +26,32 @@
 		 */
 		private $application;
 
+		/**
+		 * @var WebSocketRequestFactory
+		 */
 		private $requestFactory;
 
+		/**
+		 * @var Container
+		 */
 		private $container;
 
+		/**
+		 * @var string
+		 */
 		private $message;
 
-		public function __construct(Application $application, WebSocketRequestFactory $requestFactory, Container $container) {
+		/**
+		 * @var ILogger
+		 */
+		private $logger;
+
+		public function __construct(Application $application, WebSocketRequestFactory $requestFactory, Container $container, ILogger $logger) {
 			$this->clients = new \SplObjectStorage;
 			$this->application = $application;
 			$this->requestFactory = $requestFactory;
 			$this->container = $container;
+			$this->logger = $logger;
 		}
 
 		public function onOpen(ConnectionInterface $conn) {
@@ -41,7 +59,7 @@
 			$this->clients->attach($conn);
 			$this->conn = $conn;
 
-			echo "New connection! ({$conn->resourceId})\n";
+			$this->logger->log("New connection! ({$conn->resourceId})\n", self::WEBSOCKET_INFO_FILE);
 		}
 
 		public function onMessage(ConnectionInterface $from, $message) {
@@ -49,20 +67,17 @@
 
 			$message = Json::decode($this->message, Json::FORCE_ARRAY);
 			$request = Arrays::get($message, 'request', 'http://localhost:8005/');
-
 			ob_start();
 				try {
+					session_id($from->session->getId());
 					$httpRequest = $this->requestFactory->setUrl($request)->createHttpRequest();
 					$this->application->setHttpRequest($httpRequest);
 					$this->application->run();
+					session_id(FALSE);
 				} catch (\Exception $e) {
-					\Tracy\Debugger::log($e);
+					$this->logger->log($e);
 				}
 			$result = ob_get_clean();
-
-			$numRecv = count($this->clients) - 1;
-			echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-				, $from->resourceId, $message, $numRecv, $numRecv == 1 ? '' : 's');
 
 			foreach ($this->clients as $client) {
 				if ($from !== $client) {
@@ -77,13 +92,11 @@
 		public function onClose(ConnectionInterface $conn) {
 			// The connection is closed, remove it, as we can no longer send it messages
 			$this->clients->detach($conn);
-
-			echo "Connection {$conn->resourceId} has disconnected\n";
+			$this->logger->log("Connection {$conn->resourceId} has disconnected\n", self::WEBSOCKET_INFO_FILE);
 		}
 
 		public function onError(ConnectionInterface $conn, \Exception $e) {
-			echo "An error has occurred: {$e->getMessage()}\n";
-
+			$this->logger->log("An error has occurred: {$e->getMessage()}\n", self::WEBSOCKET_INFO_FILE);
 			$conn->close();
 		}
 
