@@ -11,6 +11,9 @@
 	use Ratchet\ConnectionInterface;
 
 	class App implements MessageComponentInterface {
+
+		const WEBSOCKET_INFO_FILE = 'WebSocketInfo';
+
 		protected $clients;
 
 		/**
@@ -41,7 +44,7 @@
 			$this->clients->attach($conn);
 			$this->conn = $conn;
 
-			echo "New connection! ({$conn->resourceId})\n";
+			\Tracy\Debugger::log("New connection! ({$conn->resourceId})\n", self::WEBSOCKET_INFO_FILE);
 		}
 
 		public function onMessage(ConnectionInterface $from, $message) {
@@ -60,9 +63,12 @@
 				}
 			$result = ob_get_clean();
 
-			$numRecv = count($this->clients) - 1;
-			echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
-				, $from->resourceId, $message, $numRecv, $numRecv == 1 ? '' : 's');
+//			$numRecv = count($this->clients) - 1;
+//			echo sprintf('Connection %d sending message "%s" to %d other connection%s' . "\n"
+//				, $from->resourceId,
+//				$message,
+//				$numRecv,
+//				$numRecv == 1 ? '' : 's');
 
 			foreach ($this->clients as $client) {
 				if ($from !== $client) {
@@ -78,11 +84,11 @@
 			// The connection is closed, remove it, as we can no longer send it messages
 			$this->clients->detach($conn);
 
-			echo "Connection {$conn->resourceId} has disconnected\n";
+			\Tracy\Debugger::log("Connection {$conn->resourceId} has disconnected\n", self::WEBSOCKET_INFO_FILE);
 		}
 
 		public function onError(ConnectionInterface $conn, \Exception $e) {
-			echo "An error has occurred: {$e->getMessage()}\n";
+			\Tracy\Debugger::log("An error has occurred: {$e->getMessage()}\n", self::WEBSOCKET_INFO_FILE);
 
 			$conn->close();
 		}

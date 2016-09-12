@@ -143,7 +143,7 @@ class Response implements IResponse
 	 */
 	public function redirect($url, $code = self::S302_FOUND)
 	{
-		echo Json::encode(['redirect' => $url]);
+		echo Json::encode(['redirect' => $url, 'code' => $code]);
 	}
 
 

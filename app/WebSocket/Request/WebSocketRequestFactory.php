@@ -7,6 +7,7 @@ use Nette\Http\RequestFactory;
 use Nette\SmartObject;
 use Nette\Http\UrlScript;
 use Nette\Http\Url;
+use Nette\Utils\Strings;
 
 class WebSocketRequestFactory extends RequestFactory
 {
@@ -41,13 +42,15 @@ class WebSocketRequestFactory extends RequestFactory
 		$uri = new UrlScript($this->url);
 //		\Tracy\Debugger::log($uri);
 		// legerete.user.sign/in
-		$uri->scheme = 'http://';
-//		$uri->port = Url::$defaultPorts['http'];
-//		$uri->host = 'localhost:8005';
+		$uri->scheme = 'http';
+		$uri->port = 8005;
+		$uri->host = 'localhost';
 //		$uri->path = '/';
 		$uri->canonicalize();
-//		$uri->path = Strings ::fixEncoding($uri->path);
-//		$uri->scriptPath = '/';
+		$uri->path = Strings ::fixEncoding($uri->path);
+		$uri->scriptPath = '/';
+
+		\Tracy\Debugger::log($uri, __METHOD__);
 //		$_SERVER = [];
 
 //		// GET, POST, COOKIE
@@ -61,14 +64,14 @@ class WebSocketRequestFactory extends RequestFactory
 //		$cookies = $useFilter ? filter_input_array(INPUT_COOKIE, FILTER_UNSAFE_RAW) : (empty($_COOKIE) ? [] : $_COOKIE);
 //
 //		$files = [];
-//		$headers = [
+		$headers = [
 //			'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36',
-//			strtolower('X-Requested-With') => 'XMLHttpRequest'
-//		];
+			strtolower('X-Requested-With') => 'XMLHttpRequest'
+		];
 //		$post = [];
 
 
-		return new \Nette\Http\Request($uri, NULL, [], [], [], [],
+		return new \Nette\Http\Request($uri, NULL, [], [], [], $headers,
 			'GET', NULL, NULL
 		);
 	}

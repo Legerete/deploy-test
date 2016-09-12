@@ -149,9 +149,11 @@
 		public function processRequest(Request $request)
 		{
 			process:
-			if (count($this->requests) > self::$maxLoop) {
-				throw new ApplicationException('Too many loops detected in application life cycle.');
-			}
+
+			// @todo chcem to kontrolovat? pri opakovanem pozadavku na tu samou akci to tu umre, nejspíš by byl stejný problém i kdyby to delali různí uživatelé, chce to vyzkoušet...
+//			if (count($this->requests) > self::$maxLoop) {
+//				throw new ApplicationException('Too many loops detected in application life cycle.');
+//			}
 
 			$this->requests[] = $request;
 			$this->onRequest($this, $request);
