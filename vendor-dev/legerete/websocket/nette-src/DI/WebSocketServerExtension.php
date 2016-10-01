@@ -1,13 +1,18 @@
 <?php
 
-namespace Legerete\Websocket\DI;
+/**
+ * @copyright   Copyright (c) 2016 legerete.cz <hello@legerete.cz>
+ * @author      Petr Besir Horáček <sirbesir@gmail.com>
+ * @package     Legerete\WebSocket
+ */
 
-use Legerete\Websocket\Request\WebSocketRequestFactory;
-use Legerete\Websocket\Application\Application;
-use Legerete\Websocket\Response\Response;
+namespace Legerete\WebSocket\DI;
+
+use Legerete\WebSocket\Request\WebSocketRequestFactory;
+use Legerete\WebSocket\Application\Application;
+use Legerete\WebSocket\Response\Response;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
-use Nette\DI\ContainerBuilder;
 
 class WebSocketServerExtension extends CompilerExtension
 {

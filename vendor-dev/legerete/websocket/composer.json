@@ -14,12 +14,13 @@
 	],
 	"autoload": {
 		"psr-4": {
-			"Legerete\\Websocket": "nette-src/"
+			"Legerete\\WebSocket": "nette-src/"
 		}
 	},
 	"require": {
 		"nette/di" : "^2.4",
 		"nette/application" : "^2.4",
+		"nette/utils": "^2.4",
 		"cboden/ratchet": "0.3.*",
 		"bazo/nette-ratchet-sessionprovider": "dev-master"
 	},

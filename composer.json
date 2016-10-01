@@ -30,7 +30,8 @@
 		"kdyby/console": "^2.6",
 		"cboden/ratchet": "^0.3.5",
 		"kdyby/translation": "dev-master",
-		"ublaboo/mailing": "^1.1"
+		"ublaboo/mailing": "^1.1",
+		"bazo/nette-ratchet-sessionprovider": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {
@@ -44,5 +45,5 @@
 	"require-dev": {
 		"nette/tester": "^1.6"
 	},
-	"minimum-stability": "stable"
+	"minimum-stability": "dev"
 }

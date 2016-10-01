@@ -1,6 +1,6 @@
 services:
 	sessionProvider:
-		class: App\Websocket\NetteSessionProvider
+		class: Bazo\Ratchet\NetteSessionProvider
 		autowired: false
 	webSocketServer:
 		class: Ratchet\WebSocket\WsServer
@@ -9,3 +9,5 @@ services:
 		class: Ratchet\Http\HttpServer
 		autowired: false
 	ioServer: Ratchet\Server\IoServer::factory
+
+	- Legerete\WebSocket\Message\ReceivedMessageFactory

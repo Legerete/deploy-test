@@ -1,12 +1,18 @@
 <?php
 
-namespace Legerete\Websocket\Request;
+/**
+ * @copyright   Copyright (c) 2016 legerete.cz <hello@legerete.cz>
+ * @author      Petr Besir Horáček <sirbesir@gmail.com>
+ * @package     Legerete\WebSocket
+ */
+
+namespace Legerete\WebSocket\Request;
 
 
+use Legerete\WebSocket\Message\ReceivedMessage;
 use Nette\Http\RequestFactory;
 use Nette\SmartObject;
 use Nette\Http\UrlScript;
-use Nette\Http\Url;
 use Nette\Utils\Strings;
 
 class WebSocketRequestFactory extends RequestFactory
@@ -14,45 +20,64 @@ class WebSocketRequestFactory extends RequestFactory
 	use SmartObject;
 
 	/**
-	 * @var Url
+	 * @var ReceivedMessage
 	 */
-	private $url;
+	private $message;
 
-	public $request;
-
-	private function createUrl()
+	/**
+	 * @param ReceivedMessage $message
+	 */
+	public function setMessage(ReceivedMessage $message)
 	{
-		$this->url = new UrlScript;
+		$this->message = $message;
 	}
 
-	public function setUrl($url)
-	{
-		$this->url = $url;
-		return $this;
-	}
-
+	/**
+	 * @return \Nette\Http\Request
+	 */
 	public function createHttpRequest()
 	{
-		$uri = new UrlScript($this->url);
-		$uri->scheme = 'http';
-		$uri->port = 8005;
-		$uri->host = 'localhost';
+		if (!$this->message) {
+			$uri = new UrlScript('');
+		} else {
+			$uri = new UrlScript($this->message->getRequestUrl());
+		}
+
 		$uri->canonicalize();
 		$uri->path = Strings ::fixEncoding($uri->path);
 		$uri->scriptPath = '/';
 
 		$headers = [
-			// Provide messages as Ajax request
+			// Provide messages to application as Ajax request
 			strtolower('X-Requested-With') => 'XMLHttpRequest'
 		];
 
-		/**
-		 * @todo doplnit $_POST
-		 * @todo doplnit $_FILES
-		 * @todo doplnit $_COOKIES
-		 */
-		return new \Nette\Http\Request($uri, NULL, [], [], [], $headers,
+		return new \Nette\Http\Request($uri, NULL, $this->createPost(), $this->createFiles(), [], $headers,
 			'GET', NULL, NULL
 		);
+	}
+
+	/**
+	 * @return array|mixed
+	 */
+	private function createPost()
+	{
+		if (!$this->message) {
+			return [];
+		} else {
+			return filter_var_array($this->message->getPost(), FILTER_SANITIZE_ENCODED);
+		}
+	}
+
+	/**
+	 * @return array
+	 */
+	private function createFiles()
+	{
+//		if (!$this->message) {
+			return [];
+//		} else {
+//			return $this->message->getFiles();
+//		}
 	}
 }
