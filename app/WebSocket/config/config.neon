@@ -7,7 +7,3 @@ extensions:
 
 WSE:
 	port: 8006
-
-services:
-	wsApp:
-		class: App\WebSocket\App

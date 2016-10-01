@@ -11,3 +11,4 @@ services:
 	ioServer: Ratchet\Server\IoServer::factory
 
 	- Legerete\WebSocket\Message\ReceivedMessageFactory
+	- Legerete\WebSocket\Application\Worker

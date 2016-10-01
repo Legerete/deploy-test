@@ -10,6 +10,7 @@ namespace Legerete\WebSocket\Request;
 
 
 use Legerete\WebSocket\Message\ReceivedMessage;
+use Nette\Http\Request;
 use Nette\Http\RequestFactory;
 use Nette\SmartObject;
 use Nette\Http\UrlScript;
@@ -35,7 +36,7 @@ class WebSocketRequestFactory extends RequestFactory
 	/**
 	 * @return \Nette\Http\Request
 	 */
-	public function createHttpRequest()
+	public function createHttpRequest() : Request
 	{
 		if (!$this->message) {
 			$uri = new UrlScript('');
@@ -60,7 +61,7 @@ class WebSocketRequestFactory extends RequestFactory
 	/**
 	 * @return array|mixed
 	 */
-	private function createPost()
+	private function createPost() : array
 	{
 		if (!$this->message) {
 			return [];
@@ -72,7 +73,7 @@ class WebSocketRequestFactory extends RequestFactory
 	/**
 	 * @return array
 	 */
-	private function createFiles()
+	private function createFiles() : array
 	{
 //		if (!$this->message) {
 			return [];
