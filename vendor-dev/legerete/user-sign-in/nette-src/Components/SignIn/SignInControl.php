@@ -124,6 +124,7 @@ class SignInControl extends UI\Control
 		$values = $form->getValues();
 		$user = $this->clientRepository()->findOneBy(['login' => $values->address]);
 
+		// TODO implement translations
 		if (!$user || !Passwords::verify($values->password, $user->password) || $user->isDel()) {
 			$this->flashMessage('Neplatné přihlašovací údaje. '
 				. '<a href="' . $this->getPresenter()->link(':Public:Users:LostPassword:') . '">Zapoměli jste heslo</a>?');
