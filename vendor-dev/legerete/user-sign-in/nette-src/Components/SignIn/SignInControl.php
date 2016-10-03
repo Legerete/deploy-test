@@ -12,12 +12,12 @@ use Kdyby\Doctrine\EntityManager,
 	Nette\Localization\ITranslator,
 	Legerete\UIForm\FormFactory,
 	Nette\Application\UI as UI,
-	Nette\Security\Identity,
-	Nette\Security\Passwords,
-	Nette\Security\User,
-	Nette\Utils\Arrays,
+	Nette\Security as Security,
 	Tracy\ILogger,
-	Nette\Utils\ArrayHash;
+	Nette\Utils as Utils;
+
+//	Nette\Utils\Arrays,
+//	Nette\Utils\ArrayHash;
 
 /**
  * Renderable component with Sign in form.
@@ -35,7 +35,7 @@ class SignInControl extends UI\Control
 		/** @type ILogger */
 		$logger,
 
-		/** @var User $user */
+		/** @var Security\User $user */
 		$user,
 
 		/** @var ITranslator */
@@ -62,14 +62,14 @@ class SignInControl extends UI\Control
 	 * @param FormFactory $formFactory
 	 * @param EntityManager $em
 	 * @param ILogger $logger
-	 * @param User $user
+	 * @param Security\User $user
 	 * @param ITranslator $translator
 	 */
 	public function __construct(array $config,
 	                            FormFactory $formFactory,
 	                            EntityManager $em,
 	                            ILogger $logger,
-	                            User $user,
+	                            Security\User $user,
 	                            ITranslator $translator)
 	{
 		parent::__construct();
@@ -87,9 +87,11 @@ class SignInControl extends UI\Control
 	 */
 	public function render()
 	{
-		$this->getTemplate()->setFile(__DIR__ . '/templates/SignInPage.latte');
-		$this->getTemplate()->allowForgotPassword = Arrays::get($this->config, 'allowForgotPassword', TRUE);
-		$this->getTemplate()->render();
+		$ds = DIRECTORY_SEPARATOR;
+		$template = $this->getTemplate();
+		$template->setFile(realpath(__DIR__ . $ds . 'templates') . $ds . 'SignInPage.latte');
+		$template->allowForgotPassword = Utils\Arrays::get($this->config, 'allowForgotPassword', TRUE);
+		$template->render();
 	}
 
 	/**
@@ -116,21 +118,26 @@ class SignInControl extends UI\Control
 
 	/**
 	 * @param UI\Form $form
-	 * @param ArrayHash $values
+	 * @param Utils\ArrayHash $values
 	 */
-	public function processSignIn(UI\Form $form, ArrayHash $values)
+	public function processSignIn(UI\Form $form, Utils\ArrayHash $values)
 	{
 		/** @var \App\CoreModule\Entity\Client $user */
-		$user = $this->clientRepository()->findOneBy(['login' => $values->address]);
+		$user = $this->clientRepository()->findOneBy(['login' => $values->login]);
 
 		// TODO implement translations
-		if (!$user || !Passwords::verify($values->password, $user->password) || !$user->getIsActive()) {
+		if (!$user || !Security\Passwords::verify($values->password, $user->getPassword()) || !$user->getIsActive()) {
 			$this->flashMessage('Neplatné přihlašovací údaje. '
-				. '<a href="' . $this->getPresenter()->link(':Public:Users:LostPassword:') . '">Zapoměli jste heslo</a>?');
+				. '<a href="'
+
+				// FIXME implement :Public:Users:LostPassword:
+				/*. $this->getPresenter()->link(':Public:Users:LostPassword:')*/
+
+				. '">Zapoměli jste heslo</a>?');
 			$this->redrawControl('flashes');
 			$this->onLogInFailed();
 		} else {
-			$identity = new Identity($user->getLogin(), 'client', ['client' => $user]);
+			$identity = new Security\Identity($user->getLogin(), 'client', ['client' => $user]);
 			$this->user->login($identity);
 			$this->onLogInSuccess();
 		}
