@@ -16,7 +16,8 @@ use Kdyby\Doctrine\EntityManager,
 	Nette\Security\Passwords,
 	Nette\Security\User,
 	Nette\Utils\Arrays,
-	Tracy\ILogger;
+	Tracy\ILogger,
+	Nette\Utils\ArrayHash;
 
 /**
  * Renderable component with Sign in form.
@@ -40,9 +41,6 @@ class SignInControl extends UI\Control
 		/** @var ITranslator */
 		$translator,
 
-		/** @var UI\Form */
-		$form,
-
 		/** @var string|bool */
 		$forgotPasswordLink;
 
@@ -55,8 +53,8 @@ class SignInControl extends UI\Control
 
 		/** @var array */
 		$config = [
-		'allowForgotPassword' => TRUE
-	];
+			'allowForgotPassword' => TRUE
+		];
 
 	/**
 	 * SignInControl constructor.
@@ -82,7 +80,6 @@ class SignInControl extends UI\Control
 		$this->logger = $logger;
 		$this->user = $user;
 		$this->translator = $translator;
-		$this->form = $this->formFactory->create();
 	}
 
 	/**
@@ -100,38 +97,40 @@ class SignInControl extends UI\Control
 	 */
 	public function createComponentSignInForm() : UI\Form
 	{
-		$this->form
-			->addText('login', $this->translator->translate('sign.in.form.inputEmail'))
+		$form = new UI\Form;
+
+		$form->addText('login', $this->translator->translate('sign.in.form.inputEmail'))
 			->addRule(UI\Form::EMAIL,
-				$this->translator->translate('sign.in.form.error.fillEmailInCorrectFormat'))
+				$this->translator->translate('sign.in.form.error.fillEmailInCorrectFormat')
+			)
 			->setRequired($this->translator->translate('sign.in.form.error.emailNotFilled'));
 
-		$this->form
-			->addPassword('password')
+		$form->addPassword('password')
 			->setRequired($this->translator->translate('sign.in.form.error.passwordNotFilled'));
 
-		$this->form->addSubmit('submit', $this->translator->translate('sign.in.form.buttonSignIn'));
-		$this->form->onSuccess[] = [$this, 'processSignIn'];
+		$form->addSubmit('submit', $this->translator->translate('sign.in.form.buttonSignIn'));
+		$form->onSuccess[] = [$this, 'processSignIn'];
 
-		return $this->form;
+		return $form;
 	}
 
 	/**
 	 * @param UI\Form $form
+	 * @param ArrayHash $values
 	 */
-	public function processSignIn(UI\Form $form)
+	public function processSignIn(UI\Form $form, ArrayHash $values)
 	{
-		$values = $form->getValues();
+		/** @var \App\CoreModule\Entity\Client $user */
 		$user = $this->clientRepository()->findOneBy(['login' => $values->address]);
 
 		// TODO implement translations
-		if (!$user || !Passwords::verify($values->password, $user->password) || $user->isDel()) {
+		if (!$user || !Passwords::verify($values->password, $user->password) || !$user->getIsActive()) {
 			$this->flashMessage('Neplatné přihlašovací údaje. '
 				. '<a href="' . $this->getPresenter()->link(':Public:Users:LostPassword:') . '">Zapoměli jste heslo</a>?');
 			$this->redrawControl('flashes');
 			$this->onLogInFailed();
 		} else {
-			$identity = new Identity($user->login, 'client', ['client' => $user]);
+			$identity = new Identity($user->getLogin(), 'client', ['client' => $user]);
 			$this->user->login($identity);
 			$this->onLogInSuccess();
 		}
