@@ -8,54 +8,44 @@
 
 namespace Legerete\UserModule\Presenters;
 
-use Legerete\Presenters\SecuredPresenter;
-use Legerete\UserModule\Components\SignIn\SignInControl;
-use Legerete\UserModule\Components\SignIn\SignInFactory;
-use Legerete\UserModule\Components\ForgotPasswordFactory;
-use Legerete\UserModule\Components\ForgotPasswordControl;
-use Legerete\UserModule\Components\ChooseNewPasswordFactory;
-use Legerete\UserModule\Components\ChooseNewPasswordControl;
-use Nette\Security\Identity;
+use Legerete\Presenters\SecuredPresenter,
+	Nette\Security\Identity,
+	Legerete\UserModule\Components as Components;
 
 /**
- * @author Petr Besir Horacek <sirbesir@gmail.com>
  * Sign in/out presenter.
+ * @author Petr Besir Horacek <sirbesir@gmail.com>
  */
 class SignPresenter extends SecuredPresenter
 {
-	/**
-	 * @inject
-	 * @var SignInFactory
-	 */
-	public $signInForm;
+	private
+		/** @var Components\SignIn\SignInFactory */
+		$signInFormFactory,
 
-	/**
-	 * @inject
-	 * @var ForgotPasswordFactory
-	 */
-	public $lostPasswordFactory;
+		/** @var Components\ForgotPasswordFactory */
+		$forgotPasswordFactory,
 
-	/**
-	 * @inject
-	 * @var ChooseNewPasswordFactory
-	 */
-	public $chooseNewPasswordFactory;
+		/** @var Components\ChooseNewPasswordFactory */
+		$chooseNewPasswordFactory,
 
-	/**
-	 * @var bool $mailConfirmed
-	 */
-	private $mailConfirmed = FALSE;
+		/** @var bool $mailConfirmed */
+		$mailConfirmed,
 
-	/**
-	 * @var array
-	 */
-	private $config;
+		/** @var array */
+		$config;
 
-	public function __construct(array $config = [])
+	public function __construct(array $config = [],
+	                            Components\SignIn\SignInFactory $signInFactory,
+	                            Components\ForgotPasswordFactory $forgotPasswordFactory,
+	                            Components\ChooseNewPasswordFactory $chooseNewPasswordFactory)
 	{
 		parent::__construct();
 
+		$this->mailConfirmed = FALSE;
 		$this->config = $config;
+		$this->signInFormFactory = $signInFactory;
+		$this->forgotPasswordFactory = $forgotPasswordFactory;
+		$this->chooseNewPasswordFactory = $chooseNewPasswordFactory;
 	}
 
 	public function renderIn()
@@ -71,6 +61,7 @@ class SignPresenter extends SecuredPresenter
 	/**
 	 * @var string $email
 	 * @var string $hash
+	 * @TODO implement this...
 	 */
 	public function actionConfirmMail($email, $hash)
 	{
@@ -96,6 +87,7 @@ class SignPresenter extends SecuredPresenter
 
 	/**
 	 * Sign out user
+	 * @TODO implement translation
 	 */
 	public function actionOut()
 	{
@@ -105,25 +97,25 @@ class SignPresenter extends SecuredPresenter
 	}
 
 	/**
-	 * @return SignInControl
+	 * @return Components\SignIn\SignInControl
 	 */
-	public function createComponentSignInForm() : SignInControl
+	public function createComponentSignInForm() : Components\SignIn\SignInControl
 	{
-		return $this->signInForm->create($this->config);
+		return $this->signInFormFactory->create($this->config);
 	}
 
 	/**
-	 * @return ForgotPasswordControl
+	 * @return Components\ForgotPasswordControl
 	 */
-	protected function createComponentForgotPasswordForm() : ForgotPasswordControl
+	protected function createComponentForgotPasswordForm() : Components\ForgotPasswordControl
 	{
-		return $this->lostPasswordFactory->create();
+		return $this->forgotPasswordFactory->create();
 	}
 
 	/**
-	 * @return ChooseNewPasswordControl
+	 * @return Components\ChooseNewPasswordControl
 	 */
-	protected function createComponentChooseNewPassword() : ChooseNewPasswordControl
+	protected function createComponentChooseNewPassword() : Components\ChooseNewPasswordControl
 	{
 		return $this->chooseNewPasswordFactory->create();
 	}
