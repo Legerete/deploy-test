@@ -277,7 +277,7 @@ LeWebSocket = function (host, port, selectors) {
 	this.addJsonProcessor = function(selector, callback) {
 		if (inner.jsonProcessors[selector] !== undefined)
 		{
-			throw 'Cannot override already registered websocket extension ' + selector + '.';
+			throw 'Cannot override already registered WebSocket extension ' + selector + '.';
 		}
 		inner.jsonProcessors[selector] = callback;
 	};
