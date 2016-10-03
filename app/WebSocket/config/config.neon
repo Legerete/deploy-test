@@ -1,16 +1,9 @@
-services:
-	http.requestFactory:
-		class: App\WebSocket\Request\WebSocketRequestFactory
-		autowired: yes
-
-#session.save_path: %tempDir%
-
 console:
 	disabled: true
 	application: false
 
 extensions:
-	WSE: Legerete\Websocket\DI\WebSocketServerExtension
+	WSE: Legerete\WebSocket\DI\WebSocketServerExtension
 
 WSE:
 	port: 8006

@@ -1,11 +1,15 @@
 <?php
 
 	/**
-	 * This file is part of the Nette Framework (https://nette.org)
+	 * @copyright   Copyright (c) 2016 legerete.cz <hello@legerete.cz>
+	 * @author      Petr Besir Horáček <sirbesir@gmail.com>
+	 * @package     Legerete\WebSocket
+	 *
+	 * This file is forked part of the Nette Framework (https://nette.org)
 	 * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
 	 */
 
-	namespace Legerete\Websocket\Application;
+	namespace Legerete\WebSocket\Application;
 
 	use Nette;
 	use Nette\Application as NetteApplication;

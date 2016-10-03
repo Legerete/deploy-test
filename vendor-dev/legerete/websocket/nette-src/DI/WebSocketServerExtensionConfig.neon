@@ -1,9 +1,6 @@
 services:
-	wsApp:
-		class: App\WebSocket\App
 	sessionProvider:
-		class: App\Websocket\NetteSessionProvider
-#		parameters: [@wsApp]
+		class: Bazo\Ratchet\NetteSessionProvider
 		autowired: false
 	webSocketServer:
 		class: Ratchet\WebSocket\WsServer
@@ -12,3 +9,6 @@ services:
 		class: Ratchet\Http\HttpServer
 		autowired: false
 	ioServer: Ratchet\Server\IoServer::factory
+
+	- Legerete\WebSocket\Message\ReceivedMessageFactory
+	- Legerete\WebSocket\Application\Worker
