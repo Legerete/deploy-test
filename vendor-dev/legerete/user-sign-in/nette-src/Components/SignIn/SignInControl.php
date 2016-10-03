@@ -8,78 +8,58 @@
 
 namespace Legerete\UserModule\Components\SignIn;
 
-use Kdyby\Doctrine\EntityManager;
-use Nette\Localization\ITranslator;
-use Legerete\UIForm\FormFactory;
-use Nette\Application\UI\Form;
-use Nette\Security\Identity;
-use Nette\Security\Passwords;
-use Nette\Security\User;
-use Nette\Utils\Arrays;
-use Tracy\ILogger;
-use Ublaboo\Mailing\MailFactory;
+use Kdyby\Doctrine\EntityManager,
+	Nette\Localization\ITranslator,
+	Legerete\UIForm\FormFactory,
+	Nette\Application\UI as UI,
+	Nette\Security\Identity,
+	Nette\Security\Passwords,
+	Nette\Security\User,
+	Nette\Utils\Arrays,
+	Tracy\ILogger;
 
 /**
  * Renderable component with Sign in form.
  */
-class SignInControl extends \Nette\Application\UI\Control
+class SignInControl extends UI\Control
 {
 
-	/**
-	 * @var FormFactory
-	 */
-	private $formFactory;
+	private
+		/** @var FormFactory */
+		$formFactory,
 
-	/**
-	 * @var EntityManager
-	 */
-	private $em;
+		/** @var EntityManager */
+		$entityManager,
 
-	/**
-	 * @type ILogger
-	 */
-	private $logger;
+		/** @type ILogger */
+		$logger,
 
-	/**
-	 * @var User $user
-	 */
-	private $user;
+		/** @var User $user */
+		$user,
 
-	/**
-	 * @var ITranslator
-	 */
-	private $t;
+		/** @var ITranslator */
+		$translator,
 
-	/**
-	 * @var Form
-	 */
-	private $form;
+		/** @var UI\Form */
+		$form,
 
-	/**
-	 * @var string|bool
-	 */
-	private $forgotPasswordLink;
+		/** @var string|bool */
+		$forgotPasswordLink;
 
-	/**
-	 * @var callback $loggedInSuccess
-	 */
-	public $onLogInSuccess = [];
+	public
+		/** @var callback $loggedInSuccess */
+		$onLogInSuccess = [],
 
-	/**
-	 * @var callback $loggedInFailed
-	 */
-	public $onLogInFailed = [];
+		/** @var callback $loggedInFailed */
+		$onLogInFailed = [],
 
-	/**
-	 * @var array
-	 */
-	public $config = [
-		'allowForgotPassword' => TRUE,
+		/** @var array */
+		$config = [
+		'allowForgotPassword' => TRUE
 	];
 
 	/**
 	 * SignInControl constructor.
-	 *
 	 * @param array $config
 	 * @param FormFactory $formFactory
 	 * @param EntityManager $em
@@ -87,17 +67,21 @@ class SignInControl extends \Nette\Application\UI\Control
 	 * @param User $user
 	 * @param ITranslator $translator
 	 */
-	public function __construct(array $config, FormFactory $formFactory, EntityManager $em, ILogger $logger, User $user, ITranslator $translator)
+	public function __construct(array $config,
+	                            FormFactory $formFactory,
+	                            EntityManager $em,
+	                            ILogger $logger,
+	                            User $user,
+	                            ITranslator $translator)
 	{
 		parent::__construct();
 
 		$this->config = $config;
 		$this->formFactory = $formFactory;
-		$this->em = $em;
+		$this->entityManager = $em;
 		$this->logger = $logger;
 		$this->user = $user;
-		$this->t = $translator;
-
+		$this->translator = $translator;
 		$this->form = $this->formFactory->create();
 	}
 
@@ -112,43 +96,42 @@ class SignInControl extends \Nette\Application\UI\Control
 	}
 
 	/**
-	 * @return Form
+	 * @return UI\Form
 	 */
-	public function createComponentSignInForm() : Form
+	public function createComponentSignInForm() : UI\Form
 	{
-		// E-mail
-		$this->form->addText('login', $this->t->translate('sign.in.form.inputEmail'))->addRule(Form::EMAIL,
-			$this->t->translate('sign.in.form.error.fillEmailInCorrectFormat'))->setRequired($this->t->translate('sign.in.form.error.emailNotFilled'));
+		$this->form
+			->addText('login', $this->translator->translate('sign.in.form.inputEmail'))
+			->addRule(UI\Form::EMAIL,
+				$this->translator->translate('sign.in.form.error.fillEmailInCorrectFormat'))
+			->setRequired($this->translator->translate('sign.in.form.error.emailNotFilled'));
 
-		// Password
-		$this->form->addPassword('password')->setRequired($this->t->translate('sign.in.form.error.passwordNotFilled'));
+		$this->form
+			->addPassword('password')
+			->setRequired($this->translator->translate('sign.in.form.error.passwordNotFilled'));
 
-		// Submit
-		$this->form->addSubmit('submit', $this->t->translate('sign.in.form.buttonSignIn'));
-
-		// Events
+		$this->form->addSubmit('submit', $this->translator->translate('sign.in.form.buttonSignIn'));
 		$this->form->onSuccess[] = [$this, 'processSignIn'];
 
 		return $this->form;
 	}
 
 	/**
-	 * @param Form $form
+	 * @param UI\Form $form
 	 */
-	public function processSignIn(Form $form)
+	public function processSignIn(UI\Form $form)
 	{
 		$values = $form->getValues();
 		$user = $this->clientRepository()->findOneBy(['login' => $values->address]);
 
-		if (! $user || ! Passwords::verify($values->password, $user->password) || $user->isDel()) {
-			$this->flashMessage('Neplatné přihlašovací údaje. <a href="' . $this->getPresenter()->link(':Public:Users:LostPassword:') . '">Zapoměli jste heslo</a>?');
+		if (!$user || !Passwords::verify($values->password, $user->password) || $user->isDel()) {
+			$this->flashMessage('Neplatné přihlašovací údaje. '
+				. '<a href="' . $this->getPresenter()->link(':Public:Users:LostPassword:') . '">Zapoměli jste heslo</a>?');
 			$this->redrawControl('flashes');
-
 			$this->onLogInFailed();
 		} else {
 			$identity = new Identity($user->login, 'client', ['client' => $user]);
 			$this->user->login($identity);
-
 			$this->onLogInSuccess();
 		}
 	}
@@ -166,7 +149,7 @@ class SignInControl extends \Nette\Application\UI\Control
 	 */
 	private function clientRepository()
 	{
-		return $this->em->getRepository('\App\Entity\Client');
+		return $this->entityManager->getRepository(\App\CoreModule\Entity\Client::class);
 	}
 
 }
