@@ -1,0 +1,19 @@
+{* kendo template *}
+<script id="spa-panels-list-template" type="text/x-kendo-template">
+	<li data-bind="events: { click: clickOnTab}" #if (active) { #class="active"#}#>
+		<a href="\\#tab2" data-toggle="tab">#=name#</a> <i class="button-close glyph-icon icon-times-circle-o"></i>
+	</li>
+</script>
+{* rendered base for kendo widget binding*}
+<ul data-role="listview"
+    data-selectable="true"
+    data-edit-template="spa-panels-list-template"
+    data-template="spa-panels-list-template"
+    data-auto-bind="true"
+    data-bind="source: panelsDataSource,
+                            events: {
+                              edit: fooClick,
+                              change: fooClick
+                            }"
+    id="spa-panels-list" class="nav-responsive nav nav-tabs">
+</ul>

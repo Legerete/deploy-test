@@ -5,7 +5,7 @@ services:
     container_name: porta-invest-crm-web
     ports:
       - 8005:80
-      - 8006:8006
+#      - 8006:8006
     volumes:
       - .:/data:rw
       - ./www/:/data/www:rw

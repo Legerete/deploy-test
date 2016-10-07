@@ -86,18 +86,18 @@ server {
 EOF
 fi
 
-echo "
-[program:ratchet]
-command                 = bash -c \"ulimit -n 10000; exec /usr/bin/php ./data/websocket-server.php\"
-process_name            = Ratchet
-numprocs                = 1
-autostart               = true
-autorestart             = true
-user                    = root
-stdout_logfile          = /data/log/ratchet-info.log
-stdout_logfile_maxbytes = 1MB
-stderr_logfile          = /data/log/ratchet-error.log
-stderr_logfile_maxbytes = 1MB
-" >> /etc/supervisord.conf
+#echo "
+#[program:ratchet]
+#command                 = bash -c \"ulimit -n 10000; exec /usr/bin/php ./data/websocket-server.php\"
+#process_name            = Ratchet
+#numprocs                = 1
+#autostart               = true
+#autorestart             = true
+#user                    = root
+#stdout_logfile          = /data/log/ratchet-info.log
+#stdout_logfile_maxbytes = 1MB
+#stderr_logfile          = /data/log/ratchet-error.log
+#stderr_logfile_maxbytes = 1MB
+#" >> /etc/supervisord.conf
 
 /usr/bin/supervisord -n -c /etc/supervisord.conf

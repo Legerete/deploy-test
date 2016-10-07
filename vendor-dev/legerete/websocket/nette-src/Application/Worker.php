@@ -19,6 +19,8 @@ use Tracy\ILogger;
 class Worker implements MessageComponentInterface {
 
 	const WEBSOCKET_INFO_FILE = 'WebSocketInfo';
+	const SENDER_SERVER = 1;
+	const SENDER_CLIENT = 2;
 
 	/**
 	 * @var \SplObjectStorage
@@ -184,5 +186,10 @@ class Worker implements MessageComponentInterface {
 	{
 		$this->parsedMessage = $this->receivedMessageFactory->create($this->message);
 		return $this->parsedMessage;
+	}
+
+	private function getSender()
+	{
+
 	}
 }

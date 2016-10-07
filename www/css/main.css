@@ -1,0 +1,162 @@
+/*
+    Created on : Jul 4, 2014, 3:29:59 AM
+    Author     : Petr Besir Horáček <sirbesir@gmail.com>
+*/
+
+/*.alert {
+	float: left;
+    left: 50%;
+    margin-left: -250px;
+    position: absolute;
+    top: 10px;
+    width: 500px;
+    z-index: 100;
+}*/
+
+#flashes {
+	background: none;
+    border-radius: 5px;
+    left: 50%;
+    margin-left: -250px;
+    position: fixed;
+    top: 20px;
+    width: 500px;
+    z-index: 100;
+}
+
+.ra-well-title {
+	font-size: 1em;
+}
+
+h2 .popover {
+	font-weight: normal;
+	font-size: 1em;
+}
+
+.no-margin-bottom {
+	margin-bottom: 0;
+}
+
+.no-margin {
+	margin: 0;
+}
+
+.small.btn-danger, .small.btn-warning {
+	color: #fff;
+}
+
+table label {
+	font-weight: normal;
+}
+
+.alert .btn {
+	margin-top: -6px;
+}
+
+.k-list .k-item {
+	border-bottom: 1px solid #eee;
+}
+
+.k-list-container.k-group .k-item.k-first {
+	padding-top: 25px;
+}
+
+body {
+	/*font-size: 20px;*/
+}
+
+#help.well {
+	background: #e7f3fc;
+	color: #000;
+}
+
+#help.well h2 {
+	border-bottom-color: #999;
+	color: #075fa2;
+}
+
+#users .user-item.col-lg-3 {
+	/*width: 23%;*/
+	border: 0;
+	margin-left: 1%;
+	margin-right: 1%;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	padding: 0;
+	box-shadow: 0px 0px 6px 1px #ccc;
+	transition: 1s;
+}
+
+@media (min-width: 1280px) {
+	#users .user-item.col-lg-3 {
+		width: 23%;
+	}
+}
+
+@media (max-width: 800px) {
+	#users .user-item.col-lg-3 {
+		width: 98%;
+	}
+}
+
+@media (min-width: 801px) and (max-width: 1279px) {
+	#users .user-item.col-lg-3 {
+		width: 48%;
+		float: left;
+	}
+}
+
+#users .user-item.col-lg-3:hover {
+	z-index: 50;
+	box-shadow: 0px 0px 10px 1px #9acfea;
+}
+
+#users .user-item.col-lg-3.del table.table thead {
+	background: #f2dede;
+}
+
+#users .user-item.col-lg-3.del:hover {
+	box-shadow: 0px 0px 10px 1px #d9534f;
+}
+
+#users .user-item table.table {
+	margin: 0;
+}
+
+#users .user-item table.table thead tr th {
+	height: 34px;
+}
+
+.k-grid .k-hierarchy-col {
+	width: 47px;
+}
+
+div.navbar-header > a > img {
+	position: relative;
+	top: -13px;
+}
+
+.k-grid-header-wrap { overflow: visible;}
+
+.k-file-success .k-progress {background-color: #5cb85c}
+
+.contacts hr {
+	border-color: #ccc;
+	margin: 5px 0;
+}
+
+/** Bootstrap **/
+table>tbody>tr.danger>td, table>tbody>tr.danger>th, .table>tbody>tr>td.danger, .table>tbody>tr>th.danger, .table>tfoot>tr.danger>td, .table>tfoot>tr.danger>th, .table>tfoot>tr>td.danger, .table>tfoot>tr>th.danger, .table>thead>tr.danger>td, .table>thead>tr.danger>th, .table>thead>tr>td.danger, .table>thead>tr>th.danger {
+	background-color: #f2dede;
+}
+
+/** SPA **/
+.nav-responsive.nav.nav-tabs li a {
+	padding-right: 30px;
+}
+
+.nav-responsive.nav.nav-tabs li i.button-close {
+	position: absolute;
+	top: 0;
+	right: 8px;
+}
