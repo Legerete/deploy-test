@@ -16,6 +16,8 @@
 
 <body id="spa-application" data-ws-host="localhost" data-ws-port="8006">
 	{* SPA templates includes *}
+	{include ./SPA/kendo-templates/views/spa-dashboard.latte}
+	{include ./SPA/kendo-templates/views/spa-users.latte}
 
 	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 	{include content}
@@ -421,6 +423,7 @@
 
 {block scripts}
 	<script src="{$basePath}/assets/js/all.min.js{resourceVersion}"></script>
+	<script src="{$basePath}/assets/js/dev.js{resourceVersion}"></script>
 	<script src="{$basePath}/kendo/kendo.all.min.js{resourceVersion}"></script>
 	<script type="text/javascript">
 		/* Responsive tabs */

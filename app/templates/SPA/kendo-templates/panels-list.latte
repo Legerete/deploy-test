@@ -1,7 +1,7 @@
 {* kendo template *}
 <script id="spa-panels-list-template" type="text/x-kendo-template">
-	<li data-bind="events: { click: clickOnTab}" #if (active) { #class="active"#}#>
-		<a href="\\#tab2" data-toggle="tab">#=name#</a> <i class="button-close glyph-icon icon-times-circle-o"></i>
+	<li data-bind="events: { click: clickOnPanel}" class="#if (active) { #active #} if (closeable) { #closeable #}#">
+		<a href="\\#tab2" data-toggle="tab">#=name#</a>#if (closeable) { #<i class="button-close glyph-icon icon-times-circle-o" data-bind="events: { click: closePanel}"></i>#}#
 	</li>
 </script>
 {* rendered base for kendo widget binding*}
