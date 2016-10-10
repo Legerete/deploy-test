@@ -41,10 +41,6 @@ $(function () {
 			this.bind('spa.changedPanel', this.changeActivePanel);
 			this.bind('spa.addedPanel', this.changeActivePanel);
 
-			if (this.panelsList().dataSource.data().length === 0) {
-				this.addPanel(this.panelTypes['dashboard'].settings);
-			}
-
 			this.trigger('spa.afterInit', this);
 		},
 
@@ -86,10 +82,6 @@ $(function () {
 			view: null
 		}),
 
-		registerPanel: function () {
-
-		},
-
 		/**
 		 * Close panel activate another one
 		 * @param {Z.Event} event Kendo event
@@ -127,6 +119,9 @@ $(function () {
 			});
 			panel.set('active', true);
 
+			// @todo bug workaround, pri prepnuti existujiciho tabu se nereflektuje stav v zalozkach
+			this.panelsList().refresh();
+
 			this.changeActiveView(panel);
 		},
 
@@ -138,11 +133,9 @@ $(function () {
 				throw 'View template ' + panel.view + ' not found.'
 			}
 
-			var newView = new kendo.View(viewTemplate.html(), {model: panel.model});
+			var newView = new kendo.View(viewTemplate.html(), {model: panel.viewModel});
 
 			$('#app-content').html(false);
-
-			console.log(panel);
 
 			newView.render('#app-content');
 
@@ -152,72 +145,26 @@ $(function () {
 		panelsDataSource: new kendo.data.DataSource({}),
 
 		/**
-		 * Panels creators
+		 * Definition of panelType interface
+		 * Settings property is optional, but returned object of create() method must have this properties.
+		 */
+		PanelType: kendo.data.Model.define({
+			settings: {
+				multiInstances: false,
+				closeable: false,
+				name: new Date(),
+				type: new Date(),
+				view: '',
+				viewModel: new kendo.observable({})
+			},
+			create: function (event, context) {}
+		}),
+
+		/**
+		 * Panels definitions
 		 * @type {Object}
 		 */
 		panelTypes: {
-			dashboard: {
-				settings: {
-					multiInstances: false,
-					closeable: false,
-					name: 'Dashboard',
-					type: 'dashboard',
-					view: '#spa-view-dashboard'
-				},
-				create: function (event, context) {
-					context.addPanel(this.settings);
-				}
-			},
-			users: {
-				settings: {
-					multiInstances: true,
-					closeable: true,
-					name: 'Users',
-					type: 'users',
-					view: '#spa-view-users'
-				},
-				create: function (event, context) {
-					var viewModel = kendo.observable({
-						isVisible: true,
-						onSave: function(e) {
-							kendoConsole.log("event :: save(" + kendo.stringify(e.values, null, 4) + ")");
-						},
-						products: new kendo.data.DataSource({
-							schema: {
-								model: {
-									id: "ProductID",
-									fields: {
-										ProductName: { type: "string" },
-										UnitPrice: { type: "number" }
-									}
-								}
-							},
-							batch: true,
-							transport: {
-								read: {
-									url: "//demos.telerik.com/kendo-ui/service/products",
-									dataType: "jsonp"
-								},
-								update: {
-									url: "//demos.telerik.com/kendo-ui/service/products/update",
-									dataType: "jsonp"
-								},
-								create: {
-									url: "//demos.telerik.com/kendo-ui/service/products/create",
-									dataType: "jsonp"
-								},
-								parameterMap: function(options, operation) {
-									if (operation !== "read" && options.models) {
-										return {models: kendo.stringify(options.models)};
-									}
-								}
-							}
-						})
-					});
-					this.settings.model = viewModel;
-					context.addPanel(this.settings);
-				}
-			}
 		},
 
 		/**
@@ -246,12 +193,22 @@ $(function () {
 
 			this.panelsList().dataSource.add(newPanel);
 
-			this.trigger('addedPanel');
+			this.trigger('spa.addedPanel', newPanel);
 			return newPanel.uid;
 		},
 
-		addPanelType: function (name, callback) {
-
+		/**
+		 * Add panel type with name, this name is same as data-panel-type attribute on the cta
+		 * @see PanelType PanelType for info about panelSettings interface structure
+		 * @param name
+		 * @param panelSettings
+		 */
+		addPanelType: function (name, panelSettings) {
+			if (this.panelTypes[name] !== undefined) {
+				throw 'Panel type with name ' + name + ' is already registered';
+			} else {
+				this.panelTypes[name] = new this.PanelType(panelSettings);
+			}
 		},
 
 		/**
@@ -266,15 +223,28 @@ $(function () {
 			if (typeof this.panelTypes[panelType].create === 'function') {
 				if (this.canBePanelCreated(panelType)) {
 					/**
-					 * Call panel type with provided event
+					 * Call panel create method with provided event
 					 */
-					this.panelTypes[panelType].create(target, this);
+					var pannelSettings = this.panelTypes[panelType].create(target, this);
+					this.addPanel(pannelSettings);
+				} else {
+					var that = this;
+					this.openedPanels().forEach(function (panel) {
+						if (panel.type === panelType) {
+							that.changeActivePanel(panel);
+						}
+					});
 				}
 			} else {
 				console.info('Panel of type ' + panelType + ' is not registered.');
 			}
 		},
 
+		/**
+		 * Check if can be panel create.
+		 * @param {string} panelType
+		 * @returns {boolean}
+		 */
 		canBePanelCreated: function (panelType) {
 			var panelSettings = $.extend({}, this.panelDefaultSettings, this.panelTypes[panelType].settings);
 			var panelCanBeCreated = true;
@@ -332,5 +302,154 @@ $(function () {
 			}
 		});
 	});
+
+	/**
+	 * Register and basic dashboard panel
+	 */
+	window.SPA.bind('spa.beforeInit', function (context) {
+		context.addPanelType('dashboard', {
+				settings: {
+					multiInstances: false,
+					closeable: false,
+					name: 'Dashboard',
+					type: 'dashboard',
+					view: '#spa-view-dashboard'
+				},
+				create: function (event, context) {
+					return this.settings;
+				}
+			}
+		);
+	});
+
+	/**
+	 * Create dashboard panel if panel list is empty
+	 */
+	window.SPA.bind('spa.afterInit', function (context) {
+		if (context.panelsList().dataSource.data().length === 0) {
+			context.addPanel(this.panelTypes['dashboard'].settings);
+		}
+	});
+
 	window.SPA.init();
+
+
+	/**
+	 * Register users panel
+	 */
+	SPA.addPanelType('users', {
+		settings: {
+			multiInstances: true,
+			closeable: true,
+			name: 'Users',
+			type: 'users',
+			view: '#spa-view-users'
+		},
+		create: function (event, context) {
+			var viewModel = kendo.observable({
+				isVisible: true,
+				onSave: function(e) {
+				},
+				foo: $('#spa-view-dashboard').html(),
+				products: new kendo.data.DataSource({
+					schema: {
+						model: {
+							id: "ProductID",
+							fields: {
+								ProductName: { type: "string" },
+								UnitPrice: { type: "number" }
+							}
+						}
+					},
+					batch: true,
+					transport: {
+						read: {
+							url: "//demos.telerik.com/kendo-ui/service/products",
+							dataType: "jsonp"
+						},
+						update: {
+							url: "//demos.telerik.com/kendo-ui/service/products/update",
+							dataType: "jsonp"
+						},
+						create: {
+							url: "//demos.telerik.com/kendo-ui/service/products/create",
+							dataType: "jsonp"
+						},
+						parameterMap: function(options, operation) {
+							if (operation !== "read" && options.models) {
+								return {models: kendo.stringify(options.models)};
+							}
+						}
+					}
+				})
+			});
+			this.settings.viewModel = viewModel;
+			return this.settings;
+		}
+	});
+
+	SPA.addPanelType('scheduler', {
+		settings: {
+			multiInstances: false,
+			closeable: true,
+			name: 'Scheduler',
+			type: 'scheduler',
+			view: '#spa-view-scheduler'
+		},
+		create: function (event, context) {
+			var viewModel = kendo.observable({
+				isVisible: true,
+				onSave: function(e) {
+					kendoConsole.log("event :: save(" + kendo.stringify(e.event, null, 4) + ")");
+				},
+				tasks: new kendo.data.SchedulerDataSource({
+					batch: true,
+					transport: {
+						read: {
+							url: "//demos.telerik.com/kendo-ui/service/tasks",
+							dataType: "jsonp"
+						},
+						update: {
+							url: "//demos.telerik.com/kendo-ui/service/tasks/update",
+							dataType: "jsonp"
+						},
+						create: {
+							url: "//demos.telerik.com/kendo-ui/service/tasks/create",
+							dataType: "jsonp"
+						},
+						destroy: {
+							url: "//demos.telerik.com/kendo-ui/service/tasks/destroy",
+							dataType: "jsonp"
+						},
+						parameterMap: function(options, operation) {
+							if (operation !== "read" && options.models) {
+								return {models: kendo.stringify(options.models)};
+							}
+						}
+					},
+					schema: {
+						model: {
+							id: "taskId",
+							fields: {
+								taskId: { from: "TaskID", type: "number" },
+								title: { from: "Title", defaultValue: "No title", validation: { required: true } },
+								start: { type: "date", from: "Start" },
+								end: { type: "date", from: "End" },
+								startTimezone: { from: "StartTimezone" },
+								endTimezone: { from: "EndTimezone" },
+								description: { from: "Description" },
+								recurrenceId: { from: "RecurrenceID" },
+								recurrenceRule: { from: "RecurrenceRule" },
+								recurrenceException: { from: "RecurrenceException" },
+								isAllDay: { type: "boolean", from: "IsAllDay" }
+							}
+						}
+					}
+				})
+			});
+			this.settings.viewModel = viewModel;
+
+			return this.settings;
+		}
+	});
 });

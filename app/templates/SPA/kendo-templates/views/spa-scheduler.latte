@@ -1,0 +1,11 @@
+<script id="spa-view-scheduler" type="text/x-kendo-template">
+	<h1>Scheduler</h1>
+	<div data-role="scheduler"
+	     data-views="['week']"
+	     data-bind="source: tasks,
+            visible: isVisible,
+            events: {
+              save: onSave
+         }"
+	     style="height: 400px"></div>
+</script>

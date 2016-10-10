@@ -245,6 +245,7 @@ gulp.task('sass-lint', function () {
 	sassLint = sassLint || require('gulp-sass-lint');
 	var sassSources = [pathSass + '/**/*.scss',
         '!' + pathSass + '/libs/*.*',
+        '!' + pathSass + '/kendo/*.*',
         '!' + pathSass + '/sprite.scss'];
 
 	return gulp.src(sassSources)

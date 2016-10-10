@@ -1,17 +1,16 @@
 <script id="spa-view-users" type="text/x-kendo-template">
-	<h1>Users view</h1>
-	<span>Tralala lalala</span>
+	<h1>{_users}</h1>
 	<div data-role="grid"
 	     data-editable="true"
 	     data-toolbar="['create', 'save']"
 	     data-columns="[
-                                 { 'field': 'ProductName', 'width': 270 },
-                                 { 'field': 'UnitPrice' },
-                              ]"
+             { 'field': 'ProductName', 'width': 270 },
+             { 'field': 'UnitPrice' },
+          ]"
 	     data-bind="source: products,
-                            visible: isVisible,
-                            events: {
-                              save: onSave
-                            }"
+            visible: isVisible,
+            events: {
+              save: onSave
+            }"
 	     style="height: 200px"></div>
 </script>

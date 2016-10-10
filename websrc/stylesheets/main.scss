@@ -105,6 +105,13 @@
 @import '../template/helpers/responsive-elements';
 @import '../template/helpers/admin-responsive';
 
+@import 'kendo/kendo.common.core.min';
+@import 'kendo/kendo.common.min';
+@import 'kendo/kendo.bootstrap.min';
+@import 'kendo/kendo.common-bootstrap.core.min';
+@import 'kendo/kendo.common-bootstrap.min';
+
+
 #loading {
   .svg-icon-loader {
     left: 50%;
@@ -112,6 +119,10 @@
     position: absolute;
     top: 50%;
   }
+}
+
+.k-loading-image {
+  background-image: url('/assets/images/svg-loaders/bars.svg');
 }
 
 html {
@@ -142,6 +153,11 @@ html {
 
 // SPA
 .nav-responsive.nav.nav-tabs {
+
+  // kendo tab design fix :-)
+  background: transparent;
+  border: 0;
+
   li {
     &.closeable {
       a {
