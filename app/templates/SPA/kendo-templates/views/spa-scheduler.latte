@@ -1,4 +1,4 @@
-<script id="spa-view-scheduler" type="text/x-kendo-template">
+<script id="spa-view-scheduler" type="text/x-kendo-template" data-source-read="{link :LeSpaScheduler:Scheduler:Scheduler: do=>read}" data-source-create="{link :LeSpaScheduler:Scheduler:Scheduler: do=>create}">
 	<h1>Scheduler</h1>
 	<div data-role="scheduler"
 	     data-views="['week']"
@@ -7,5 +7,5 @@
             events: {
               save: onSave
          }"
-	     style="height: 400px"></div>
+	     style="height: 600px"></div>
 </script>

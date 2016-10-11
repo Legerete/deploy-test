@@ -45,6 +45,7 @@ final class AuthorizatorFactory
 		/**
 		 * PublicModule
 		 */
+		$acl->addResource('LeSpaScheduler:Scheduler:Scheduler');
 		$acl->addResource('User:Sign');
 		$acl->addResource('User:LostPassword');
 		$acl->addResource('Legerete:User:ForgotPassword');
@@ -63,6 +64,7 @@ final class AuthorizatorFactory
 		$acl->allow(self::ROLE_GUEST, 'User:LostPassword');
 		$acl->allow(self::ROLE_GUEST, 'Legerete:User:Sign');
 		$acl->allow(self::ROLE_GUEST, 'Legerete:User:ForgotPassword');
+		$acl->allow(self::ROLE_GUEST, 'LeSpaScheduler:Scheduler:Scheduler');
 //		$acl->deny(self::ROLE_GUEST, 'Public:Users:Account');
 
 	}

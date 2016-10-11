@@ -31,7 +31,8 @@
 		"cboden/ratchet": "^0.3.5",
 		"kdyby/translation": "dev-master",
 		"ublaboo/mailing": "^1.1",
-		"bazo/nette-ratchet-sessionprovider": "dev-master"
+		"bazo/nette-ratchet-sessionprovider": "dev-master",
+		"simshaun/recurr": "^1.2"
 	},
 	"autoload": {
 		"psr-4": {

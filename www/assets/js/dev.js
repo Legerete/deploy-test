@@ -127,6 +127,7 @@ $(function () {
 
 		changeActiveView: function (panel) {
 			this.trigger('spa.beforePanelViewChange');
+			$('#app-content').html('');
 
 			var viewTemplate = $(panel.view);
 			if (viewTemplate.length === 0) {
@@ -134,9 +135,6 @@ $(function () {
 			}
 
 			var newView = new kendo.View(viewTemplate.html(), {model: panel.viewModel});
-
-			$('#app-content').html(false);
-
 			newView.render('#app-content');
 
 			this.trigger('spa.afterPanelViewChange');
@@ -339,7 +337,7 @@ $(function () {
 	 */
 	SPA.addPanelType('users', {
 		settings: {
-			multiInstances: true,
+			multiInstances: false,
 			closeable: true,
 			name: 'Users',
 			type: 'users',
@@ -397,51 +395,57 @@ $(function () {
 			view: '#spa-view-scheduler'
 		},
 		create: function (event, context) {
+			var view = $(this.settings.view);
+			var readUrl = view.data('source-read');
+			var createUrl = view.data('source-create');
+
 			var viewModel = kendo.observable({
 				isVisible: true,
 				onSave: function(e) {
-					kendoConsole.log("event :: save(" + kendo.stringify(e.event, null, 4) + ")");
 				},
 				tasks: new kendo.data.SchedulerDataSource({
 					batch: true,
 					transport: {
 						read: {
-							url: "//demos.telerik.com/kendo-ui/service/tasks",
+							url: readUrl,
 							dataType: "jsonp"
 						},
 						update: {
 							url: "//demos.telerik.com/kendo-ui/service/tasks/update",
-							dataType: "jsonp"
+							dataType: "json",
+							type: 'POST'
 						},
 						create: {
-							url: "//demos.telerik.com/kendo-ui/service/tasks/create",
-							dataType: "jsonp"
+							url: createUrl,
+							dataType: "json",
+							type: "POST"
 						},
 						destroy: {
 							url: "//demos.telerik.com/kendo-ui/service/tasks/destroy",
-							dataType: "jsonp"
+							dataType: "json",
+							type: 'POST'
 						},
-						parameterMap: function(options, operation) {
-							if (operation !== "read" && options.models) {
-								return {models: kendo.stringify(options.models)};
-							}
-						}
+						// parameterMap: function(options, operation) {
+						// 	if (operation !== "read" && options.models) {
+						// 		return {models: kendo.stringify(options.models)};
+						// 	}
+						// }
 					},
 					schema: {
 						model: {
 							id: "taskId",
 							fields: {
-								taskId: { from: "TaskID", type: "number" },
-								title: { from: "Title", defaultValue: "No title", validation: { required: true } },
-								start: { type: "date", from: "Start" },
-								end: { type: "date", from: "End" },
-								startTimezone: { from: "StartTimezone" },
-								endTimezone: { from: "EndTimezone" },
-								description: { from: "Description" },
-								recurrenceId: { from: "RecurrenceID" },
-								recurrenceRule: { from: "RecurrenceRule" },
-								recurrenceException: { from: "RecurrenceException" },
-								isAllDay: { type: "boolean", from: "IsAllDay" }
+								taskId: { type: "number" },
+								title: { defaultValue: "No title", validation: { required: true } },
+								start: { type: "date" },
+								end: { type: "date" },
+								startTimezone: {  },
+								endTimezone: {  },
+								description: {  },
+								recurrenceId: {  },
+								recurrenceRule: {  },
+								recurrenceException: {  },
+								isAllDay: { type: "boolean",  }
 							}
 						}
 					}
