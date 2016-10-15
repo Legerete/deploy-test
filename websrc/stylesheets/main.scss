@@ -9,6 +9,7 @@
 // endbower
 
 @import 'common/variables';
+@import 'common/colors';
 //@import 'common/fonts';
 //@import 'common/mixins';
 @import 'sprite';
@@ -194,7 +195,7 @@ html {
 
   &.active {
     a {
-      background-color: #E91E63;
+      background-color: $color-active;
       color: #fff;
     }
   }
@@ -210,6 +211,15 @@ html {
         right: 8px;
         top: 0;
       }
+    }
+  }
+}
+
+.k-scheduler-views {
+  .k-state-default {
+    &.k-state-selected {
+        background-color: $color-active;
+        border-color: $color-active;
     }
   }
 }

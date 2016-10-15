@@ -15,6 +15,14 @@ parameters:
 		secure: 'ssl'
 		port: 465
 
+	database:
+		host: 127.0.0.1
+		port: 3308
+		user: root
+		password: 08802e9a2ade49e40a55ff00faec
+		database: porta-invest-crm
+		debug: on
+
 latte:
 	macros:
 		- App\Utils\Latte\Macros
@@ -89,17 +97,18 @@ mail:
 
 doctrine:
 	default:
-		host:
-		user:
-		password:
-		dbname:
+		host: %database.host%
+		port: %database.port%
+		user: %database.user%
+		password: %database.password%
+		dbname: %database.database%
 		charset: UTF8
 		driver: pdo_mysql
 		#entityDir: '%appDir%/entities'
 		#proxyDir: '%tempDir%/proxies'
 		#proxyNamespace: 'App\Entities\Proxies'
 		autoGenerateProxyClasses: true
-		debug: no
+		debug: %database.debug%
 		metadata:
 			App: %appDir%
 			Legerete\Spa\KendoScheduler\Model: %appDir%/../vendor-dev

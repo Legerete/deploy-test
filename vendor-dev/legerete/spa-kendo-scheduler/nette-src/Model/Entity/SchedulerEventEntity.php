@@ -35,7 +35,7 @@ class SchedulerEventEntity
 	protected $start;
 
 	/**
-	 * @ORM\Column(type="datetime")
+	 * @ORM\Column(type="datetime", name="`end`")
 	 */
 	protected $end;
 
@@ -57,17 +57,17 @@ class SchedulerEventEntity
 	/**
 	 * @ORM\ManyToOne(targetEntity="SchedulerEventEntity")
 	 */
-	protected $recurence;
+	protected $recurrence;
 
 	/**
 	 * @ORM\Column(type="string")
 	 */
-	protected $recurenceRule;
+	protected $recurrenceRule;
 
 	/**
 	 * @ORM\Column(type="string")
 	 */
-	protected $recurenceException;
+	protected $recurrenceException;
 
 	/**
 	 * @ORM\Column(type="integer")
@@ -75,9 +75,14 @@ class SchedulerEventEntity
 	protected $ownerId;
 
 	/**
-	 * @ORM\Column(type="bool")
+	 * @ORM\Column(type="integer")
 	 */
 	protected $isAllDay;
+
+	/**
+	 * @ORM\Column(type="string")
+	 */
+	protected $status = 'ok';
 
 	/**
 	 * SchedulerEventEntity constructor.
@@ -91,17 +96,17 @@ class SchedulerEventEntity
 	 * @param $ownerId
 	 * @param $isAllDay
 	 */
-	public function __construct($title, $start, $end, $startTimezone, $endTimezone, $description, $recurenceRule, $ownerId, $isAllDay)
+	public function __construct($title, $start, $end, $startTimezone, $endTimezone, $description, $recurrenceRule, $ownerId, $isAllDay)
 	{
 		$this->title = $title;
-		$this->start = new \DateTime($start);
-		$this->end = new \DateTime($end);
-		$this->startTimezone = new \DateTimeZone($startTimezone);
-		$this->endTimezone = new \DateTimeZone($endTimezone);
+		$this->start = (is_object($start) && get_class($start) === \DateTime::class) ? $start : new \DateTime($start);
+		$this->end = (is_object($end) && get_class($end) === \DateTime::class) ? $end : new \DateTime($end);
+		$this->startTimezone = (new \DateTimeZone($startTimezone))->getName();
+		$this->endTimezone = (new \DateTimeZone($endTimezone))->getName();
 		$this->description = $description;
-		$this->recurenceRule = $recurenceRule;
+		$this->recurrenceRule = $recurrenceRule;
 		$this->ownerId = $ownerId;
-		$this->isAllDay = $isAllDay;
+		$this->isAllDay = filter_var($isAllDay, FILTER_VALIDATE_BOOLEAN);
 	}
 
 
@@ -144,7 +149,7 @@ class SchedulerEventEntity
 	/**
 	 * @var mixed $start
 	 */
-	public function setStart($start)
+	public function setStart(\DateTime $start)
 	{
 		$this->start = $start;
 		return $this;
@@ -161,7 +166,7 @@ class SchedulerEventEntity
 	/**
 	 * @var mixed $end
 	 */
-	public function setEnd($end)
+	public function setEnd(\DateTime $end)
 	{
 		$this->end = $end;
 		return $this;
@@ -172,7 +177,7 @@ class SchedulerEventEntity
 	 */
 	public function getStartTimezone()
 	{
-		return $this->startTimezone;
+		return new \DateTimeZone($this->startTimezone);
 	}
 
 	/**
@@ -189,7 +194,7 @@ class SchedulerEventEntity
 	 */
 	public function getEndTimezone()
 	{
-		return $this->endTimezone;
+		return new \DateTimeZone($this->endTimezone);
 	}
 
 	/**
@@ -221,51 +226,51 @@ class SchedulerEventEntity
 	/**
 	 * @return mixed
 	 */
-	public function getRecurence()
+	public function getRecurrence()
 	{
-		return $this->recurence;
+		return $this->recurrence;
 	}
 
 	/**
-	 * @var mixed $recurence
+	 * @var mixed $recurrence
 	 */
-	public function setRecurence($recurence)
+	public function setRecurrence($recurrence)
 	{
-		$this->recurence = $recurence;
+		$this->recurrence = $recurrence;
 		return $this;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function getRecurenceRule()
+	public function getRecurrenceRule()
 	{
-		return $this->recurenceRule;
+		return $this->recurrenceRule;
 	}
 
 	/**
-	 * @var mixed $recurenceRule
+	 * @var mixed $recurrenceRule
 	 */
-	public function setRecurenceRule($recurenceRule)
+	public function setRecurrenceRule($recurrenceRule)
 	{
-		$this->recurenceRule = $recurenceRule;
+		$this->recurrenceRule = $recurrenceRule;
 		return $this;
 	}
 
 	/**
 	 * @return mixed
 	 */
-	public function getRecurenceException()
+	public function getRecurrenceException()
 	{
-		return $this->recurenceException;
+		return $this->recurrenceException;
 	}
 
 	/**
-	 * @var mixed $recurenceException
+	 * @var mixed $recurrenceException
 	 */
-	public function setRecurenceException($recurenceException)
+	public function setRecurrenceException($recurrenceException)
 	{
-		$this->recurenceException = $recurenceException;
+		$this->recurrenceException = $recurrenceException;
 		return $this;
 	}
 
@@ -299,10 +304,35 @@ class SchedulerEventEntity
 	 */
 	public function setIsAllDay($isAllDay)
 	{
-		$this->isAllDay = $isAllDay;
+		$this->isAllDay = filter_var($isAllDay, FILTER_VALIDATE_BOOLEAN);
 		return $this;
 	}
 
+	public function destroy()
+	{
+		$this->status = 'del';
+		return $this;
+	}
 
+	/**
+	 * @return array
+	 */
+	public function toArray() : array
+	{
+		return [
+			'id' => $this->id,
+			'title'=> $this->title,
+			'start'=> $this->start,
+			'end'=> $this->end,
+			'startTimezone'=> $this->startTimezone,
+			'endTimezone'=> $this->endTimezone,
+			'description'=> $this->description,
+			'recurrenceId'=> $this->recurrence,
+			'recurrenceRule'=> $this->recurrenceRule,
+			'recurrenceException'=> $this->recurrenceException,
+			'ownerId'=> 1,
+			'isAllDay'=> $this->isAllDay,
+		];
+	}
 
 }

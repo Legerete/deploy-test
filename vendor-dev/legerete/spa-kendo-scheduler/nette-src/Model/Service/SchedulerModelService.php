@@ -11,7 +11,6 @@ namespace Legerete\Spa\KendoScheduler\Model\Service;
 use Kdyby\Doctrine\EntityManager;
 use Legerete\Spa\KendoScheduler\Model\Entity\SchedulerEventEntity;
 use Nette\Security\User;
-use Recurr\RecurrenceCollection;
 
 class SchedulerModelService
 {
@@ -32,6 +31,11 @@ class SchedulerModelService
 	private $em;
 
 	/**
+	 * @var array $eventData
+	 */
+	private $eventData;
+
+	/**
 	 * SchedulerModelService constructor.
 	 *
 	 * @param EntityManager $em
@@ -44,17 +48,24 @@ class SchedulerModelService
 		$this->timeZone = $timeZone ?: date_default_timezone_get();
 	}
 
+	/**
+	 * @param array $eventData
+	 */
 	public function createNewEvent($eventData = [])
 	{
-		$event = $this->createEventEntity($eventData);
+		$events = [];
+		$this->eventData = $eventData;
+		$event = $this->createEventEntity($this->eventData);
 
-//		$this->em->persist($event);
+		$this->em->persist($event);
+		$this->em->flush();
 
-		\Tracy\Debugger::barDump($this->getRecurrences($event));
+		$events[] = $event->toArray();
+
+		return $events;
 	}
 
 	/**
-	 * @param array $eventData
 	 * @return SchedulerEventEntity
 	 */
 	private function createEventEntity(array $eventData) : SchedulerEventEntity
@@ -73,17 +84,106 @@ class SchedulerModelService
 	}
 
 	/**
-	 * @param SchedulerEventEntity $parentEvent
-	 * @return RecurrenceCollection
+	 * @param \DateTime $date
+	 * @param string $view
+	 * @param string $schedulerAction
+	 * @return array
 	 */
-	private function getRecurrences(SchedulerEventEntity $parentEvent) : RecurrenceCollection
+	public function readEvents(\DateTime $date, string $view, string $schedulerAction)
 	{
-		$startDate   = $parentEvent->getStart()->setTimezone($parentEvent->getStartTimezone());
-		$endDate     = $parentEvent->getEnd()->setTimezone($parentEvent->getEndTimezone());
-		$rule = new \Recurr\Rule($parentEvent->getRecurenceRule(), $startDate, $endDate, $this->timeZone);
-		$transformer = new \Recurr\Transformer\ArrayTransformer();
+		list($firstDayModifier, $lastDayModifier) = $this->getFirstAndLastDay($view);
+		$firstDay = $date->modify($firstDayModifier);
+		$lastDay = (clone $firstDay)->modify($lastDayModifier);
 
-		return $transformer->transform($rule);
+		$qb = $this->getSchedulerEventsRepository()->createQueryBuilder('e');
+		$events = $qb
+			->select('e, partial r.{id}')
+			->leftJoin('e.recurrence', 'r')
+			->where('e.start >= :first')
+			->andWhere('e.end <= :last')
+			->orWhere('e.recurrenceRule != :empty')
+			->andWhere('e.recurrence is NULL')
+			->andWhere('e.status = :statusOk')
+			->setParameters(['first' => $firstDay, 'last' => $lastDay, 'empty' => '', 'statusOk' => 'ok'])
+			->getQuery();
+
+		return $events->getArrayResult();
+	}
+
+	/**
+	 * @param string $view
+	 * @return array
+	 */
+	private function getFirstAndLastDay(string $view) : array
+	{
+		switch ($view) {
+			case 'day':
+				$modifyPhrases = ['today', 'today + 1 days'];
+				break;
+			case 'week':
+				$modifyPhrases = ['monday this week', 'sunday this week'];
+				break;
+			case 'month':
+				$modifyPhrases = ['first day of this month', 'last day of this month'];
+				break;
+			case 'agenda':
+				$modifyPhrases = ['monday this week', 'sunday this week'];
+				break;
+			default:
+				$modifyPhrases = self::getFirstAndLastDay('week');
+		}
+
+		return $modifyPhrases;
+	}
+
+	/**
+	 * @param array $data
+	 * @return array
+	 */
+	public function updateEvent(array $data) : array
+	{
+		/**
+		 * @type SchedulerEventEntity $event
+		 */
+		$event = $this->getSchedulerEventsRepository()->find($data['id']);
+
+		$event
+			->setTitle($data['title'])
+			->setStart(new \DateTime($data['start']))
+			->setEnd(new \DateTime($data['end']))
+			->setStartTimezone($data['startTimezone'])
+			->setEndTimezone($data['endTimezone'])
+			->setDescription($data['description'])
+			->setRecurrence(
+				empty($data['recurrenceId']) ? NULL : $this->em->getReference(SchedulerEventEntity::class, $data['recurrenceId']))
+			->setRecurrenceRule($data['recurrenceRule'])
+			->setRecurrenceException($data['recurrenceException'])
+			->setIsAllDay($data['isAllDay']);
+
+		$this->em->flush();
+		return $event->toArray();
+	}
+
+	/**
+	 * @param integer $id
+	 */
+	public function destroyEvent(integer $id)
+	{
+		/**
+		 * @type SchedulerEventEntity $event
+		 */
+		$event = $this->getSchedulerEventsRepository()->find($id);
+			$event->destroy();
+
+		$this->em->flush();
+	}
+
+	/**
+	 * @return \Kdyby\Doctrine\EntityRepository
+	 */
+	private function getSchedulerEventsRepository()
+	{
+		return $this->em->getRepository(SchedulerEventEntity::class);
 	}
 
 }

@@ -33,7 +33,7 @@ $(function () {
 			this.trigger('spa.beforeInit', this);
 
 			/* global LeWebSocket */
-			this.ws = new LeWebSocket('localhost', 8006);
+			// this.ws = new LeWebSocket('localhost', 8006);
 
 			/**
 			 * Bind internal app events routines
@@ -122,7 +122,11 @@ $(function () {
 			// @todo bug workaround, pri prepnuti existujiciho tabu se nereflektuje stav v zalozkach
 			this.panelsList().refresh();
 
-			this.changeActiveView(panel);
+			var view = this.changeActiveView(panel);
+			if (typeof panel.wakeUp === 'function')
+			{
+				panel.wakeUp(view);
+			}
 		},
 
 		changeActiveView: function (panel) {
@@ -135,9 +139,10 @@ $(function () {
 			}
 
 			var newView = new kendo.View(viewTemplate.html(), {model: panel.viewModel});
-			newView.render('#app-content');
+			var view = newView.render('#app-content');
 
 			this.trigger('spa.afterPanelViewChange');
+			return view[0];
 		},
 
 		panelsDataSource: new kendo.data.DataSource({}),
@@ -392,26 +397,61 @@ $(function () {
 			closeable: true,
 			name: 'Scheduler',
 			type: 'scheduler',
-			view: '#spa-view-scheduler'
+			view: '#spa-view-scheduler',
+			wakeUp: function(view) {
+				if (this.viewModel.get('navigateDate')) {
+					var scheduler = $(view).find('div[data-role="scheduler"]').data('kendoScheduler');
+					scheduler.date(this.viewModel.get('navigateDate'));
+				}
+			}
 		},
 		create: function (event, context) {
+			kendo.culture().calendar.firstDay = 1;
 			var view = $(this.settings.view);
-			var readUrl = view.data('source-read');
+			var scheduler = $('#app-content').find('div[data-role="scheduler"]').data('kendoScheduler');
 			var createUrl = view.data('source-create');
+			var readUrl = view.data('source-read');
+			var updateUrl = view.data('source-update');
+			var destroyUrl = view.data('source-destroy');
 
 			var viewModel = kendo.observable({
 				isVisible: true,
-				onSave: function(e) {
+				navigateDate: null,
+				navigateView: null,
+				navigateAction: null,
+				navigate: function (e) {
+					this.navigateView = e.view;
+					this.navigateDate = e.date;
+					this.navigateAction = e.action;
 				},
 				tasks: new kendo.data.SchedulerDataSource({
 					batch: true,
 					transport: {
 						read: {
-							url: readUrl,
-							dataType: "jsonp"
+							url: function() {
+								// @todo find better way to get scheduler
+								var scheduler = $('#app-content').find('div[data-role="scheduler"]').data('kendoScheduler');
+								var url = readUrl;
+								if (viewModel.get('navigateDate')) {
+									var date = new Date(viewModel.get('navigateDate'));
+									url = url + '&date=' +date.toLocaleDateString();
+								} else {
+									url = url + '&date=' + new Date().toLocaleDateString();
+								}
+								if (viewModel.get('navigateView')) {
+									url = url + '&view=' + viewModel.get('navigateView');
+								} else {
+									url = url + '&view=' + scheduler.view().title.toLowerCase();
+								}
+								if (viewModel.get('navigateAction')) {
+									url = url + '&schedulerAction=' + viewModel.get('navigateAction');
+								}
+								return url;
+							},
+							dataType: "json"
 						},
 						update: {
-							url: "//demos.telerik.com/kendo-ui/service/tasks/update",
+							url: updateUrl,
 							dataType: "json",
 							type: 'POST'
 						},
@@ -421,31 +461,41 @@ $(function () {
 							type: "POST"
 						},
 						destroy: {
-							url: "//demos.telerik.com/kendo-ui/service/tasks/destroy",
+							url: destroyUrl,
 							dataType: "json",
 							type: 'POST'
-						},
-						// parameterMap: function(options, operation) {
-						// 	if (operation !== "read" && options.models) {
-						// 		return {models: kendo.stringify(options.models)};
-						// 	}
-						// }
+						}
 					},
+					serverFiltering: true,
+					serverPaging: true,
+					serverGrouping: true,
+					serverSorting: true,
+					serverAggregates: true,
 					schema: {
+						data: function(response) {
+							response.forEach(function (item) {
+								item.start = item.start.date;
+								item.end = item.end.date;
+								if (item.recurrence) {
+									item.recurrenceId = item.recurrence.id;
+								}
+							});
+							return response;
+						},
 						model: {
-							id: "taskId",
+							id: "id",
 							fields: {
-								taskId: { type: "number" },
+								id: { type: "number", from: 'id' },
 								title: { defaultValue: "No title", validation: { required: true } },
-								start: { type: "date" },
-								end: { type: "date" },
+								start: { type: "date"},
+								end: { type: "date"},
 								startTimezone: {  },
 								endTimezone: {  },
 								description: {  },
 								recurrenceId: {  },
 								recurrenceRule: {  },
 								recurrenceException: {  },
-								isAllDay: { type: "boolean",  }
+								isAllDay: { type: "boolean"  }
 							}
 						}
 					}
