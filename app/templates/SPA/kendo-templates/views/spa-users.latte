@@ -1,16 +1,33 @@
 <script id="spa-view-users" type="text/x-kendo-template">
-	<h1>{_users}</h1>
+	<h1>{_users.users.h1}</h1>
 	<div data-role="grid"
-	     data-editable="true"
-	     data-toolbar="['create', 'save']"
-	     data-columns="[
-             { 'field': 'ProductName', 'width': 270 },
-             { 'field': 'UnitPrice' },
-          ]"
-	     data-bind="source: products,
-            visible: isVisible,
-            events: {
-              save: onSave
-            }"
-	     style="height: 600px"></div>
+			data-editable="{ mode: 'popup'}"
+			data-toolbar="['create', 'save']"
+			data-columns="[
+				{ command: [
+						{
+							name: '{_customEdit}',
+							click: SPA.openPanel
+						}
+					]
+				},
+				{
+					'field': 'customUserEdit',
+					'title': '{_users.edit}',
+					'template': '<div class=\'btn btn-primary\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'#=id#\'>edit</div>'
+				},
+				{ 'field': 'ProductName', 'width': 270 },
+				{ 'field': 'UnitPrice' },
+            ]"
+			data-bind="source: users,
+				visible: isVisible,
+				events: {
+				save: onSave
+			}"
+			style="height: 600px"></div>
+</script>
+
+<script id="spa-view-user" type="text/x-kendo-template">
+	<h1>{_users.user.h1}</h1>
+	<div class="btn btn-success" data-bind="click: save"></div>
 </script>

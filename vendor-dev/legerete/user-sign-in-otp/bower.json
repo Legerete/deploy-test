@@ -1,5 +1,5 @@
 {
-	"name": "legerete-crm-sign-in",
+	"name": "legerete-user-crm-sign-in",
 	"description": "Legerete s.r.o. Project CRM sign-in component assets",
 	"main": [
 		"bower-src/javascript/crm-sign-in.js",
@@ -14,5 +14,10 @@
 	"dependencies": {
 		"wowjs": "~1.1.2",
 		"jquery": "~2.1.1"
-	}
+	},
+	"ignore": [
+		"composer.json",
+		"nette-src",
+		"tests"
+	]
 }

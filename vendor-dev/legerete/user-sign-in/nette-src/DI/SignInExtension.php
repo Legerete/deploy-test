@@ -6,8 +6,9 @@
  * @package     Legerete\SignInExtension
  */
 
-namespace Legerete\UserModule\DI;
+namespace Legerete\UserSignInModule\DI;
 
+use Legerete\Security\AuthorizatorFactory;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 use Nette\NotImplementedException;
@@ -23,6 +24,9 @@ class SignInExtension extends CompilerExtension
 	 */
 	private $defaults = [
 		'allowForgotPassword' => TRUE,
+		'afterLoginRedirectPage' => '',
+		'afterLogoutRedirectPage' => '',
+		'loginAfterAuthorization' => 'on',
 	];
 
 	public function loadConfiguration()
@@ -36,13 +40,25 @@ class SignInExtension extends CompilerExtension
 		// Inject config to SignPresenter
 		$builder->getDefinition($this->prefix('SignPresenter'))->setArguments([$config]);
 
+		$presenterFactory = $builder->getDefinition('application.presenterFactory');
+		$presenterFactory->addSetup('setMapping', [['LeSignIn' => 'Legerete\*Module\Presenters\*Presenter']]);
+
+		$router = $builder->getDefinition('routing.router');
+		$router->addSetup('$service->prepend(new Nette\Application\Routers\Route(?, ?));', ['sign[/<action>]', [
+			'module' => 'LeSignIn:UserSignIn',
+			'presenter' => 'Sign',
+			'action' => 'default',
+			'alias' => 'LeSignIn'
+		]]);
+
 		// Add resources to authorizator
-//		$authorizator = $builder->getDefinition($builder->getByType(IAuthorizator::class));
-//
-//		if (!$authorizator) {
-//			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
-//		}
-//		$authorizator->addSetup('addResource', ['Legerete:User:Sign']);
+		$authorizator = $builder->getDefinition($builder->getByType(IAuthorizator::class));
+
+		if (!$authorizator) {
+			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
+		}
+		$authorizator->addSetup('addResource', ['LeSignIn:UserSignIn:Sign']);
+		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSignIn:UserSignIn:Sign']);
 	}
 
 	public function beforeCompile()

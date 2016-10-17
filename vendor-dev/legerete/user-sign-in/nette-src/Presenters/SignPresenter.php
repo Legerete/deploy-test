@@ -6,11 +6,11 @@
  * @package     Legerete\SignInExtension
  */
 
-namespace Legerete\UserModule\Presenters;
+namespace Legerete\UserSignInModule\Presenters;
 
 use Legerete\Presenters\SecuredPresenter,
 	Nette\Security\Identity,
-	Legerete\UserModule\Components as Components;
+	Legerete\UserSignInModule\Components as Components;
 
 /**
  * Sign in/out presenter.
@@ -35,9 +35,9 @@ class SignPresenter extends SecuredPresenter
 		$config;
 
 	public function __construct(array $config = [],
-	                            Components\SignIn\SignInFactory $signInFactory,
-	                            Components\ForgotPasswordFactory $forgotPasswordFactory,
-	                            Components\ChooseNewPasswordFactory $chooseNewPasswordFactory)
+								Components\SignIn\SignInFactory $signInFactory,
+								Components\ForgotPasswordFactory $forgotPasswordFactory,
+								Components\ChooseNewPasswordFactory $chooseNewPasswordFactory)
 	{
 		parent::__construct();
 

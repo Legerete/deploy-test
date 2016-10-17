@@ -1,6 +1,6 @@
 <?php
 
-	namespace Legerete\UserModule\Components;
+	namespace Legerete\UserSignInModule\Components;
 
 	use App\Entity\Client;
 	use Kdyby\Doctrine\EntityManager;

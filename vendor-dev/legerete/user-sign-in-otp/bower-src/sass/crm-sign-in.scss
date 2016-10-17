@@ -1,0 +1,24 @@
+html {
+  &.sign, &.forgot-password {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  &.sign {
+    #forgot-password-form-container {
+      display: none;
+    }
+  }
+
+  &.forgot-password {
+    #sign-in-form-container {
+      display: none;
+    }
+  }
+
+  body {
+    height: 100%;
+    overflow: hidden;
+
+  }
+}

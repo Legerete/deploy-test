@@ -1,0 +1,3 @@
+services:
+	SignPresenter: Legerete\UserSignInOtp\Presenters\SignOtpPresenter
+	- Legerete\UserSignInOtp\Components\SignInOtp\SignInOtpFactory

@@ -19,11 +19,16 @@ final class AuthorizatorFactory
 	const ROLE_ADMIN  = 'admin';
 
 	/**
+	 * @var Permission
+	 */
+	private $acl;
+
+	/**
 	 * @return IAuthorizator
 	 */
 	public function create()
 	{
-		$acl = new Permission;
+		$acl = $this->acl = new Permission;
 
 		$this->addRoles($acl);
 		$this->addResources($acl);
@@ -45,11 +50,10 @@ final class AuthorizatorFactory
 		/**
 		 * PublicModule
 		 */
-		$acl->addResource('LeSpaScheduler:Scheduler:Scheduler');
 		$acl->addResource('User:Sign');
 		$acl->addResource('User:LostPassword');
 		$acl->addResource('Legerete:User:ForgotPassword');
-		$acl->addResource('Legerete:User:Sign');
+//		$acl->addResource('LeSignIn:UserSignIn:Sign');
 
 	}
 
@@ -62,11 +66,9 @@ final class AuthorizatorFactory
 //		$acl->allow(self::ROLE_GUEST, 'Public');
 		$acl->allow(self::ROLE_GUEST, 'User:Sign');
 		$acl->allow(self::ROLE_GUEST, 'User:LostPassword');
-		$acl->allow(self::ROLE_GUEST, 'Legerete:User:Sign');
 		$acl->allow(self::ROLE_GUEST, 'Legerete:User:ForgotPassword');
-		$acl->allow(self::ROLE_GUEST, 'LeSpaScheduler:Scheduler:Scheduler');
+//		$acl->allow(self::ROLE_GUEST, 'LeSpaScheduler:Scheduler:Scheduler');
+//		$acl->allow(self::ROLE_GUEST, 'LeSignIn:UserSignIn:Sign');
 //		$acl->deny(self::ROLE_GUEST, 'Public:Users:Account');
-
 	}
-
 }

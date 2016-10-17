@@ -20,7 +20,7 @@
 	"require": {
 		"nette/di" : "^2.4",
 		"nette/application" : "^2.4",
-		"legerete/crm-core" : "dev-master"
+		"legerete/core" : "dev-master"
 	},
 	"minimum-stability": "dev",
 	"require-dev": {

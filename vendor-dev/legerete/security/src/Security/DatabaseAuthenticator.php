@@ -1,78 +1,111 @@
 <?php
 
+/**
+ * @copyright   Copyright (c) 2016 Legerete s.r.o. <core@legerete.cz>
+ * @author      Petr Besir Horáček <sirbesir@gmail.com>
+ * @author      Pavel Janda <me@paveljanda.com>
+ * @package     Legerete\SignInExtension
+ */
+
 namespace Legerete\Security;
 
-use Nette\Security;
+use Legerete\User\Entity\UserEntity;
+use Nette\Security\AuthenticationException;
+use Nette\InvalidArgumentException;
+use Kdyby\Doctrine\EntityManager;
+use Nette\Security\Passwords;
+use Nette\Security\IAuthenticator;
+use Nette\Security\Identity;
+use Nette\Security\User;
 
-/**
- * Users authenticator.
- * @author Petr Horacek <petr.horacek@wunderman.cz>
- */
-class DatabaseAuthenticator implements Security\IAuthenticator
+final class DatabaseAuthenticator implements IDatabaseAuthenticator
 {
-	/**
-	 * @var \Kdyby\Doctrine\EntityManager
-	 */
-	public $entityManager;
 
 	/**
-	 * @author Petr Horacek <petr.horacek@wunderman.cz>
-	 * @param \Kdyby\Doctrine\EntityManager $entityManager
+	 * @var EntityManager
 	 */
-	public function __construct(\Kdyby\Doctrine\EntityManager $entityManager)
+	private $em;
+
+	/**
+	 * @var User
+	 */
+	private $user;
+
+	/**
+	 * @param EntityManager $em
+	 * @param User $user
+	 */
+	public function __construct(EntityManager $em, User $user)
 	{
-		$this->entityManager = $entityManager;
+		$this->em = $em;
+		$this->user = $user;
 	}
 
 	/**
-	 * Performs an authentication.
-	 * @author Petr Horacek <petr.horacek@wunderman.cz>
-	 * @return Nette\Security\Identity
-	 * @throws Nette\Security\AuthenticationException
+	 * @param string $username
+	 * @param string $password
+	 * @param bool $authenticateUser If is set to FALSE user will be logged, but no athenticate (set-up user identity without login)
+	 * @return void
+	 * @throws AuthenticationException
+	 * @throws InvalidArgumentException
 	 */
-	public function authenticate(array $credentials)
+	public function authenticate($username, $password, $authenticateUser = TRUE)
 	{
-		list($username, $password) = $credentials;
-
 		$user = $this->userRespository()
-						->createQueryBuilder('u')
-						->select('u')
-						->where('u.username = :username')
-						->setParameter('username', $username)
-						->getQuery()
-						->getResult();
+			->createQueryBuilder('u')
+			->select('u')
+			->where('u.username = :username')
+			->setParameter('username', $username)
+			->getQuery()
+			->getSingleResult();
 
-		if (!count($user)) {
-			throw new Security\AuthenticationException('Špatné přihlašovací údaje.', self::INVALID_CREDENTIAL);
+		if (!$user) {
+			throw new AuthenticationException(
+				'Špatné přihlašovací údaje.',
+				IAuthenticator::INVALID_CREDENTIAL
+			);
 		}
 
-		$user = (object) $user[0];
-
-		/*if (!Passwords::verify($user->password, $user->password)) {
-			throw new Security\AuthenticationException('Špatné přihlašovací údaje.', self::INVALID_CREDENTIAL);
-		}*/
+		if (!Passwords::verify($password, $user->password)) {
+			throw new AuthenticationException(
+				'Špatné přihlašovací údaje.',
+				IAuthenticator::INVALID_CREDENTIAL
+			);
+		}
 
 		if ($user->isDel())
 		{
-			throw new Security\AuthenticationException('Uživatelský účet byl smazán.', self::IDENTITY_NOT_FOUND);
+			throw new AuthenticationException(
+				'Uživatelský účet byl smazán.',
+				IAuthenticator::IDENTITY_NOT_FOUND
+			);
 		}
 
-		if (is_null($user->role) or $user-> role === '')
+		if (is_null($user->role) or $user->role === '')
 		{
-			throw new \Nette\InvalidArgumentException('Uživatelský účet nemá nastavenou žádnou roli.');
+			throw new InvalidArgumentException('Uživatelský účet nemá nastavenou žádnou roli.');
 		}
 
-		return new Security\Identity($user->id, $user->role, [
+		$identity = new Identity($user->id, $user->role, [
 			'name' => $user->getName(),
 			'surname' => $user->getSurname(),
 			'email' => $user->getEmail(),
 			'role' => $user->getRole()
 		]);
+
+		$this->user->login($identity);
+
+		if ($authenticateUser === FALSE) {
+			$this->user->getStorage()->setAuthenticated(FALSE);
+		}
 	}
 
-	private function userRespository()
+	/**
+	 * @return \Kdyby\Doctrine\EntityRepository
+	 */
+	protected function userRespository()
 	{
-		return $this->entityManager->getRepository('\App\Entity\User');
+		return $this->em->getRepository(UserEntity::class);
 	}
 
 }

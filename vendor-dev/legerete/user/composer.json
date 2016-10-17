@@ -1,7 +1,7 @@
 {
-	"name": "legerete/crm-user-sign-in",
+	"name": "legerete/user",
 	"type": "library",
-	"description": "Legerete s.r.o. Project CRM sign-in component",
+	"description": "Legerete s.r.o. Basic user entity",
 	"license": "GNU GPL v3",
 	"support": {
 		"issues": ""
@@ -20,10 +20,20 @@
 	"require": {
 		"nette/di" : "^2.4",
 		"nette/application" : "^2.4",
-		"legerete/crm-core" : "dev-master"
+		"legerete/core" : "dev-master"
 	},
 	"minimum-stability": "dev",
 	"require-dev": {
 		"codeception/codeception": "^2.1"
+	},
+	"suggest": {
+		"legerete\security": "Implement basic security classes e.g. Authorizator, Authenticator, SecuredPresenter"
+	},
+	"archive": {
+		"exclude": [
+			"bower.json",
+			"bower-src",
+			"tests"
+		]
 	}
 }
