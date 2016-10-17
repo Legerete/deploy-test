@@ -22,6 +22,8 @@ parameters:
 		password: 08802e9a2ade49e40a55ff00faec
 		database: porta-invest-crm
 		debug: on
+		metadata:
+			App: %appDir%
 
 latte:
 	macros:
@@ -48,14 +50,31 @@ extensions:
 	mailing: Ublaboo\Mailing\DI\MailingExtension
 	core: Legerete\DI\CoreExtension
 	LeSecurity: Legerete\Security\DI\SecurityExtension
-	signIn: Legerete\UserModule\DI\SignInExtension
+	signIn: Legerete\UserSignInModule\DI\SignInExtension
+	signInOtp: Legerete\UserSignInOtp\DI\SignInOtpExtension
 	scheduler: Legerete\Spa\KendoScheduler\DI\SpaSchedulerExtension
 
 core:
 	pageTitle: 'Porta Invest s.r.o. - CRM'
+	doctrine:
+		host: %database.host%
+		port: %database.port%
+		user: %database.user%
+		password: %database.password%
+		dbname: %database.database%
+		charset: UTF8
+		driver: pdo_mysql
+		#entityDir: '%appDir%/entities'
+		#proxyDir: '%tempDir%/proxies'
+		#proxyNamespace: 'App\Entities\Proxies'
+		autoGenerateProxyClasses: true
+		debug: %database.debug%
 
 signIn:
 	allowForgotPassword: TRUE
+	loginAfterAuthorization: off
+	loginRedirectPage: 'SPA:default'
+	logoutRedirectPage: ''
 
 LeSecurity:
 	roles:
@@ -110,8 +129,9 @@ doctrine:
 		autoGenerateProxyClasses: true
 		debug: %database.debug%
 		metadata:
+#			%database.metadata%
 			App: %appDir%
-			Legerete\Spa\KendoScheduler\Model: %appDir%/../vendor-dev
+#			Legerete\Spa\KendoScheduler\Model: %appDir%/../vendor-dev
 
 services:
 	router: App\Router\RouterFactory::createRouter

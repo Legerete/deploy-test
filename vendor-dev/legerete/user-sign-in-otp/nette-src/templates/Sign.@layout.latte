@@ -3,10 +3,9 @@
  * @param array    $flashes  flash messages
  *}
 <!DOCTYPE html>
-<html class="sign">
+<html n:class="isset($pageClass) ? $pageClass">
 <head>
 	<meta charset="utf-8">
-{dump $pageTitle}
 	<title>{ifset title}{include title|stripHtml}{ifset $pageTitle} | {/ifset}{/ifset}{ifset $pageTitle}{$pageTitle}{/ifset}</title>
 
 	<link rel="stylesheet" href="{$basePath}/assets/css/all.min.css{resourceVersion}">
@@ -15,12 +14,14 @@
 </head>
 
 <body>
-<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
+	<div id="app-content">
+		<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 
-{include content}
+		{include content}
 
-{block scripts}
-	<script src="{$basePath}/assets/js/all.min.js{resourceVersion}"></script>
-{/block}
+		{block scripts}
+			<script src="{$basePath}/assets/js/all.min.js{resourceVersion}"></script>
+		{/block}
+	</div>
 </body>
 </html>

@@ -14,7 +14,7 @@
 	],
 	"autoload": {
 		"psr-4": {
-			"Legerete\\CRM\\UserModule\\": "nette-src/"
+			"Legerete\\Spa\\KendoScheduler": "nette-src/"
 		}
 	},
 	"require": {
@@ -27,7 +27,7 @@
 		"codeception/codeception": "^2.1"
 	},
 	"suggest": {
-		"legerete\security": "Implement basic security classes e.g. Authorizator, Authenticator, SecuredPresenter"
+		"legerete/security": "Implement basic security classes e.g. Authorizator, Authenticator, SecuredPresenter"
 	},
 	"archive": {
 		"exclude": [

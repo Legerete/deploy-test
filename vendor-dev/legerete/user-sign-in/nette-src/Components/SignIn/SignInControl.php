@@ -6,7 +6,7 @@
  * @package     Legerete\SignInExtension
  */
 
-namespace Legerete\UserModule\Components\SignIn;
+namespace Legerete\UserSignInModule\Components\SignIn;
 
 use Kdyby\Doctrine\EntityManager,
 	Nette\Localization\ITranslator,
@@ -15,6 +15,7 @@ use Kdyby\Doctrine\EntityManager,
 	Nette\Security as Security,
 	Tracy\ILogger,
 	Nette\Utils as Utils;
+use Legerete\Security\IDatabaseAuthenticator;
 
 //	Nette\Utils\Arrays,
 //	Nette\Utils\ArrayHash;
@@ -24,59 +25,56 @@ use Kdyby\Doctrine\EntityManager,
  */
 class SignInControl extends UI\Control
 {
+	/** @var FormFactory */
+	private $formFactory;
 
-	private
-		/** @var FormFactory */
-		$formFactory,
+	/** @type ILogger */
+	private $logger;
 
-		/** @var EntityManager */
-		$entityManager,
+	/** @var Security\User $user */
+	private $user;
 
-		/** @type ILogger */
-		$logger,
+	/** @var IDatabaseAuthenticator */
+	private $authenticator;
 
-		/** @var Security\User $user */
-		$user,
+	/** @var ITranslator */
+	private $translator;
 
-		/** @var ITranslator */
-		$translator,
+	/** @var string|bool */
+	private $forgotPasswordLink;
 
-		/** @var string|bool */
-		$forgotPasswordLink;
+	/** @var callback $loggedInSuccess */
+	public $onLogInSuccess = [];
 
-	public
-		/** @var callback $loggedInSuccess */
-		$onLogInSuccess = [],
+	/** @var callback $loggedInFailed */
+	public $onLogInFailed = [];
 
-		/** @var callback $loggedInFailed */
-		$onLogInFailed = [],
-
-		/** @var array */
-		$config = [
-			'allowForgotPassword' => TRUE
-		];
+	/** @var array */
+	public $config = [
+		'allowForgotPassword' => TRUE
+	];
 
 	/**
 	 * SignInControl constructor.
 	 * @param array $config
 	 * @param FormFactory $formFactory
-	 * @param EntityManager $em
+	 * @param IDatabaseAuthenticator $authenticator
 	 * @param ILogger $logger
 	 * @param Security\User $user
 	 * @param ITranslator $translator
 	 */
 	public function __construct(array $config,
-	                            FormFactory $formFactory,
-	                            EntityManager $em,
-	                            ILogger $logger,
-	                            Security\User $user,
-	                            ITranslator $translator)
+								FormFactory $formFactory,
+								IDatabaseAuthenticator $authenticator,
+								ILogger $logger,
+								Security\User $user,
+								ITranslator $translator)
 	{
 		parent::__construct();
 
+		$this->authenticator = $authenticator;
 		$this->config = $config;
 		$this->formFactory = $formFactory;
-		$this->entityManager = $em;
 		$this->logger = $logger;
 		$this->user = $user;
 		$this->translator = $translator;
@@ -88,10 +86,9 @@ class SignInControl extends UI\Control
 	public function render()
 	{
 		$ds = DIRECTORY_SEPARATOR;
-		$template = $this->getTemplate();
-		$template->setFile(realpath(__DIR__ . $ds . 'templates') . $ds . 'SignInPage.latte');
-		$template->allowForgotPassword = Utils\Arrays::get($this->config, 'allowForgotPassword', TRUE);
-		$template->render();
+		$this->getTemplate()->setFile(realpath(__DIR__ . $ds . 'templates') . $ds . 'SignInPage.latte');
+		$this->getTemplate()->allowForgotPassword = Utils\Arrays::get($this->config, 'allowForgotPassword', TRUE);
+		$this->getTemplate()->render();
 	}
 
 	/**
@@ -122,25 +119,27 @@ class SignInControl extends UI\Control
 	 */
 	public function processSignIn(UI\Form $form, Utils\ArrayHash $values)
 	{
-		/** @var \App\CoreModule\Entity\Client $user */
-		$user = $this->clientRepository()->findOneBy(['login' => $values->login]);
-
-		// TODO implement translations
-		if (!$user || !Security\Passwords::verify($values->password, $user->getPassword()) || !$user->getIsActive()) {
-			$this->flashMessage('Neplatné přihlašovací údaje. '
-				. '<a href="'
-
-				// FIXME implement :Public:Users:LostPassword:
-				/*. $this->getPresenter()->link(':Public:Users:LostPassword:')*/
-
-				. '">Zapoměli jste heslo</a>?');
-			$this->redrawControl('flashes');
-			$this->onLogInFailed();
-		} else {
-			$identity = new Security\Identity($user->getLogin(), 'client', ['client' => $user]);
-			$this->user->login($identity);
-			$this->onLogInSuccess();
+		try {
+			$this->authenticator->authenticate([$values->login, $values->password]);
+		    $this->onLogInSuccess();
+		} catch (Security\AuthenticationException $e) {
+			$this->flashMessage($this->getFailedMessage());
+		    $this->onLogInFailed();
 		}
+	}
+
+	/**
+	 * @return string
+	 */
+	private function getFailedMessage() : string
+	{
+		$message = $this->translator->translate('sign.in.form.error.invalidCredentials');
+
+		if ($this->forgotPasswordLink) {
+			$message .= '<br>' . sprintf($this->translator->translate('sign.in.form.error.invalidCredentials'), $this->forgotPasswordLink);
+		}
+
+		return $message;
 	}
 
 	/**
@@ -150,13 +149,4 @@ class SignInControl extends UI\Control
 	{
 		$this->forgotPasswordLink = $link;
 	}
-
-	/**
-	 * @return \Kdyby\Doctrine\EntityRepository
-	 */
-	private function clientRepository()
-	{
-		return $this->entityManager->getRepository(\App\CoreModule\Entity\Client::class);
-	}
-
 }

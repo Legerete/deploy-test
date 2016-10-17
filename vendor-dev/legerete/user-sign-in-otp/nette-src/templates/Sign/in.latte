@@ -1,0 +1,21 @@
+{var $robots = noindex}
+
+{block #content}
+<div id="loading">
+	<div class="svg-icon-loader">
+		<img src="{$basePath}/assets/images/svg-loaders/bars.svg" width="40" alt="">
+	</div>
+</div>
+
+<img src="{$basePath}/assets/images/blurred-bg/blurred-bg-3.jpg" class="login-img wow fadeIn" alt="">
+
+<div class="center-vertical">
+	<div class="center-content">
+
+		<div class="col-md-3 center-margin">
+			{control signInForm}
+			{control forgotPasswordForm}
+		</div>
+
+	</div>
+</div>

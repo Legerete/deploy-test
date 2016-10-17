@@ -220,8 +220,13 @@ $(function () {
 		 * @returns {void}
 		 */
 		openPanel: function (e) {
-			var target = e.currentTarget;
-			var panelType = $(e.currentTarget).data('panel-type');
+			var target;
+			if (e.currentTarget !== undefined) {
+				target = e.currentTarget;
+			} else {
+				target = $(e);
+			}
+			var panelType = $(target).data('panel-type');
 
 			if (typeof this.panelTypes[panelType].create === 'function') {
 				if (this.canBePanelCreated(panelType)) {
@@ -325,6 +330,10 @@ $(function () {
 		);
 	});
 
+	$(SPA).on('spa.afterInit', function () {
+		console.log('test trigger');
+	});
+
 	/**
 	 * Create dashboard panel if panel list is empty
 	 */
@@ -351,10 +360,12 @@ $(function () {
 		create: function (event, context) {
 			var viewModel = kendo.observable({
 				isVisible: true,
-				onSave: function(e) {
+				editUser: function (e) {
+					var uid = $(e.target).closest('tr').data('uid');
+					var model = this.products.getByUid(uid);
+					console.log(model);
 				},
-				foo: $('#spa-view-dashboard').html(),
-				products: new kendo.data.DataSource({
+				users: new kendo.data.DataSource({
 					schema: {
 						model: {
 							id: "ProductID",
@@ -387,7 +398,57 @@ $(function () {
 				})
 			});
 			this.settings.viewModel = viewModel;
+			this.registerListeners(viewModel);
 			return this.settings;
+		},
+		registerListeners: function (viewModel) {
+			SPA.bind('user-edit.update', function (user) {
+				viewModel.users.read();
+			});
+		}
+	});
+
+	/**
+	 * Register users panel
+	 */
+	SPA.addPanelType('user-edit', {
+		settings: {
+			multiInstances: true,
+			closeable: true,
+			name: 'User',
+			type: 'user-edit',
+			view: '#spa-view-user'
+		},
+		user: {
+			id: null,
+			username: '',
+			name: '',
+			surname: '',
+			phone: '',
+			email: '',
+			degree: '',
+			role: [],
+			status: 'ok',
+		},
+		User: kendo.data.Model.define(this.user),
+		create: function (event, context) {
+			var that = this;
+			// console.log($(event).data('user-id'));
+			var viewModel = kendo.observable({
+				isVisible: true,
+				save: function () {
+					that.save();
+				}
+			});
+			this.settings.viewModel = viewModel;
+			this.registerListeners();
+			return this.settings;
+		},
+		save: function () {
+			SPA.trigger('user-edit.update', this.settings.viewModel);
+		},
+		registerListeners: function () {
+			// @todo dopsat listener pro update uzivatele v případě shodnosti s updatovaným v jiném tabu
 		}
 	});
 

@@ -1,6 +1,6 @@
 <?php
 
-	namespace Legerete\UserModule\Components;
+	namespace Legerete\UserSignInModule\Components;
 
 	use Kdyby\Doctrine\EntityManager;
 	use Tracy\ILogger;
