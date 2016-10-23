@@ -19,18 +19,7 @@ class UserExtension extends CompilerExtension
 
 	public function loadConfiguration()
 	{
-		$builder = $this->getContainerBuilder();
-		$config = $this->getConfig($this->defaults);
-
-		// Load services definitions for extension
-		Compiler::loadDefinitions($builder, $this->loadFromFile(__DIR__ . '/UserExtensionConfig.neon')['services'], $this->name);
-
 		$this->registerDoctrineEntityAnnotationDriver(__DIR__.'/../Model/Entity', 'Legerete\User\Model\Entity');
-	}
-
-	public function beforeCompile()
-	{
-		$builder = $this->getContainerBuilder();
 	}
 
 }

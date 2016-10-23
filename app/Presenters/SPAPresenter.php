@@ -4,16 +4,19 @@ namespace App\Presenters;
 
 
 
+use Ublaboo\ImageStorage\ImageStorage;
+
 class SPAPresenter extends BasePresenter
 {
+	/**
+	 * @var ImageStorage
+	 * @inject
+	 */
+	public $imageStorage;
 
-	public function renderDefault()
+	public function startup()
 	{
+		parent::startup();
+		$this->getTemplate()->imageStorage = $this->imageStorage;
 	}
-
-
-	public function renderRobotsTxt()
-	{
-	}
-
 }

@@ -8,19 +8,19 @@
 
 namespace Legerete\Spa\KendoUser\Model\Service;
 
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Internal\Hydration\ArrayHydrator;
 use Kdyby\Doctrine\EntityManager;
+use Kdyby\Doctrine\EntityRepository;
 use Legerete\Spa\KendoScheduler\Model\Entity\SchedulerEventEntity;
+use Legerete\Spa\KendoUser\Model\Exception\UserNotFoundException;
 use Legerete\User\Model\Entity\UserEntity;
 use Nette\Application\BadRequestException;
 use Nette\Security\User;
 
 class UserModelService
 {
-	/**
-	 * @var string $timeZone
-	 * @see http://php.net/manual/en/timezones.php
-	 */
-	private $timeZone;
+	const PARTIAL_USER_SELECT = 'id, username, name, surname, email, phone, degree, roles, status, avatar';
 
 	/**
 	 * @var User $user
@@ -33,11 +33,6 @@ class UserModelService
 	private $em;
 
 	/**
-	 * @var array $eventData
-	 */
-	private $eventData;
-
-	/**
 	 * SchedulerModelService constructor.
 	 *
 	 * @param EntityManager $em
@@ -47,7 +42,6 @@ class UserModelService
 	{
 		$this->em = $em;
 		$this->user = $user;
-		$this->timeZone = $timeZone ?: date_default_timezone_get();
 	}
 
 	/**
@@ -56,131 +50,93 @@ class UserModelService
 	public function createNewUser($userData = [])
 	{
 		if (count($userData)) {
-			$user = new UserEntity();
+			$user = new UserEntity(
+				$userData['username'],
+				$userData['name'],
+				$userData['surname'],
+				$userData['email'],
+				[] // @todo user roles
+			);
+
+			$user->setPhone($userData['phone']);
+
+			$this->em->persist($user)->flush();
+			return $user;
 		} else {
 			throw new BadRequestException('Empty $userData argument.');
 		}
 	}
 
 	/**
-	 * @return SchedulerEventEntity
+	 * @return array
 	 */
-	private function createEventEntity(array $eventData) : SchedulerEventEntity
+	public function readUsers() : array
 	{
-		return new SchedulerEventEntity(
-			$eventData['title'],
-			$eventData['start'],
-			$eventData['end'],
-			!empty($eventData['startTimezone']) ? $eventData['startTimezone'] : $this->timeZone,
-			!empty($eventData['endTimezone']) ? $eventData['endTimezone'] : $this->timeZone,
-			$eventData['description'],
-			$eventData['recurrenceRule'],
-			$this->user->getId(),
-			$eventData['isAllDay']
-		);
+		return $this->userRepository()->createQueryBuilder('u')
+			->select('partial u.{'.self::PARTIAL_USER_SELECT.'}')
+			->getQuery()
+			->getArrayResult();
+	}
+
+	public function readUser($id)
+	{
+		return $this->userRepository()->createQueryBuilder('u')
+			->select('partial u.{'.self::PARTIAL_USER_SELECT.'}')
+			->where('u.id = :id')
+			->setParameter('id', $id)
+			->setMaxResults(1)
+			->getQuery()
+			->getSingleResult(AbstractQuery::HYDRATE_ARRAY);
 	}
 
 	/**
-	 * @param \DateTime $date
-	 * @param string $view
-	 * @param string $schedulerAction
-	 * @return array
+	 * @param $data
 	 */
-	public function readEvents(\DateTime $date, string $view, string $schedulerAction)
+	public function updateUser($data)
 	{
-		list($firstDayModifier, $lastDayModifier) = $this->getFirstAndLastDay($view);
-		$firstDay = $date->modify($firstDayModifier);
-		$lastDay = (clone $firstDay)->modify($lastDayModifier);
-
-		$qb = $this->getSchedulerEventsRepository()->createQueryBuilder('e');
-		$events = $qb
-			->select('e, partial r.{id}')
-			->leftJoin('e.recurrence', 'r')
-			->where('e.start >= :first')
-			->andWhere('e.end <= :last')
-			->orWhere('e.recurrenceRule != :empty')
-			->andWhere('e.recurrence is NULL')
-			->andWhere('e.status = :statusOk')
-			->setParameters(['first' => $firstDay, 'last' => $lastDay, 'empty' => '', 'statusOk' => 'ok'])
-			->getQuery();
-
-		return $events->getArrayResult();
-	}
-
-	/**
-	 * @param string $view
-	 * @return array
-	 */
-	private function getFirstAndLastDay(string $view) : array
-	{
-		switch ($view) {
-			case 'day':
-				$modifyPhrases = ['today', 'today + 1 days'];
-				break;
-			case 'week':
-				$modifyPhrases = ['monday this week', 'sunday this week'];
-				break;
-			case 'month':
-				$modifyPhrases = ['first day of this month', 'last day of this month'];
-				break;
-			case 'agenda':
-				$modifyPhrases = ['monday this week', 'sunday this week'];
-				break;
-			default:
-				$modifyPhrases = self::getFirstAndLastDay('week');
+		if (!isset($data['id'])) {
+			throw new \InvalidArgumentException('User data not contains [id].');
 		}
 
-		return $modifyPhrases;
-	}
+		$user = $this->findUserById($data['id']);
 
-	/**
-	 * @param array $data
-	 * @return array
-	 */
-	public function updateEvent(array $data) : array
-	{
-		/**
-		 * @type SchedulerEventEntity $event
-		 */
-		$event = $this->getSchedulerEventsRepository()->find($data['id']);
+		foreach ($data as $key => $value) {
+			if (method_exists($user, $method = 'set'.ucfirst($key))) {
+				$user->$method($value);
+			}
+		}
 
-		$event
-			->setTitle($data['title'])
-			->setStart(new \DateTime($data['start']))
-			->setEnd(new \DateTime($data['end']))
-			->setStartTimezone($data['startTimezone'])
-			->setEndTimezone($data['endTimezone'])
-			->setDescription($data['description'])
-			->setRecurrence(
-				empty($data['recurrenceId']) ? NULL : $this->em->getReference(SchedulerEventEntity::class, $data['recurrenceId']))
-			->setRecurrenceRule($data['recurrenceRule'])
-			->setRecurrenceException($data['recurrenceException'])
-			->setIsAllDay($data['isAllDay']);
+		if (isset($data['newAvatar'])) {
+			$user->setAvatar($data['newAvatar']);
+		}
 
 		$this->em->flush();
-		return $event->toArray();
+		return $this->readUser($data['id']);
 	}
 
 	/**
-	 * @param integer $id
+	 * @param $id
+	 *
+	 * @return UserEntity
+	 * @throws UserNotFoundException
 	 */
-	public function destroyEvent(integer $id)
+	private function findUserById($id) : UserEntity
 	{
-		/**
-		 * @type SchedulerEventEntity $event
-		 */
-		$event = $this->getSchedulerEventsRepository()->find($id);
-			$event->destroy();
+		$user = $this->userRepository()->find($id);
 
-		$this->em->flush();
+		if (!$user) {
+			throw new UserNotFoundException("User with id [{$id}] not found.");
+		}
+
+		return $user;
 	}
 
 	/**
-	 * @return \Kdyby\Doctrine\EntityRepository
+	 * @return EntityRepository
 	 */
-	private function getSchedulerEventsRepository()
+	private function userRepository() : EntityRepository
 	{
-		return $this->em->getRepository(SchedulerEventEntity::class);
+		return $this->em->getRepository(UserEntity::class);
 	}
 
 }

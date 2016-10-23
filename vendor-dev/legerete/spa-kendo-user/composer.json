@@ -20,7 +20,7 @@
 	"require": {
 		"nette/di" : "^2.4",
 		"nette/application" : "^2.4",
-		"simshaun/recurr": "^1.2"
+		"ublaboo/image-storage": "^1.1"
 	},
 	"minimum-stability": "dev",
 	"require-dev": {

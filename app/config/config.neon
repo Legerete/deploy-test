@@ -48,11 +48,20 @@ extensions:
 	translation: Kdyby\Translation\DI\TranslationExtension
 #	monolog: App\Utils\Monolog\DI\MonologExtension
 	mailing: Ublaboo\Mailing\DI\MailingExtension
+	imageStorage: Ublaboo\ImageStorage\DI\ImageStorageExtension
 	core: Legerete\DI\CoreExtension
 	LeSecurity: Legerete\Security\DI\SecurityExtension
 	signIn: Legerete\UserSignInModule\DI\SignInExtension
 	signInOtp: Legerete\UserSignInOtp\DI\SignInOtpExtension
 	scheduler: Legerete\Spa\KendoScheduler\DI\SpaSchedulerExtension
+	user: Legerete\User\DI\UserExtension
+	userSPA: Legerete\Spa\KendoUser\DI\SpaUserExtension
+
+imageStorage:
+	data_path: %appDir%/../www/data/images
+	data_dir: data/images
+	noimage_identifier : noimage/03/no-image.png
+	quality: 100
 
 core:
 	pageTitle: 'Porta Invest s.r.o. - CRM'

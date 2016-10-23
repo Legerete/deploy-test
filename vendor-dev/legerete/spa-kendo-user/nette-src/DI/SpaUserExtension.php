@@ -31,14 +31,14 @@ class SpaUserExtension extends CompilerExtension
 		Compiler::loadDefinitions($builder, $this->loadFromFile(__DIR__ . '/config.neon')['services'], $this->name);
 
 		$presenterFactory = $builder->getDefinition('application.presenterFactory');
-		$presenterFactory->addSetup('setMapping', [['LeSpaScheduler' => 'Legerete\Spa\KendoScheduler\*Module\Presenters\*Presenter']]);
+		$presenterFactory->addSetup('setMapping', [['LeSpaUser' => 'Legerete\Spa\KendoUser\*Module\Presenters\*Presenter']]);
 
 		$router = $builder->getDefinition('routing.router');
-		$router->addSetup('$service->prepend(new Nette\Application\Routers\Route(?, ?));', ['scheduler[/<action>]', [
-			'module' => 'LeSpaScheduler:Scheduler',
-			'presenter' => 'Scheduler',
+		$router->addSetup('$service->prepend(new Nette\Application\Routers\Route(?, ?));', ['user[/<action>]', [
+			'module' => 'LeSpaUser:User',
+			'presenter' => 'User',
 			'action' => 'default',
-			'alias' => 'LeSpaScheduler'
+			'alias' => 'LeSpaUser'
 		]]);
 
 		// Add resources to authorizator
@@ -47,16 +47,20 @@ class SpaUserExtension extends CompilerExtension
 		if (!$authorizator) {
 			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
 		}
-		$authorizator->addSetup('addResource', ['LeSpaScheduler:Scheduler:Scheduler']);
+		$authorizator->addSetup('addResource', ['LeSpaUser:User:User']);
 
 		// @todo DEVELOP TEMPORARY! Delete Me!
-		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSpaScheduler:Scheduler:Scheduler']);
+		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSpaUser:User:User']);
 
 //		// Add mapping to doctrine
-		$this->registerDoctrineEntityAnnotationDriver(__DIR__.'/../Model/Entity', 'Legerete\Spa\KendoScheduler\Model\Entity');
+		$this->registerDoctrineEntityAnnotationDriver(__DIR__.'/../Model/Entity', 'Legerete\Spa\KendoUser\Model\Entity');
 	}
 
 	public function beforeCompile()
 	{
+		$builder = $this->getContainerBuilder();
+
+		// Add default english dictionary
+		$builder->getDefinition('translation.default')->addSetup('addResource', ['neon', __DIR__ . '/../lang/users.en.neon', 'en', 'users']);
 	}
 }
