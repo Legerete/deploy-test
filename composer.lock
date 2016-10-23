@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "a66762b300d4902224a9e32899ff3c3d",
-    "content-hash": "d6ae8d1c83741d95aedcdfcbedfb8ef9",
+    "hash": "160921640cd5963c954043339552dc1c",
+    "content-hash": "839a89c6ab6927b556c66ce2187751bb",
     "packages": [
         {
             "name": "bazo/nette-ratchet-sessionprovider",
@@ -3587,6 +3587,58 @@
                 "nette"
             ],
             "time": "2016-09-30 14:17:54"
+        },
+        {
+            "name": "ublaboo/image-storage",
+            "version": "v1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ublaboo/image-storage.git",
+                "reference": "dd98c009d036a811df3ad5f6e77904b1644c0578"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ublaboo/image-storage/zipball/dd98c009d036a811df3ad5f6e77904b1644c0578",
+                "reference": "dd98c009d036a811df3ad5f6e77904b1644c0578",
+                "shasum": ""
+            },
+            "require": {
+                "latte/latte": "^2.3|^2.4",
+                "nette/di": "^2.3|^2.4",
+                "nette/http": "^2.3|^2.4",
+                "nette/utils": "^2.3|^2.4"
+            },
+            "require-dev": {
+                "nette/tester": "~1.6.1",
+                "tracy/tracy": "^2.3|^2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ublaboo\\ImageStorage\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pavel Janda",
+                    "homepage": "http://paveljanda.com"
+                }
+            ],
+            "description": "Image storage for Nette framework",
+            "homepage": "http://ublaboo.paveljanda.com/image-storage",
+            "keywords": [
+                "crop",
+                "image",
+                "nette",
+                "resize",
+                "storage",
+                "upload"
+            ],
+            "time": "2016-07-02 15:00:16"
         },
         {
             "name": "ublaboo/mailing",

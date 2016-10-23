@@ -20,26 +20,9 @@ use Nette\Utils\Json;
  */
 class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 {
-
-	/**
-	 * Events
-	 * @var array
-	 */
-	public $onCreate = [];
-	public $onUpdate = [];
-
-	/**
-	 * Roles
-	 */
-	const DEFAULT_ROLE = self::ROLE_REGISTERED;
-	const ROLE_SUPERADMIN = 'SuperAdmin';
-	const ROLE_ADMIN = 'Admin';
-	const ROLE_COUPE_OWNER = 'CoupeOwner';
-	const ROLE_COUPE_PATRON = 'CoupePatron';
-	const ROLE_VENDOR = 'Vendor';
-	const ROLE_REGISTERED = 'Registered';
-
-
+	const AVATAR_NAMESPACE = 'user-avatar';
+	const AVATAR_DIMENSIONS_LARGE = '350x350';
+	const AVATAR_DIMENSIONS_SMALL = '80x80';
 
 	/**
 	 * @ORM\Id
@@ -50,61 +33,91 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $username
 	 */
 	protected $username;
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $password
 	 */
 	protected $password;
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $passwordResetHash
 	 */
 	protected $passwordResetHash;
 
 	/**
 	 * @ORM\Column(type="integer")
+	 * @var integer $passwordNeedReset
 	 */
 	protected $passwordNeedReset = 0;
 
 	/**
 	 * @ORM\Column(type="date")
+	 * @var \DateTime $passwordLastChange
 	 */
 	protected $passwordLastChange;
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $name
 	 */
 	protected $name;
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $surname
 	 */
 	protected $surname;
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $degree
+	 */
+	protected $degree;
+
+	/**
+	 * @ORM\Column(type="string")
+	 * @var string $email
 	 */
 	protected $email;
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $phone
+	 */
+	protected $phone;
+
+	/**
+	 * @ORM\Column(type="string")
+	 * @var string $avatar
+	 */
+	protected $avatar;
+
+	/**
+	 * @ORM\Column(type="string")
+	 * @var string $verificationHash
 	 */
 	protected $verificationHash;
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $roles
 	 */
 	protected $roles;
 
 	/**
 	 * @ORM\Column(type="datetime")
+	 * @var \DateTime $registerNotificationSent
 	 */
 	protected $registerNotificationSent = null;
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $status
 	 */
 	protected $status = 'ok';
 
@@ -119,11 +132,11 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	 */
 	public function __construct($username, $name, $surname, $email, $roles)
 	{
-		$this->username = $username;
-		$this->name = $name;
-		$this->surname = $surname;
-		$this->email = $email;
-		$this->roles = $this->setRoles($roles);
+		$this->setUsername($username)
+			->setName($name)
+			->setSurname($surname)
+			->setEmail($email)
+			->setRoles($roles);
 	}
 
 	/**
@@ -136,44 +149,75 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	}
 
 	/**
-	 * @return mixed
+	 * @return integer
 	 */
 	public function getIdentityNo()
 	{
 		return $this->identityNo;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getUsername()
 	{
 		return $this->username;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getPassword()
 	{
 		return $this->password;
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getPasswordResetHash()
 	{
 		return $this->passwordResetHash;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getName()
 	{
 		return $this->name;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getSurname()
 	{
 		return $this->surname;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getEmail()
 	{
 		return $this->email;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getPhone()
+	{
+		return $this->phone;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAvatar()
+	{
+		return $this->avatar;
 	}
 
 	/**
@@ -184,11 +228,17 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 		return $this->verificationHash;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getRoles()
 	{
-		return $this->roles;
+		return Json::decode($this->roles);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function getStatus()
 	{
 		return $this->status;
@@ -200,12 +250,16 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	 */
 
 
-	public function setUsername($username)
+	public function setUsername(string $username)
 	{
-		$this->username = $username;
+		$this->username = trim($username);
 		return $this;
 	}
 
+	/**
+	 * @param string $password
+	 * @return $this
+	 */
 	public function setPassword($password)
 	{
 		$this->password = self::calculateHash($password);
@@ -213,22 +267,22 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	}
 
 	/**
-	 * @param mixed $passwordResetHash
+	 * @param string $passwordResetHash
+	 * @return $this
 	 */
 	public function setPasswordResetHash($passwordResetHash)
 	{
 		$this->passwordResetHash = $passwordResetHash;
-
 		return $this;
 	}
 
 	/**
-	 * @param mixed $passwordNeedReset
+	 * @param integer $passwordNeedReset
+	 * @return $this
 	 */
 	public function setPasswordNeedReset($passwordNeedReset)
 	{
 		$this->passwordNeedReset = $passwordNeedReset;
-
 		return $this;
 	}
 
@@ -238,25 +292,56 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	public function setPasswordLastChange($passwordLastChange)
 	{
 		$this->passwordLastChange = $passwordLastChange;
-
 		return $this;
 	}
 
-	public function setName($name)
+	/**
+	 * @param string $name
+	 * @return $this
+	 */
+	public function setName(string $name)
 	{
-		$this->name = $name;
+		$this->name = trim($name);
 		return $this;
 	}
 
-	public function setSurname($surname)
+	/**
+	 * @param string $surname
+	 * @return $this
+	 */
+	public function setSurname(string $surname)
 	{
-		$this->surname = $surname;
+		$this->surname = trim($surname);
 		return $this;
 	}
 
+	/**
+	 * @param string $email
+	 * @return $this
+	 */
 	public function setEmail($email)
 	{
-		$this->email = $email;
+		$this->email = trim($email);
+		return $this;
+	}
+
+	/**
+	 * @var mixed $phone
+	 * @return $this
+	 */
+	public function setPhone($phone)
+	{
+		$this->phone = $phone;
+		return $this;
+	}
+
+	/**
+	 * @var string $avatar
+	 * @return $this
+	 */
+	public function setAvatar($avatar)
+	{
+		$this->avatar = $avatar;
 		return $this;
 	}
 

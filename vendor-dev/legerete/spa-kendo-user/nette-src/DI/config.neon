@@ -1,6 +1,2 @@
 services:
-	- Legerete\Spa\KendoScheduler\Model\Service\SchedulerModelService
-
-#	database:
-#		metadata:
-#			Legerete\Spa\KendoScheduler\Model: %appDir%/../vendor-dev/legerete/spa-kendo-scheduler/nette-src/Model/Entity
+	- Legerete\Spa\KendoUser\Model\Service\UserModelService

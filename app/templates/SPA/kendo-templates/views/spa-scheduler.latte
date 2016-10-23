@@ -1,10 +1,15 @@
 <script id="spa-view-scheduler" type="text/x-kendo-template" data-source-read="{link :LeSpaScheduler:Scheduler:Scheduler: do=>read}" data-source-create="{link :LeSpaScheduler:Scheduler:Scheduler: do=>create}" data-source-update="{link :LeSpaScheduler:Scheduler:Scheduler: do=>update}" data-source-destroy="{link :LeSpaScheduler:Scheduler:Scheduler: do=>destroy}">
-	<div data-role="scheduler"
-	     data-views="[{ type: 'day', showWorkHours: true }, { type: 'week', showWorkHours: true, selected: true }, 'month', 'agenda']"
-	     data-bind="source: tasks,
-            visible: isVisible, events: {
-                navigate: navigate
-	        }"
-	     data-first-day="1"
-	     style="height: 400px"></div>
+	<div class="content-box">
+		<h3 class="content-box-header">{_scheduler.h1}
+		</h3>
+		<div data-role="scheduler"
+			data-views="[{ type: 'day', showWorkHours: true }, { type: 'week', showWorkHours: true, selected: true }, 'month', 'agenda']"
+			data-bind="source: tasks,
+				visible: isVisible, events: {
+					navigate: navigate
+				}"
+			data-first-day="1"
+			style="height: 400px">
+		</div>
+	</div>
 </script>

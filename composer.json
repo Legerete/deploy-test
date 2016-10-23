@@ -32,7 +32,8 @@
 		"kdyby/translation": "dev-master",
 		"ublaboo/mailing": "^1.1",
 		"bazo/nette-ratchet-sessionprovider": "dev-master",
-		"simshaun/recurr": "^1.2"
+		"simshaun/recurr": "^1.2",
+		"ublaboo/image-storage": "^1.1"
 	},
 	"autoload": {
 		"psr-4": {

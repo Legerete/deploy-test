@@ -1,5 +1,1 @@
 services:
-	SignPresenter: Legerete\UserSignInModule\Presenters\SignPresenter
-	- Legerete\UserSignInModule\Components\ChooseNewPasswordFactory
-	- Legerete\UserSignInModule\Components\ForgotPasswordFactory
-	- Legerete\UserSignInModule\Components\SignIn\SignInFactory

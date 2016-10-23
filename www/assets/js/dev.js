@@ -24,6 +24,10 @@ $(function () {
 	/* global window, kendo */
 	window.SPA = kendo.observable({
 
+		test: function () {
+			console.log(this);
+		},
+
 		/**
 		 * SetUp app
 		 * @returns {void}
@@ -131,18 +135,24 @@ $(function () {
 
 		changeActiveView: function (panel) {
 			this.trigger('spa.beforePanelViewChange');
-			$('#app-content').html('');
+			var that = this;
+			var appContent = $('#app-content');
 
-			var viewTemplate = $(panel.view);
-			if (viewTemplate.length === 0) {
-				throw 'View template ' + panel.view + ' not found.'
-			}
+			appContent.fadeOut(150, function () {
+				appContent.html('');
+				var viewTemplate = $(panel.view);
+				if (viewTemplate.length === 0) {
+					throw 'View template ' + panel.view + ' not found.'
+				}
 
-			var newView = new kendo.View(viewTemplate.html(), {model: panel.viewModel});
-			var view = newView.render('#app-content');
+				var newView = new kendo.View(viewTemplate.html(), {model: panel.viewModel, show: function () {
+					appContent.fadeIn(100);
+				}});
+				var view = newView.render('#app-content');
+				that.trigger('spa.afterPanelViewChange');
+				return view[0];
+			});
 
-			this.trigger('spa.afterPanelViewChange');
-			return view[0];
 		},
 
 		panelsDataSource: new kendo.data.DataSource({}),
@@ -233,8 +243,8 @@ $(function () {
 					/**
 					 * Call panel create method with provided event
 					 */
-					var pannelSettings = this.panelTypes[panelType].create(target, this);
-					this.addPanel(pannelSettings);
+					var panelSettings = this.panelTypes[panelType].create(target, this);
+					this.addPanel(panelSettings);
 				} else {
 					var that = this;
 					this.openedPanels().forEach(function (panel) {
@@ -358,6 +368,8 @@ $(function () {
 			view: '#spa-view-users'
 		},
 		create: function (event, context) {
+			var view = $(this.settings.view);
+			var readUrl = view.data('source-read');
 			var viewModel = kendo.observable({
 				isVisible: true,
 				editUser: function (e) {
@@ -368,7 +380,7 @@ $(function () {
 				users: new kendo.data.DataSource({
 					schema: {
 						model: {
-							id: "ProductID",
+							id: 'id',
 							fields: {
 								ProductName: { type: "string" },
 								UnitPrice: { type: "number" }
@@ -378,21 +390,8 @@ $(function () {
 					batch: true,
 					transport: {
 						read: {
-							url: "//demos.telerik.com/kendo-ui/service/products",
-							dataType: "jsonp"
-						},
-						update: {
-							url: "//demos.telerik.com/kendo-ui/service/products/update",
-							dataType: "jsonp"
-						},
-						create: {
-							url: "//demos.telerik.com/kendo-ui/service/products/create",
-							dataType: "jsonp"
-						},
-						parameterMap: function(options, operation) {
-							if (operation !== "read" && options.models) {
-								return {models: kendo.stringify(options.models)};
-							}
+							url: readUrl,
+							dataType: "json"
 						}
 					}
 				})
@@ -402,7 +401,10 @@ $(function () {
 			return this.settings;
 		},
 		registerListeners: function (viewModel) {
-			SPA.bind('user-edit.update', function (user) {
+			SPA.bind('user-edit.updated', function (user) {
+				viewModel.users.read();
+			});
+			SPA.bind('user-edit.created', function (user) {
 				viewModel.users.read();
 			});
 		}
@@ -425,30 +427,127 @@ $(function () {
 			name: '',
 			surname: '',
 			phone: '',
-			email: '',
+			email: '@',
 			degree: '',
 			role: [],
+			edited: false,
+			avatarSmall: '',
+			avatarBig: '',
+			newAvatar: false,
 			status: 'ok',
 		},
 		User: kendo.data.Model.define(this.user),
 		create: function (event, context) {
+			this.registerListeners();
+			var view = $(this.settings.view);
+			var createUrl = view.data('source-create');
+			var readUrl = view.data('source-read');
+			var updateUrl = view.data('source-update');
+			var userId = $(event).data('user-id');
+			var avatarBigNoImage = view.data('avatar-big-no-image');
+			var avatarLoadImage = view.data('avatar-load-image');
 			var that = this;
-			// console.log($(event).data('user-id'));
-			var viewModel = kendo.observable({
-				isVisible: true,
-				save: function () {
-					that.save();
+
+			this.settings.viewModel = kendo.observable({
+				/**
+				 * Prepare user data for storing
+				 */
+				saveUser: function () {
+					var user = this.user.toJSON();
+					user.id = this.user.id;
+
+					// existing user
+					if (user.id) {
+						this.updateUser(user);
+					}
+					// new user
+					else {
+						this.createUser(user);
+					}
+				},
+				avatarBig: function (e) {
+					/**
+					 * User have set avatar image
+					 */
+					if (this.get('user.avatarBig'))
+					{
+						return '/' + this.get('user.avatarBig');
+					}
+					/**
+					 * User not loaded
+					 */
+					else if (this.get('user.uid') === undefined) {
+						return '/' + avatarLoadImage;
+					}
+					/**
+					 * User don't have avatar (new user)
+					 */
+					return '/' + avatarBigNoImage;
+				},
+				uploadAvatarStart: function () {
+					this.set('user.avatarBig', avatarLoadImage);
+				},
+				uploadAvatarComplete: function (e) {
+					this.set('user.avatarBig', e.response['big-image']);
+					this.set('user.newAvatar', '/' + e.response['original']);
+				},
+				createUser: function (user) {
+					var vm = this;
+					$.post(createUrl, user, function (responseData) {
+						vm.createUserModel(responseData);
+						SPA.trigger('user-edit.created', responseData);
+					});
+				},
+				updateUser: function (user) {
+					var vm = this;
+					$.post(updateUrl, user, function (responseData) {
+						vm.createUserModel(responseData);
+						SPA.trigger('user-edit.updated', responseData);
+					});
+				},
+				isDirty: function () {
+					return this.get('user.edited');
+				},
+				setUserModel: function (model) {
+					this.set('user', model);
+				},
+				readUserModel: function () {
+					var viewModel = this;
+					return $.getJSON(readUrl+userId, {}, function (data) {
+						var panel = SPA.panelsDataSource.getByUid(that.settings.panelUid);
+						panel.set('name', that.settings.name + ' - ' + data.name + ' ' + data.surname);
+						viewModel.createUserModel(data);
+						SPA.refreshPanels();
+					})
+				},
+				createNewUserModel: function () {
+					this.createUserModel(new that.User(that.user));
+				},
+				createUserModel: function (data) {
+					var user = new that.User(data);
+					user.bind('change', function () {
+						this.set('edited', true);
+					});
+					this.setUserModel(user);
+					return user;
 				}
 			});
-			this.settings.viewModel = viewModel;
-			this.registerListeners();
+
+			if (userId) {
+				this.settings.viewModel.readUserModel();
+			} else {
+				this.settings.viewModel.createNewUserModel();
+			}
 			return this.settings;
 		},
-		save: function () {
-			SPA.trigger('user-edit.update', this.settings.viewModel);
-		},
 		registerListeners: function () {
-			// @todo dopsat listener pro update uzivatele v případě shodnosti s updatovaným v jiném tabu
+			var that = this;
+			SPA.bind('spa.addedPanel', function (panel) {
+				that.settings.panelUid = panel.uid;
+			});
+
+			// @todo dopsat listener pro update uzivatele v případě shodnosti s updatovaným v jiném tabu,
+			// @todo NEBO vyresit kontrolu v tabech, zda uz tentyz jiny neexistuje
 		}
 	});
 
