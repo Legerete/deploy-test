@@ -7,6 +7,7 @@ import './libs/js-core/jquery-ui-position.js';
 import './libs/js-core/transition.js';
 import './libs/template/widgets/progressbar/progressbar.js';
 import './libs/template/widgets/superclick/superclick.js';
+import './libs/template/widgets/input-switch/inputswitch.js';
 import './libs/template/widgets/input-switch/inputswitch-alt.js';
 import './libs/template/widgets/slimscroll/slimscroll.js';
 import './libs/template/widgets/slidebars/slidebars.js';
@@ -20,8 +21,8 @@ import './libs/template/widgets/material/ripples.js';
 import './libs/template/widgets/overlay/overlay.js';
 import './libs/template/widgets/tabs/tabs-responsive.js';
 
-import './libs/template/themes/admin/layout.js';
 import './widgets-init.js';
+import './libs/template/themes/admin/layout.js';
 
 import './libs/nette.websocket';
 

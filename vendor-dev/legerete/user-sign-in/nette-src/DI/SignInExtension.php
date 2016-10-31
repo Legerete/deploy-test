@@ -9,6 +9,7 @@
 namespace Legerete\UserSignInModule\DI;
 
 use Legerete\Security\AuthorizatorFactory;
+use Legerete\Security\Permission;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 use Nette\NotImplementedException;
@@ -58,6 +59,7 @@ class SignInExtension extends CompilerExtension
 			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
 		}
 		$authorizator->addSetup('addResource', ['LeSignIn:UserSignIn:Sign']);
+		$authorizator->addSetup('addResourcePrivilege', ['LeSignIn:UserSignIn:Sign', Permission::PRIVILEGE_SHOW]);
 		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSignIn:UserSignIn:Sign']);
 	}
 

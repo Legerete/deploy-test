@@ -380,11 +380,7 @@ $(function () {
 				users: new kendo.data.DataSource({
 					schema: {
 						model: {
-							id: 'id',
-							fields: {
-								ProductName: { type: "string" },
-								UnitPrice: { type: "number" }
-							}
+							id: 'id'
 						}
 					},
 					batch: true,
@@ -551,6 +547,153 @@ $(function () {
 		}
 	});
 
+	/**
+	 * Register acl panel
+	 */
+	SPA.addPanelType('acl', {
+		settings: {
+			multiInstances: false,
+			closeable: true,
+			name: 'Acl',
+			type: 'acl',
+			view: '#spa-view-acl'
+		},
+		user: {
+			id: null,
+			status: 'ok',
+		},
+		Acl: null,
+		create: function (event, context) {
+			this.registerListeners();
+			var view = $(this.settings.view);
+			var defaultAclData = $('#spa-view-acl-role-detail').data('resources');
+
+			var createUrl = view.data('source-create');
+			var readUrl = view.data('source-read');
+			var updateUrl = view.data('source-update');
+			var that = this;
+
+
+			this.settings.viewModel = kendo.observable({
+				isDirty: function () {
+					return this.get('user.edited');
+				},
+				gridDataBound: function (e) {
+					var rows = e.sender.tbody.find('tr.k-master-row');
+					rows.each(function (index, row) {
+						var uid = row.getAttribute('data-uid');
+						var button = $(row).find('div[data-role="update"]');
+						kendo.bind(button, e.sender.dataSource.getByUid(uid));
+						button.on('click', function () {
+							e.sender.dataSource.sync();
+						});
+					});
+				},
+				roles: new kendo.data.DataSource({
+					schema: {
+						model: {
+							id: 'id',
+							fields: {
+								id: { type: 'number'},
+								update: { editable: false, defaultValue: null},
+								name: { type: 'string', defaultValue: ''},
+								title: { type: 'string', defaultValue: ''},
+								parents: { type: 'array', defaultValue: [] },
+								resources: { type: 'array', defaultValue: []}
+							}
+						}
+					},
+					batch: false,
+					transport: {
+						create: {
+							url: createUrl,
+							dataType: "json"
+						},
+						read: {
+							url: readUrl,
+							dataType: "json"
+						},
+						update: {
+							url: updateUrl,
+							dataType: "json",
+							method: 'POST'
+						}
+					},
+					change: function (e) {
+						if (e.action !== undefined) {
+							$(e.items).each(function (index, item) {
+								item.set('edited', true);
+							});
+						}
+					}
+				}),
+				Acl: kendo.data.Model.define(defaultAclData),
+				AclModel: null,
+				previousAclModel: null,
+
+				detailExpand: function (e) {
+					var grid = $(e.sender.element).data('kendoGrid');
+					grid.collapseRow(':not([data-uid="' + e.masterRow.data('uid') + '"])');
+				},
+
+				/**
+				 * Settings for detail table with settings permissions
+				 * @param {jQuery.Event} e
+				 */
+				detailInit: function (e) {
+					var gridElement = e.sender.element;
+					var grid = $(gridElement).data('kendoGrid');
+					var detail = this;
+					var masterRow = e.masterRow;
+					var detailRow = e.detailRow;
+					var roleUid = e.masterRow.data('uid');
+					var roleModel = this.roles.getByUid(roleUid);
+
+					if (this.get('AclModel') === null || this.get('previousAclModel') !== roleUid) {
+						this.set('previousAclModel', roleUid);
+						this.set('AclModel', new that.settings.viewModel.Acl(roleModel.get('resources')));
+					}
+
+					var observable = kendo.observable({
+						onChange: function (e) {
+							var property = e.target.getAttribute('name');
+							var resource = e.target.getAttribute('data-resource');
+							var privilege = e.target.getAttribute('data-privilege');
+							var propertyValue = e.target.checked;
+
+							/**
+							 * Lazy creating resources and privileges for role.
+							 * Privilege not needed if is not granted.
+							 */
+							if (roleModel.get('resources.'+resource) === undefined) {
+								roleModel.set('resources.'+resource, {});
+							}
+							roleModel.set('resources.' + property, propertyValue);
+							roleModel.set('edited', true);
+
+							// @todo workaround proti zavreni detailu gridu po updatu dat role, chtelo by co nejdrive odstranit
+							grid.expandRow($(gridElement).find('tr[data-uid="'+roleUid+'"]'));
+						},
+						Acl: that.settings.viewModel.AclModel
+					});
+
+					kendo.unbind(detailRow, observable);
+					kendo.bind(detailRow, observable);
+				}
+			});
+
+			window.test = this.settings.viewModel;
+
+			return this.settings;
+		},
+		test: function () {
+			console.log('that test');
+		},
+		registerListeners: function () {
+			var that = this;
+		}
+	});
+
 	SPA.addPanelType('scheduler', {
 		settings: {
 			multiInstances: false,
@@ -559,7 +702,7 @@ $(function () {
 			type: 'scheduler',
 			view: '#spa-view-scheduler',
 			wakeUp: function(view) {
-				if (this.viewModel.get('navigateDate')) {
+				if (this.viewModel.get('navigateDate') && view) {
 					var scheduler = $(view).find('div[data-role="scheduler"]').data('kendoScheduler');
 					scheduler.date(this.viewModel.get('navigateDate'));
 				}

@@ -15,13 +15,11 @@
 </head>
 
 <body id="spa-application" data-ws-host="localhost" data-ws-port="8006" data-user-id="{$user->getId()}">
-	{*
-	 * @todo Vyrobit nejakou konvenci a makro pro aut. vkladani registrovaných templates
-	 * SPA templates includes
-	 *}
 	{include ./SPA/kendo-templates/views/spa-dashboard.latte}
-	{include ./SPA/kendo-templates/views/spa-users.latte}
-	{include ./SPA/kendo-templates/views/spa-scheduler.latte}
+
+	{foreach $templatesControls as $templateControl}
+		{control $templateControl}
+	{/foreach}
 
 	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
 	{include content}

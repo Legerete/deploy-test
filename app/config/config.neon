@@ -50,12 +50,14 @@ extensions:
 	mailing: Ublaboo\Mailing\DI\MailingExtension
 	imageStorage: Ublaboo\ImageStorage\DI\ImageStorageExtension
 	core: Legerete\DI\CoreExtension
+	LeSpa: Legerete\Spa\DI\SpaExtension
 	LeSecurity: Legerete\Security\DI\SecurityExtension
-	signIn: Legerete\UserSignInModule\DI\SignInExtension
-	signInOtp: Legerete\UserSignInOtp\DI\SignInOtpExtension
-	scheduler: Legerete\Spa\KendoScheduler\DI\SpaSchedulerExtension
-	user: Legerete\User\DI\UserExtension
-	userSPA: Legerete\Spa\KendoUser\DI\SpaUserExtension
+	LeSpaAcl: Legerete\Spa\KendoAcl\DI\SpaAclExtension
+	LeSignIn: Legerete\UserSignInModule\DI\SignInExtension
+	LeSignInOtp: Legerete\UserSignInOtp\DI\SignInOtpExtension
+	LeSpaScheduler: Legerete\Spa\KendoScheduler\DI\SpaSchedulerExtension
+	LeUser: Legerete\User\DI\UserExtension
+	LeSpaUser: Legerete\Spa\KendoUser\DI\SpaUserExtension
 
 imageStorage:
 	data_path: %appDir%/../www/data/images
@@ -79,7 +81,7 @@ core:
 		autoGenerateProxyClasses: true
 		debug: %database.debug%
 
-signIn:
+LeSignIn:
 	allowForgotPassword: TRUE
 	loginAfterAuthorization: off
 	loginRedirectPage: 'SPA:default'

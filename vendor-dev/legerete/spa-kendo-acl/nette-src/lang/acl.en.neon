@@ -1,0 +1,17 @@
+h1: Acl
+resource: Resource
+create: Create
+destroy: Destroy
+readAll: Read all
+readMy: Read My
+show: Show
+update: Update
+allow: Allow
+deny: Deny
+
+role:
+	save: Save
+	create: Add new role
+	name: Name
+	title: Title
+	parentRoles: Parent roles

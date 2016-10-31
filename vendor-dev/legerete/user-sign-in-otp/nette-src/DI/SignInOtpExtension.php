@@ -10,6 +10,7 @@ namespace Legerete\UserSignInOtp\DI;
 
 use Legerete\DI\Helpers\DoctrineAnnotationDriverExtensionHelperTrait;
 use Legerete\Security\AuthorizatorFactory;
+use Legerete\Security\Permission;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 use Nette\NotImplementedException;
@@ -60,6 +61,7 @@ class SignInOtpExtension extends CompilerExtension
 			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
 		}
 		$authorizator->addSetup('addResource', ['LeSignIn:UserSignInOtp:Sign']);
+		$authorizator->addSetup('addResourcePrivilege', ['LeSignIn:UserSignInOtp:Sign', Permission::PRIVILEGE_SHOW]);
 		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSignIn:UserSignInOtp:Sign']);
 
 		// Add Doctrine Entity mapping

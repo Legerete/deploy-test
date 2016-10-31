@@ -1,7 +1,10 @@
+{*
+ * @todo do konfigu
+ *}
 {capture $avatarBigNoImage}data/images/noimage/03/no-image.350x350.fit.q100.png{/capture}
 {capture $avatarLoad}assets/images/svg-loaders/bars.svg{/capture}
 
-<script id="spa-view-users" type="text/x-kendo-template" data-source-read="{link LeSpaUser:User:User:}?do=read">
+<script id="spa-view-users" type="text/x-kendo-template" data-source-read="{plink LeSpaUser:User:User:}?do=read">
 	<div class="content-box">
 		<h3 class="content-box-header">{_users.users.h1}
 		</h3>
@@ -37,10 +40,10 @@
 </script>
 
 <script id="spa-view-user" type="text/x-kendo-template"
-		data-source-create="{link LeSpaUser:User:User:}?do=create"
-		data-source-read="{link LeSpaUser:User:User:}?do=read&id="
-		data-source-update="{link LeSpaUser:User:User:}?do=update"
-		data-source-uploadAvatar="{link LeSpaUser:User:User:}?do=uploadAvatar"
+		data-source-create="{plink LeSpaUser:User:User:}?do=create"
+		data-source-read="{plink LeSpaUser:User:User:}?do=read&id="
+		data-source-update="{plink LeSpaUser:User:User:}?do=update"
+		data-source-uploadAvatar="{plink LeSpaUser:User:User:}?do=uploadAvatar"
         data-avatar-big-no-image="{$avatarBigNoImage}"
         data-avatar-load-image="{$avatarLoad}"
 >
@@ -63,7 +66,7 @@
 									data-show-file-list="false"
 									data-multiple="false"
 									data-validation="{ allowedExtensions: ['.jpg', '.png']}"
-									data-async="{ saveUrl: '{link LeSpaUser:User:User:}?do=avatar', autoUpload: true }"
+									data-async="{ saveUrl: '{plink LeSpaUser:User:User:}?do=avatar', autoUpload: true }"
 									data-bind="events: { success: uploadAvatarComplete, upload: uploadAvatarStart}"
 									data-drop-zone=".image-box.user-photo-drop-zone"
 									name="user-avatar">

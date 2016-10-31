@@ -10,6 +10,8 @@ namespace Legerete\Spa\KendoUser\DI;
 
 use Legerete\DI\Helpers\DoctrineAnnotationDriverExtensionHelperTrait;
 use Legerete\Security\AuthorizatorFactory;
+use Legerete\Security\Permission;
+use Legerete\Spa\Collection\SpaTemplatesControlsCollection;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 use Nette\NotImplementedException;
@@ -48,12 +50,22 @@ class SpaUserExtension extends CompilerExtension
 			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
 		}
 		$authorizator->addSetup('addResource', ['LeSpaUser:User:User']);
+		$authorizator->addSetup('addResourcePrivileges', ['LeSpaUser:User:User', [
+			Permission::PRIVILEGE_SHOW,
+			Permission::PRIVILEGE_READ_ALL,
+			Permission::PRIVILEGE_CREATE,
+			Permission::PRIVILEGE_UPDATE,
+			Permission::PRIVILEGE_DESTROY,
+		]]);
 
 		// @todo DEVELOP TEMPORARY! Delete Me!
 		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSpaUser:User:User']);
 
 //		// Add mapping to doctrine
 		$this->registerDoctrineEntityAnnotationDriver(__DIR__.'/../Model/Entity', 'Legerete\Spa\KendoUser\Model\Entity');
+
+		$templatesCollection = $builder->getDefinition($builder->getByType(SpaTemplatesControlsCollection::class));
+		$templatesCollection->addSetup('set', ['userTemplate', $this->prefix('@userTemplate')]);
 	}
 
 	public function beforeCompile()

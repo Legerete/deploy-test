@@ -8,7 +8,6 @@
 
 namespace Legerete\Security;
 
-use Nette\Security\Permission;
 use Nette\Security\IAuthorizator;
 
 final class AuthorizatorFactory
@@ -22,6 +21,11 @@ final class AuthorizatorFactory
 	 * @var Permission
 	 */
 	private $acl;
+
+	/**
+	 * @var array $privileges
+	 */
+	private $privilegesTypes = [];
 
 	/**
 	 * @return IAuthorizator
@@ -53,7 +57,6 @@ final class AuthorizatorFactory
 		$acl->addResource('User:Sign');
 		$acl->addResource('User:LostPassword');
 		$acl->addResource('Legerete:User:ForgotPassword');
-//		$acl->addResource('LeSignIn:UserSignIn:Sign');
 
 	}
 
@@ -63,12 +66,8 @@ final class AuthorizatorFactory
 		/**
 		 * Role guest
 		 */
-//		$acl->allow(self::ROLE_GUEST, 'Public');
 		$acl->allow(self::ROLE_GUEST, 'User:Sign');
 		$acl->allow(self::ROLE_GUEST, 'User:LostPassword');
 		$acl->allow(self::ROLE_GUEST, 'Legerete:User:ForgotPassword');
-//		$acl->allow(self::ROLE_GUEST, 'LeSpaScheduler:Scheduler:Scheduler');
-//		$acl->allow(self::ROLE_GUEST, 'LeSignIn:UserSignIn:Sign');
-//		$acl->deny(self::ROLE_GUEST, 'Public:Users:Account');
 	}
 }
