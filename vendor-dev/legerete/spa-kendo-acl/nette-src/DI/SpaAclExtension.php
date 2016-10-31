@@ -6,24 +6,22 @@
  * @package     Legerete\SignInExtension
  */
 
-namespace Legerete\Spa\KendoScheduler\DI;
+namespace Legerete\Spa\KendoAcl\DI;
 
 use Legerete\DI\Helpers\DoctrineAnnotationDriverExtensionHelperTrait;
 use Legerete\Security\AuthorizatorFactory;
 use Legerete\Security\Permission;
-use Legerete\Spa\Collection\KendoTemplatesCollection;
 use Legerete\Spa\Collection\SpaTemplatesControlsCollection;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
 use Nette\NotImplementedException;
 use Nette\Security\IAuthorizator;
 
-class SpaSchedulerExtension extends CompilerExtension
+class SpaAclExtension extends CompilerExtension
 {
 	use DoctrineAnnotationDriverExtensionHelperTrait;
 
 	private $defaults = [
-		'timeZone' => null // date_default_timezone_get()
 	];
 
 	public function loadConfiguration()
@@ -34,14 +32,14 @@ class SpaSchedulerExtension extends CompilerExtension
 		Compiler::loadDefinitions($builder, $this->loadFromFile(__DIR__ . '/config.neon')['services'], $this->name);
 
 		$presenterFactory = $builder->getDefinition('application.presenterFactory');
-		$presenterFactory->addSetup('setMapping', [['LeSpaScheduler' => 'Legerete\Spa\KendoScheduler\*Module\Presenters\*Presenter']]);
+		$presenterFactory->addSetup('setMapping', [['LeSpaAcl' => 'Legerete\Spa\KendoAcl\*Module\Presenters\*Presenter']]);
 
 		$router = $builder->getDefinition('routing.router');
-		$router->addSetup('$service->prepend(new Nette\Application\Routers\Route(?, ?));', ['scheduler[/<action>]', [
-			'module' => 'LeSpaScheduler:Scheduler',
-			'presenter' => 'Scheduler',
+		$router->addSetup('$service->prepend(new Nette\Application\Routers\Route(?, ?));', ['acl[/<action>]', [
+			'module' => 'LeSpaAcl:Acl',
+			'presenter' => 'Acl',
 			'action' => 'default',
-			'alias' => 'LeSpaScheduler'
+			'alias' => 'LeSpaAcl'
 		]]);
 
 		// Add resources to authorizator
@@ -50,29 +48,27 @@ class SpaSchedulerExtension extends CompilerExtension
 		if (!$authorizator) {
 			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
 		}
-
-		$resource = 'LeSpaScheduler:Scheduler:Scheduler';
-		$authorizator->addSetup('addResource', [$resource]);
-		$authorizator->addSetup('addResourcePrivileges', [$resource, [
+		$authorizator->addSetup('addResource', ['LeSpaAcl:Acl:Acl']);
+		$authorizator->addSetup('addResourcePrivileges', ['LeSpaAcl:Acl:Acl', [
 			Permission::PRIVILEGE_SHOW,
 			Permission::PRIVILEGE_CREATE,
 			Permission::PRIVILEGE_READ_ALL,
-			Permission::PRIVILEGE_READ_MY,
 			Permission::PRIVILEGE_UPDATE,
 			Permission::PRIVILEGE_DESTROY,
 		]]);
 
 		// @todo DEVELOP TEMPORARY! Delete Me!
-		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSpaScheduler:Scheduler:Scheduler']);
-
-		// Add mapping to doctrine
-		$this->registerDoctrineEntityAnnotationDriver(__DIR__.'/../Model/Entity', 'Legerete\Spa\KendoScheduler\Model\Entity');
+		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSpaAcl:Acl:Acl']);
 
 		$templatesCollection = $builder->getDefinition($builder->getByType(SpaTemplatesControlsCollection::class));
-		$templatesCollection->addSetup('set', ['schedulerTemplate', $this->prefix('@schedulerTemplate')]);
+		$templatesCollection->addSetup('set', ['aclTemplate', $this->prefix('@aclTemplate')]);
 	}
 
 	public function beforeCompile()
 	{
+		$builder = $this->getContainerBuilder();
+
+		// Add default english dictionary
+		$builder->getDefinition('translation.default')->addSetup('addResource', ['neon', __DIR__ . '/../lang/acl.en.neon', 'en', 'acl']);
 	}
 }

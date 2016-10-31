@@ -1,2 +1,3 @@
 services:
 	- Legerete\Spa\KendoUser\Model\Service\UserModelService
+	userTemplate: Legerete\Spa\KendoUser\Components\UserTemplateControlFactory

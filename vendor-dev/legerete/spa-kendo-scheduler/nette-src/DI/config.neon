@@ -1,6 +1,3 @@
 services:
 	- Legerete\Spa\KendoScheduler\Model\Service\SchedulerModelService
-
-#	database:
-#		metadata:
-#			Legerete\Spa\KendoScheduler\Model: %appDir%/../vendor-dev/legerete/spa-kendo-scheduler/nette-src/Model/Entity
+	schedulerTemplate: Legerete\Spa\KendoScheduler\Components\SchedulerTemplateControlFactory
