@@ -563,6 +563,62 @@ $(function () {
 			status: 'ok',
 		},
 		Acl: null,
+
+		/**
+		 * @param {jQuery.object} container
+		 * @param {object} options
+		 */
+		parentRolesEditor: function (container, options) {
+			let grid = container.closest('div[data-role="grid"]').data('kendoGrid');
+			let currentModelUid = container.closest('tr').data('uid');
+			let currentModel = grid.dataSource.getByUid(currentModelUid);
+
+			/**
+			 * Add the editor to the cell
+			 */
+			$('<input name="' + options.field + '"/>')
+				.appendTo(container)
+				.kendoMultiSelect({
+					clearButton: false,
+					placeholder: "Select roles",
+					dataTextField: "title",
+					dataValueField: "id",
+					dataSource: {
+						transport: {
+							read: {
+								url: grid.dataSource.options.transport.read.url + '&ignore=' + currentModel.get('id'),
+								dataType: "json"
+							}
+						}
+					}
+				}).data('kendoMultiSelect').open();
+		},
+
+		/**
+		 * @param {array} roles
+		 * @returns {string}
+		 */
+		generateRolesTemplate: function (roles) {
+			var result = '';
+
+			if (typeof roles !== 'undefined') {
+				for (var i = 0; i < roles.length; i++) {
+					result += roles[i].title;
+					if (i !== (roles.length-1)) {
+						result += ', ';
+					}
+				}
+			}
+
+			return result;
+		},
+
+		/**
+		 * Tab creator interface, used in SPA::openPanel()
+		 * @param {jQuery.event} event Event then trigger open panel
+		 * @param context
+		 * @returns {settings|{multiInstances, closeable, name, type, view}}
+		 */
 		create: function (event, context) {
 			this.registerListeners();
 			var view = $(this.settings.view);
@@ -572,7 +628,6 @@ $(function () {
 			var readUrl = view.data('source-read');
 			var updateUrl = view.data('source-update');
 			var that = this;
-
 
 			this.settings.viewModel = kendo.observable({
 				isDirty: function () {
@@ -589,6 +644,10 @@ $(function () {
 						});
 					});
 				},
+
+				/**
+				 * Actual roles, dataSource for grid with roles
+				 */
 				roles: new kendo.data.DataSource({
 					schema: {
 						model: {
@@ -603,11 +662,12 @@ $(function () {
 							}
 						}
 					},
-					batch: false,
+					batch: true,
 					transport: {
 						create: {
 							url: createUrl,
-							dataType: "json"
+							dataType: "json",
+							method: 'POST'
 						},
 						read: {
 							url: readUrl,
@@ -627,6 +687,7 @@ $(function () {
 						}
 					}
 				}),
+
 				Acl: kendo.data.Model.define(defaultAclData),
 				AclModel: null,
 				previousAclModel: null,

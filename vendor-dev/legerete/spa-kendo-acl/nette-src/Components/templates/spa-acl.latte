@@ -7,7 +7,7 @@
 	<div class="content-box">
 		<h3 class="content-box-header">{_acl.h1}
 		</h3>
-		<div data-role="grid"
+		<div id="acl-roles-grid" data-role="grid"
 			data-toolbar="[{
 						name: 'create',
 						text: '{_acl.role.create}',
@@ -22,10 +22,10 @@
 				},
 				{ field: 'name', title: '{_acl.role.name}', template: '#=name#'},
 				{ field: 'title', title: '{_acl.role.title}', template: '#=title#'},
-				{ field: 'parentRoles', title: '{_acl.role.parentRoles}'}
+				{ field: 'parents', editor: SPA.panelTypes['acl'].parentRolesEditor, title: '{_acl.role.parentRoles}', template: '#=SPA.panelTypes[\'acl\'].generateRolesTemplate(parents)#'}
 			]"
 			data-editable="true"
-			data-bind="source: roles, events: { dataBound: gridDataBound, detailInit: detailInit, detailExpand: detailExpand, change: gridDataChanged}"
+			data-bind="source: roles, events: { dataBound: gridDataBound, detailInit: detailInit, detailExpand: detailExpand, change: gridDataChanged, edit: edit}"
 			data-detail-template="spa-view-acl-role-detail"
 		>
 

@@ -50,12 +50,12 @@ class AclPresenter extends SecuredPresenter
 
 	public function handleCreate()
 	{
+//		$this->modelService->createRole($data);
 	}
 
-	public function handleRead($id = null)
+	public function handleRead($ignore = null)
 	{
-		$roles = $this->modelService->readRolesWithResources();
-
+		$roles = $this->modelService->readRolesWithResources((int) $ignore);
 		$this->sendJson($roles);
 	}
 
