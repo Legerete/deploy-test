@@ -562,7 +562,6 @@ $(function () {
 			id: null,
 			status: 'ok',
 		},
-		Acl: null,
 
 		/**
 		 * @param {jQuery.object} container
@@ -571,7 +570,17 @@ $(function () {
 		parentRolesEditor: function (container, options) {
 			let grid = container.closest('div[data-role="grid"]').data('kendoGrid');
 			let currentModelUid = container.closest('tr').data('uid');
-			let currentModel = grid.dataSource.getByUid(currentModelUid);
+			let multiSelectDataSource = [];
+
+			/**
+			 * Filtering current line from available parents, cannot filter on grid.dataSource,
+			 * because filter method reduce data in original dataSource
+			 */
+			grid.dataSource.data().forEach(function (item) {
+				if (item.uid !== currentModelUid) {
+					multiSelectDataSource.push(item.toJSON());
+				}
+			});
 
 			/**
 			 * Add the editor to the cell
@@ -580,17 +589,12 @@ $(function () {
 				.appendTo(container)
 				.kendoMultiSelect({
 					clearButton: false,
-					placeholder: "Select roles",
+					placeholder: "-- add translate roles --",
 					dataTextField: "title",
 					dataValueField: "id",
 					dataSource: {
-						transport: {
-							read: {
-								url: grid.dataSource.options.transport.read.url + '&ignore=' + currentModel.get('id'),
-								dataType: "json"
-							}
-						}
-					}
+						data: multiSelectDataSource
+					},
 				}).data('kendoMultiSelect').open();
 		},
 
@@ -622,11 +626,10 @@ $(function () {
 		create: function (event, context) {
 			this.registerListeners();
 			var view = $(this.settings.view);
-			var defaultAclData = $('#spa-view-acl-role-detail').data('resources');
-
 			var createUrl = view.data('source-create');
 			var readUrl = view.data('source-read');
 			var updateUrl = view.data('source-update');
+			var aclResources = view.data('resources');
 			var that = this;
 
 			this.settings.viewModel = kendo.observable({
@@ -658,13 +661,27 @@ $(function () {
 								name: { type: 'string', defaultValue: ''},
 								title: { type: 'string', defaultValue: ''},
 								parents: { type: 'array', defaultValue: [] },
-								resources: { type: 'array', defaultValue: []}
+								resources: { type: 'array', defaultValue: aclResources}
 							}
+						},
+						parse: function(data) {
+
+							/**
+							 * Extend received resources with default data
+							 */
+							for (i = 0; i < data.length; i++) {
+								let newResourcesMap = {};
+								newResourcesMap = $.extend(true, {}, aclResources, data[i].resources);
+								data[i].resources = newResourcesMap;
+							}
+
+							return data;
 						}
 					},
 					batch: true,
 					transport: {
 						create: {
+							async: false,
 							url: createUrl,
 							dataType: "json",
 							method: 'POST'
@@ -674,6 +691,7 @@ $(function () {
 							dataType: "json"
 						},
 						update: {
+							async: false,
 							url: updateUrl,
 							dataType: "json",
 							method: 'POST'
@@ -688,67 +706,26 @@ $(function () {
 					}
 				}),
 
-				Acl: kendo.data.Model.define(defaultAclData),
-				AclModel: null,
-				previousAclModel: null,
-
 				detailExpand: function (e) {
 					var grid = $(e.sender.element).data('kendoGrid');
 					grid.collapseRow(':not([data-uid="' + e.masterRow.data('uid') + '"])');
 				},
 
-				/**
-				 * Settings for detail table with settings permissions
-				 * @param {jQuery.Event} e
-				 */
 				detailInit: function (e) {
 					var gridElement = e.sender.element;
 					var grid = $(gridElement).data('kendoGrid');
-					var detail = this;
-					var masterRow = e.masterRow;
-					var detailRow = e.detailRow;
-					var roleUid = e.masterRow.data('uid');
-					var roleModel = this.roles.getByUid(roleUid);
+					let roleUid = e.masterRow.data('uid');
+					let roleModel = this.roles.getByUid(roleUid);
 
-					if (this.get('AclModel') === null || this.get('previousAclModel') !== roleUid) {
-						this.set('previousAclModel', roleUid);
-						this.set('AclModel', new that.settings.viewModel.Acl(roleModel.get('resources')));
-					}
+					roleModel.onChangeResource = function (e) {
+						grid.expandRow($(gridElement).find('tr[data-uid="' + roleUid + '"]'));
+					};
 
-					var observable = kendo.observable({
-						onChange: function (e) {
-							var property = e.target.getAttribute('name');
-							var resource = e.target.getAttribute('data-resource');
-							var privilege = e.target.getAttribute('data-privilege');
-							var propertyValue = e.target.checked;
-
-							/**
-							 * Lazy creating resources and privileges for role.
-							 * Privilege not needed if is not granted.
-							 */
-							if (roleModel.get('resources.'+resource) === undefined) {
-								roleModel.set('resources.'+resource, {});
-							}
-							roleModel.set('resources.' + property, propertyValue);
-							roleModel.set('edited', true);
-
-							// @todo workaround proti zavreni detailu gridu po updatu dat role, chtelo by co nejdrive odstranit
-							grid.expandRow($(gridElement).find('tr[data-uid="'+roleUid+'"]'));
-						},
-						Acl: that.settings.viewModel.AclModel
-					});
-
-					kendo.unbind(detailRow, observable);
-					kendo.bind(detailRow, observable);
+					kendo.bind(e.detailRow, roleModel);
 				}
 			});
 
-			window.test = this.settings.viewModel;
-
 			return this.settings;
-		},
-		test: function () {
-			console.log('that test');
 		},
 		registerListeners: function () {
 			var that = this;

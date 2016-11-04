@@ -3,6 +3,7 @@
 		data-source-read="{plink LeSpaAcl:Acl:Acl:}?do=read"
 		data-source-update="{plink LeSpaAcl:Acl:Acl:}?do=update"
 		data-source-destroy="{plink LeSpaAcl:Acl:Acl:}?do=destroy"
+		data-resources="{$allResourcesJson}"
 >
 	<div class="content-box">
 		<h3 class="content-box-header">{_acl.h1}
@@ -20,7 +21,6 @@
 					title: '{_acl.role.save}',
 					template: '<div data-bind=\'visible: edited\' data-role=\'update\' class=\'btn btn-success btn-xs k-grid-update\'><span class=\'glyph-icon icon-save\'>  {_acl.role.save}</div>',
 				},
-				{ field: 'name', title: '{_acl.role.name}', template: '#=name#'},
 				{ field: 'title', title: '{_acl.role.title}', template: '#=title#'},
 				{ field: 'parents', editor: SPA.panelTypes['acl'].parentRolesEditor, title: '{_acl.role.parentRoles}', template: '#=SPA.panelTypes[\'acl\'].generateRolesTemplate(parents)#'}
 			]"
@@ -33,7 +33,7 @@
 	</div>
 </script>
 
-<script id="spa-view-acl-role-detail" type="text/x-kendo-template" data-resources="{$allResourcesJson}">
+<script id="spa-view-acl-role-detail" type="text/x-kendo-template">
 	<table class="acl-table">
 		<thead>
 			<tr>
@@ -51,7 +51,7 @@
 			{foreach $allPrivileges as $privilege}
 				{if isset($resources[$resource][$privilege])}
 					<td>
-						<input class="custom-checkbox" data-resource="{$resource|replace:':',''}" data-privilege="{$privilege}" type="checkbox" name="{$resource|replace:':',''}.{$privilege}" value="1" data-bind="checked: Acl.{$resource|replace:':',''}.{$privilege}, events: { change: onChange}">
+						<input class="custom-checkbox" data-resource="{$resource|replace:':',''}" data-privilege="{$privilege}" type="checkbox" name="{$resource|replace:':',''}.{$privilege}" value="1" data-bind="checked: resources.{$resource|replace:':',''}.{$privilege}, events: { change: onChangeResource}">
 					</td>
 				{else}
 					<td>
