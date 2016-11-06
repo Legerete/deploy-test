@@ -52,8 +52,6 @@ class AclPresenter extends SecuredPresenter
 	{
 		$roles = $this->getHttpRequest()->getPost('models');
 		$createdRoles = $this->modelService->createRoles($roles, true);
-//		$actualRoles = $this->modelService->readRolesWithResources();
-//		$this->sendJson($actualRoles);
 		$this->sendJson($createdRoles);
 	}
 
@@ -65,6 +63,9 @@ class AclPresenter extends SecuredPresenter
 
 	public function handleUpdate()
 	{
+		$roles = $this->getHttpRequest()->getPost('models');
+		$updatedRoles = $this->modelService->updateRoles($roles, true);
+		$this->sendJson($updatedRoles);
 	}
 
 	public function handleDestroy()

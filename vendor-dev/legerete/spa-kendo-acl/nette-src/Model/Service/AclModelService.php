@@ -199,25 +199,33 @@ class AclModelService
 		return $privilegesEntities;
 	}
 
-	public function setRoleParents($role, $parents)
+	public function updateRoles($roles, $returnWithResources = false)
 	{
-
-	}
-
-	public function updateRoles($roles)
-	{
+		$updatedRoles = [];
 		$this->em->beginTransaction();
 		foreach ($roles as $role) {
-			$this->updateRole($role);
+			$updatedRoles[] = $this->updateRole($role, $returnWithResources);
 		}
 		$this->em->commit();
 
-		return $roles;
+		return $updatedRoles;
 	}
 
-	public function updateRole($role)
+	public function updateRole($roleData, $returnWithResources = false)
 	{
-		$role = $this->roleRepository()->find($role['id']);
+		/**
+		 * @var RoleEntity $role
+		 */
+		$role = $this->roleRepository()->find($roleData['id']);
+
+		$role->setTitle($roleData['title']);
+		$this->createPrivileges($role, $roleData['resources']);
+
+		if ($returnWithResources) {
+			return $this->readRoleWithResources($roleData['id']);
+		} else {
+			return $this->readRole($roleData['id']);
+		}
 	}
 
 	/**
