@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\Table;
  * @Table(name="acl_privileges")
  * @ORM\HasLifecycleCallbacks
  */
-class PrivilegesEntity extends \Kdyby\Doctrine\Entities\BaseEntity
+class PrivilegeEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 {
 
 	/**
@@ -52,8 +52,20 @@ class PrivilegesEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	 */
 	protected $allowed;
 
-	public function __construct()
+	/**
+	 * PrivilegeEntity constructor.
+	 *
+	 * @param RoleEntity $role
+	 * @param ResourceEntity $resource
+	 * @param string $privilege
+	 * @param int $allowed
+	 */
+	public function __construct(RoleEntity $role, ResourceEntity $resource, $privilege, $allowed = false)
 	{
+		$this->role = $role;
+		$this->resource = $resource;
+		$this->privilege = $privilege;
+		$this->allowed = $allowed;
 	}
 
 	/**
@@ -134,7 +146,7 @@ class PrivilegesEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	/**
 	 * @var integer $allowed
 	 */
-	public function setAllowed(integer $allowed)
+	public function setAllowed(int $allowed)
 	{
 		$this->allowed = $allowed;
 		return $this;

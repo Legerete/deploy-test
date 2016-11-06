@@ -11,10 +11,13 @@ namespace Legerete\Spa\KendoAcl\Model\Service;
 use Doctrine\ORM\AbstractQuery;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
+use Legerete\Security\Model\Entity\PrivilegeEntity;
+use Legerete\Security\Model\Entity\ResourceEntity;
 use Legerete\Security\Model\Entity\RoleEntity;
-use Legerete\Security\Model\Entity\UserEntity;
 use Legerete\Security\Permission;
 use Nette\Security\IAuthorizator;
+use Nette\Utils\Random;
+use Nette\Utils\Strings;
 
 class AclModelService
 {
@@ -53,7 +56,6 @@ class AclModelService
 		return $this->prepareReadRoleQuery()
 			->where('r.id = :roleId')
 			->setParameter('roleId', $roleId)
-			->setMaxResults(1)
 			->getQuery()
 			->getSingleResult(AbstractQuery::HYDRATE_ARRAY);
 	}
@@ -71,6 +73,23 @@ class AclModelService
 			->getArrayResult();
 	}
 
+	/**
+	 * @param integer $roleId
+	 * @return array
+	 */
+	public function readRoleWithResources($roleId)
+	{
+		$role = $this->readRole($roleId);
+		$role['resources'] = $this->reformatPrivilegesToResources($role['privileges']);
+		unset($role['privileges']);
+
+		return $role;
+	}
+
+	/**
+	 * @param null|integer $ignore
+	 * @return array
+	 */
 	public function readRolesWithResources($ignore = null)
 	{
 		$roles = $this->readRoles($ignore);
@@ -84,32 +103,100 @@ class AclModelService
 				'resources' => [],
 			];
 
-			foreach ($roleData['privileges'] as $privilege) {
-				$resourceKey = $privilege['resource']['slug'];
-				$result[$roleKey]['resources'][$resourceKey] = $result[$roleKey]['resources'][$resourceKey] ?? [];
-
-				$result[$roleKey]['resources'][$resourceKey][$privilege['privilege']] = (bool) $privilege['allowed'];
-			}
-
+			$result[$roleKey]['resources'] = $this->reformatPrivilegesToResources($roleData['privileges']);
 		}
 
 		return $result;
 	}
 
-	public function createRoles($roles)
+	/**
+	 * @param array $privileges
+	 * @return array
+	 */
+	private function reformatPrivilegesToResources($privileges)
 	{
+		$resources = [];
+		foreach ($privileges as $privilege) {
+			$resourceKey = $privilege['resource']['slug'];
+			$resources[$resourceKey] = $resources[$resourceKey] ?? [];
+			$resources[$resourceKey][$privilege['privilege']] = (bool) $privilege['allowed'];
+		}
+
+		return $resources;
+	}
+
+	/**
+	 * @param $roles
+	 * @param bool $returnWithResources
+	 * @return array
+	 */
+	public function createRoles($roles, $returnWithResources = false)
+	{
+		$newRoles = [];
 		$this->em->beginTransaction();
 		foreach ($roles as $role) {
-			$this->createRole($role);
+			$newRoles[] = $this->createRole($role, $returnWithResources);
 		}
 		$this->em->commit();
 
-		return $roles;
+		return $newRoles;
 	}
 
-	public function createRole($role)
+	/**
+	 * @param array $role
+	 * @param bool $returnWithResources
+	 * @return array
+	 */
+	public function createRole(array $role, $returnWithResources = false) : array
 	{
-		$role = new RoleEntity($role['title'], $role['name']);
+		$roleName = $this->generateUniqueRoleName($role['title']);
+
+		$this->em->beginTransaction();
+
+		$roleEntity = new RoleEntity($role['title'], $roleName);
+		$this->em->persist($roleEntity);
+		$rolePrivileges = $this->createPrivileges($roleEntity, $role['resources']);
+		$roleEntity->setPrivileges($rolePrivileges);
+
+		$this->em->commit();
+
+		if ($returnWithResources) {
+			return $this->readRoleWithResources($roleEntity->id);
+		}
+		return $this->readRole($roleEntity->id);
+	}
+
+	/**
+	 * @param RoleEntity $role
+	 * @param array $privileges
+	 *
+	 * @return array
+	 */
+	private function createPrivileges(RoleEntity $role, array $privileges = []) : array
+	{
+		$privilegesEntities = [];
+
+		foreach ($privileges as $resourceName => $privilegeAction) {
+			$resource = $this->resourceRepository()->findOneBy(['slug' => $resourceName]);
+
+			foreach ($privilegeAction as $privilegeName => $allowed) {
+				$privilege = $this->privilegeRepository()->findOneBy([
+					'role' => $role->getId(),
+					'resource' => $resource->getId(),
+					'privilege' => $privilegeName
+				]);
+
+				if (!$privilege) {
+					$privilege = new PrivilegeEntity($role, $resource, $privilegeName);
+				}
+				$privilege->setAllowed(filter_var($allowed, FILTER_VALIDATE_BOOLEAN));
+
+				$privilegesEntities[] = $privilege;
+				$this->em->persist($privilege)->flush();
+			}
+		}
+
+		return $privilegesEntities;
 	}
 
 	public function setRoleParents($role, $parents)
@@ -158,17 +245,64 @@ class AclModelService
 	}
 
 	/**
-	 * @return EntityRepository
+	 * @param $roleTitle
+	 * @return string
 	 */
-	private function userRepository() : EntityRepository
+	private function generateUniqueRoleName($roleTitle)
 	{
-		return $this->em->getRepository(UserEntity::class);
+		$webalizedTitle = Strings::webalize($roleTitle);
+
+		if ($this->checkIfRoleNameExists($webalizedTitle))
+		{
+			do {
+				$randSuffix = Random::generate(6);
+				$uniqueName = $webalizedTitle . '-' . $randSuffix;
+				$nameExists = $this->checkIfRoleNameExists($uniqueName);
+			} while ($nameExists === true);
+
+			return $uniqueName;
+		}
+
+		return $webalizedTitle;
+	}
+
+	/**
+	 * @param string $name
+	 * @return bool
+	 */
+	private function checkIfRoleNameExists(string $name) : bool
+	{
+		$roleExists = $this->roleRepository()->createQueryBuilder('r')
+			->select('partial r.{id}')
+			->where('r.name = :name')
+			->setParameter('name', $name)
+			->setMaxResults(1)
+			->getQuery()
+			->getScalarResult();
+
+		return (bool) $roleExists;
 	}
 
 	/**
 	 * @return EntityRepository
 	 */
-	private function roleRepository() : EntityRepository
+	private function privilegeRepository()
+	{
+		return $this->em->getRepository(PrivilegeEntity::class);
+	}
+
+	/**
+	 * @return EntityRepository
+	 */
+	private function resourceRepository()
+	{
+		return $this->em->getRepository(ResourceEntity::class);
+	}
+
+	/**
+	 * @return EntityRepository
+	 */
+	private function roleRepository()
 	{
 		return $this->em->getRepository(RoleEntity::class);
 	}

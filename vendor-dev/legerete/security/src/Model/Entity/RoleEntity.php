@@ -8,6 +8,8 @@
 
 namespace Legerete\Security\Model\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
 
@@ -38,12 +40,20 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	protected $title;
 
 	/**
-	 * @ORM\OneToMany(targetEntity="PrivilegesEntity", mappedBy="role")
+	 * @ORM\OneToMany(targetEntity="PrivilegeEntity", mappedBy="role")
+	 * @var Collection $privileges
 	 */
 	protected $privileges;
 
-	public function __construct()
+	/**
+	 * RoleEntity constructor.
+	 *
+	 * @param string $title
+	 */
+	public function __construct($title, $name, $parents = [])
 	{
+		$this->title = $title;
+		$this->name = $name;
 	}
 
 	/**
@@ -72,6 +82,14 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	}
 
 	/**
+	 * @return Collection
+	 */
+	public function getPrivileges()
+	{
+		return $this->privileges->toArray();
+	}
+
+	/**
 	 * ************************************* Setters ***************************************
 	 */
 
@@ -90,6 +108,38 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	public function setTitle($title)
 	{
 		$this->title = $title;
+		return $this;
+	}
+
+	/**
+	 * @param array $privileges
+	 * @return $this
+	 */
+	public function setPrivileges(array $privileges)
+	{
+		foreach ($privileges as $privilege) {
+			$this->setPrivilege($privilege);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @param PrivilegeEntity $privilege
+	 * @return $this
+	 */
+	public function setPrivilege(PrivilegeEntity $privilege)
+	{
+		if (!$this->privileges) {
+			$this->privileges = new ArrayCollection();
+		}
+//		if ($privilege->getAllowed() === false && $this->privileges->contains($privilege))
+//		{
+//			$this->privileges->remove($privilege);
+//		} else if ($privilege->getAllowed() === true) {
+			$this->privileges->add($privilege);
+//		}
+
 		return $this;
 	}
 

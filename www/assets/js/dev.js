@@ -657,6 +657,7 @@ $(function () {
 							id: 'id',
 							fields: {
 								id: { type: 'number'},
+								edited: { defaultValue: false},
 								update: { editable: false, defaultValue: null},
 								name: { type: 'string', defaultValue: ''},
 								title: { type: 'string', defaultValue: ''},
@@ -698,7 +699,7 @@ $(function () {
 						}
 					},
 					change: function (e) {
-						if (e.action !== undefined) {
+						if (e.action !== undefined && e.action !== 'sync') {
 							$(e.items).each(function (index, item) {
 								item.set('edited', true);
 							});
