@@ -146,3 +146,9 @@ doctrine:
 
 services:
 	router: App\Router\RouterFactory::createRouter
+
+	# Kdyby\Console commands
+	#
+	-
+		class: App\Console\Command\UpdateAclResources
+		tags: [kdyby.console.command]
