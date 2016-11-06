@@ -39,6 +39,10 @@ class AclPresenter extends SecuredPresenter
 		parent::startup();
 	}
 
+	/**
+	 * If is render method called without parameter [do] (handle method),
+	 * then will send info about unsuported request.
+	 */
 	public function renderDefault()
 	{
 		$this->getHttpResponse()->setCode(404);
@@ -48,6 +52,23 @@ class AclPresenter extends SecuredPresenter
 		]);
 	}
 
+	/**
+	 * Process create roles, expected models[] in post
+	 * $models = [
+	 * 		0 => [
+	 * 			'title' => 'Foo Role Name',
+	 * 			'resources' => [
+	 * 				'LeSpaAclAclAcl' => [
+	 * 					'show' => 'false',
+	 * 					'create' => 'true',
+	 * 					'readAll' => 'false',
+	 * 					'update' => 'false',
+	 * 					'destroy' => 'false',
+	 * 				],
+	 * 			],
+	 * 		],
+	 * ]
+	 */
 	public function handleCreate()
 	{
 		$roles = $this->getHttpRequest()->getPost('models');
@@ -55,12 +76,34 @@ class AclPresenter extends SecuredPresenter
 		$this->sendJson($createdRoles);
 	}
 
+	/**
+	 * Read roles info
+	 * @param null|integer $ignore If is set, query will ignore role with id [$ignore]
+	 */
 	public function handleRead($ignore = null)
 	{
 		$roles = $this->modelService->readRolesWithResources((int) $ignore);
 		$this->sendJson($roles);
 	}
 
+	/**
+	 * Process update roles, expected models[] in post
+	 * $models = [
+	 * 		0 => [
+	 * 			'id' => '1', // unMutable
+	 * 			'title' => 'Foo Role Name',
+	 * 			'resources' => [
+	 * 				'LeSpaAclAclAcl' => [
+	 * 					'show' => 'false',
+	 * 					'create' => 'true',
+	 * 					'readAll' => 'false',
+	 * 					'update' => 'false',
+	 * 					'destroy' => 'false',
+	 * 				],
+	 * 			],
+	 * 		],
+	 * ]
+	 */
 	public function handleUpdate()
 	{
 		$roles = $this->getHttpRequest()->getPost('models');
@@ -68,16 +111,10 @@ class AclPresenter extends SecuredPresenter
 		$this->sendJson($updatedRoles);
 	}
 
+	/**
+	 * Process destroy of role
+	 */
 	public function handleDestroy()
 	{
-	}
-
-	private function sendInvalidDataResponse()
-	{
-		$this->getHttpResponse()->setCode(400);
-		$this->sendJson([
-			'status' => 'error',
-			'error' => 'Invalid user data.'
-		]);
 	}
 }

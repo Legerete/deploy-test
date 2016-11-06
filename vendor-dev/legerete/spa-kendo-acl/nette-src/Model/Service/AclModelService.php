@@ -36,6 +36,11 @@ class AclModelService
 	 */
 	private $em;
 
+	/**
+	 * AclModelService constructor.
+	 * @param IAuthorizator $permissions
+	 * @param EntityManager $entityManager
+	 */
 	public function __construct(IAuthorizator $permissions, EntityManager $entityManager)
 	{
 		$this->em = $entityManager;
@@ -43,6 +48,9 @@ class AclModelService
 		$this->resources = $this->permissions->getResources();
 	}
 
+	/**
+	 * @return \Doctrine\ORM\QueryBuilder
+	 */
 	private function prepareReadRoleQuery()
 	{
 		return $this->roleRepository()->createQueryBuilder('r')
@@ -51,6 +59,37 @@ class AclModelService
 			->leftJoin('p.resource', 'res');
 	}
 
+	/**
+	 * @param $roleId
+	 * @return null|array
+	 * [
+	 * 	'id' => 1,
+	 * 	'name' => 'guest',
+	 * 	'title' => 'Guest',
+	 * 	'privileges' => [
+	 * 		0 => [
+	 * 			'id' => 1,
+	 * 			'privilege' => 'create',
+	 * 			'allowed' => 1,
+	 * 			'resource' => [
+	 * 				'id' => 1,
+	 * 				'name' => 'LeSpaAcl:Acl:Acl',
+	 * 				'slug' => 'LeSpaAclAclAcl',
+	 * 			],
+	 * 		],
+	 * 		1 => [
+	 * 			'id' => 733,
+	 * 			'privilege' => 'show',
+	 * 			'allowed' => 0,
+	 * 			'resource' => [
+	 * 				'id' => 1,
+	 * 				'name' => 'LeSpaAcl:Acl:Acl',
+	 * 				'slug' => 'LeSpaAclAclAcl',
+	 * 			],
+	 * 		],
+	 * 	],
+	 * ]
+	 */
 	public function readRole($roleId)
 	{
 		return $this->prepareReadRoleQuery()
@@ -60,13 +99,17 @@ class AclModelService
 			->getSingleResult(AbstractQuery::HYDRATE_ARRAY);
 	}
 
-	public function readRoles($ignoreId = null)
+	/**
+	 * @param null $ignoredRoleId
+	 * @return array {@inheritdoc}
+	 */
+	public function readRoles($ignoredRoleId = null)
 	{
 		$query = $this->prepareReadRoleQuery();
 
-		if ($ignoreId) {
+		if ($ignoredRoleId) {
 			$query = $query->andWhere('r.id <> :ignoreId')
-				->setParameter('ignoreId', $ignoreId);
+				->setParameter('ignoreId', $ignoredRoleId);
 		}
 
 		return $query->getQuery()
@@ -76,6 +119,22 @@ class AclModelService
 	/**
 	 * @param integer $roleId
 	 * @return array
+	 * [
+	 * 	'id' => 1,
+	 * 	'name' => 'guest',
+	 * 	'title' => 'Guest',
+	 * 	'resources' => [
+	 * 		'LeSpaAclAclAcl' => [
+	 * 			'create' => TRUE,
+	 * 			'show' => FALSE,
+	 * 			'readAll' => FALSE,
+	 * 			'update' => FALSE,
+	 * 			'destroy' => FALSE,
+	 * 		],
+	 * 		'LeSignInUserSignInSign' => [
+	 * 			'show' => FALSE,
+	 * 		],
+	 * 	]
 	 */
 	public function readRoleWithResources($roleId)
 	{
@@ -87,12 +146,13 @@ class AclModelService
 	}
 
 	/**
-	 * @param null|integer $ignore
+	 * @inheritdoc self::readRoleWithResources()
+	 * @param null|integer $ignoredRoleId
 	 * @return array
 	 */
-	public function readRolesWithResources($ignore = null)
+	public function readRolesWithResources($ignoredRoleId = null)
 	{
-		$roles = $this->readRoles($ignore);
+		$roles = $this->readRoles($ignoredRoleId);
 		$result = [];
 
 		foreach ($roles as $roleKey => $roleData) {
@@ -169,7 +229,6 @@ class AclModelService
 	/**
 	 * @param RoleEntity $role
 	 * @param array $privileges
-	 *
 	 * @return array
 	 */
 	private function createPrivileges(RoleEntity $role, array $privileges = []) : array
@@ -199,6 +258,11 @@ class AclModelService
 		return $privilegesEntities;
 	}
 
+	/**
+	 * @param array $roles
+	 * @param bool $returnWithResources
+	 * @return array
+	 */
 	public function updateRoles($roles, $returnWithResources = false)
 	{
 		$updatedRoles = [];
@@ -211,6 +275,11 @@ class AclModelService
 		return $updatedRoles;
 	}
 
+	/**
+	 * @param array $roleData
+	 * @param bool $returnWithResources
+	 * @return array|mixed
+	 */
 	public function updateRole($roleData, $returnWithResources = false)
 	{
 		/**
