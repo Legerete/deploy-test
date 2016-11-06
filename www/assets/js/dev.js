@@ -578,7 +578,11 @@ $(function () {
 			 */
 			grid.dataSource.data().forEach(function (item) {
 				if (item.uid !== currentModelUid) {
-					multiSelectDataSource.push(item.toJSON());
+					multiSelectDataSource.push({
+						id: item.id,
+						uid: item.uid,
+						title: item.title
+					});
 				}
 			});
 
@@ -607,10 +611,7 @@ $(function () {
 
 			if (typeof roles !== 'undefined') {
 				for (var i = 0; i < roles.length; i++) {
-					result += roles[i].title;
-					if (i !== (roles.length-1)) {
-						result += ', ';
-					}
+					result += '<span class="bs-label label-primary">' + roles[i].title + '</span> ';
 				}
 			}
 
@@ -643,7 +644,7 @@ $(function () {
 						var button = $(row).find('div[data-role="update"]');
 						kendo.bind(button, e.sender.dataSource.getByUid(uid));
 						button.on('click', function () {
-							e.sender.dataSource.sync();
+							e.sender.wrapper.data('kendoGrid').saveChanges();
 						});
 					});
 				},
@@ -706,6 +707,64 @@ $(function () {
 						}
 					}
 				}),
+
+				saveGridChanges: function (e) {
+					e.sender.table.find('tr .table-cell.title').removeClass('bg-danger');
+					if (typeof e.values.edited === 'undefined' || e.model.isNew())
+					{
+						if (typeof e.values.title !== 'undefined') {
+							e.model.set('title', e.values.title);
+						}
+
+						this.validateAll(e.sender.dataSource.data());
+					}
+				},
+
+				saveChanges: function (e) {
+					if (! this.validateAll(e.sender.dataSource.data())) {
+						e.preventDefault();
+					}
+				},
+
+				validateAll: function (data) {
+					let that = this;
+					var titleValidation = 0;
+
+					data.forEach(function (item) {
+						if (! that.validateTitleUnique(item)) {
+							titleValidation++;
+						}
+					});
+
+					if (titleValidation > 0) {
+						noty({text: 'You have ' + titleValidation + ' duplicates in column title. Column title must be unique.', timeout:2500});
+					}
+
+					return titleValidation === 0;
+				},
+				
+				validateTitleUnique: function (validatedModel) {
+					let that = this;
+					var success = true;
+
+					this.roles.data().forEach(function (item) {
+						if (item.title === validatedModel.title && item.uid !== validatedModel.uid) {
+							that.markWrongCell(that.findCellByUidAndClass(item.uid, 'title'));
+							that.markWrongCell(that.findCellByUidAndClass(validatedModel.uid, 'title'));
+							success = false;
+						}
+					});
+
+					return success;
+				},
+
+				findCellByUidAndClass: function (uid, cellClass) {
+					return $('#acl-roles-grid').find('tr[data-uid="' + uid + '"]').find('.table-cell.' + cellClass);
+				},
+
+				markWrongCell: function (cell) {
+					cell.addClass('bg-danger');
+				},
 
 				detailExpand: function (e) {
 					var grid = $(e.sender.element).data('kendoGrid');

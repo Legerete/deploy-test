@@ -8,6 +8,7 @@
 
 namespace Legerete\Spa\KendoAcl\Model\Service;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
@@ -289,12 +290,32 @@ class AclModelService
 
 		$role->setTitle($roleData['title']);
 		$this->createPrivileges($role, $roleData['resources']);
+		$this->setRoleParents($role, $roleData['parents']);
 
 		if ($returnWithResources) {
 			return $this->readRoleWithResources($roleData['id']);
 		} else {
 			return $this->readRole($roleData['id']);
 		}
+	}
+
+	private function setRoleParents(RoleEntity $role, $parents)
+	{
+		$parentsCollection = new ArrayCollection();
+
+		foreach ($parents as $parent) {
+			if (isset($parent['id']) && ! empty($parent['id'])) {
+				$parentEntity = $this->roleRepository()->find($parent['id']);
+			} else {
+				$parentEntity = new RoleEntity($parent['title'], $this->generateUniqueRoleName($parent['title']));
+				$this->em->persist($parentEntity);
+			}
+
+			$parentsCollection->add($parentEntity);
+		}
+
+		$role->setParents($parents);
+
 	}
 
 	/**

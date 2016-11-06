@@ -12,6 +12,7 @@ import './libs/template/widgets/input-switch/inputswitch-alt.js';
 import './libs/template/widgets/slimscroll/slimscroll.js';
 import './libs/template/widgets/slidebars/slidebars.js';
 import './libs/template/widgets/slidebars/slidebars-demo.js';
+import './libs/template/widgets/noty-notifications/noty.js';
 import './libs/template/widgets/charts/piegage/piegage.js';
 import './libs/template/widgets/charts/piegage/piegage-demo.js';
 import './libs/template/widgets/screenfull/screenfull.js';

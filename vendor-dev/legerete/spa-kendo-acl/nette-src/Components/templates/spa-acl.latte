@@ -19,13 +19,20 @@
 					field: 'update',
 					width: 70,
 					title: '{_acl.role.save}',
-					template: '<div data-bind=\'visible: edited\' data-role=\'update\' class=\'btn btn-success btn-xs k-grid-update\'><span class=\'glyph-icon icon-save\'>  {_acl.role.save}</div>',
+					template: '<div data-bind=\'visible: edited\' data-role=\'update\' class=\'btn btn-success btn-xs k-grid-save-changes\'><span class=\'glyph-icon icon-save\'>  {_acl.role.save}</div>',
 				},
-				{ field: 'title', title: '{_acl.role.title}', template: '#=title#'},
+				{
+					field: 'title',
+					title: '{_acl.role.title}',
+					template: '#=title#',
+					attributes: {
+						'class': 'table-cell title'
+					}
+				},
 				{ field: 'parents', editor: SPA.panelTypes['acl'].parentRolesEditor, title: '{_acl.role.parentRoles}', template: '#=SPA.panelTypes[\'acl\'].generateRolesTemplate(parents)#'}
 			]"
 			data-editable="true"
-			data-bind="source: roles, events: { dataBound: gridDataBound, detailInit: detailInit, detailExpand: detailExpand, change: gridDataChanged, edit: edit}"
+			data-bind="source: roles, events: { dataBound: gridDataBound, detailInit: detailInit, detailExpand: detailExpand, change: gridDataChanged, save: saveGridChanges, saveChanges: saveChanges}"
 			data-detail-template="spa-view-acl-role-detail"
 		>
 

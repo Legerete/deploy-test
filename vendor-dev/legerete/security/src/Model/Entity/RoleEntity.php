@@ -46,6 +46,16 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	protected $privileges;
 
 	/**
+	 * @ORM\ManyToMany(targetEntity="RoleEntity")
+	 * @ORM\JoinTable(name="acl_role_parent",
+	 * 		joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id")},
+	 * 		inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")}
+	 * )
+	 * @var Collection $parents
+	 */
+	protected $parents;
+
+	/**
 	 * RoleEntity constructor.
 	 *
 	 * @param string $title
@@ -86,7 +96,7 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	 */
 	public function getPrivileges()
 	{
-		return $this->privileges->toArray();
+		return $this->privileges;
 	}
 
 	/**
@@ -109,6 +119,23 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	{
 		$this->title = $title;
 		return $this;
+	}
+
+	public function setParents($parents = [])
+	{
+		foreach ($this->parents as $parent) {
+			if ($parent) // @todo hledani v doslych rodicich
+			{
+				$this->parents->removeElement($parent);
+			}
+		}
+
+		foreach ($parents as $parent) {
+			if (! $this->parents->contains($parent)) {
+				$this->parents->add($parent);
+			}
+		}
+
 	}
 
 	/**
