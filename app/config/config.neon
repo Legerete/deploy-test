@@ -140,9 +140,7 @@ doctrine:
 		autoGenerateProxyClasses: true
 		debug: %database.debug%
 		metadata:
-#			%database.metadata%
 			App: %appDir%
-#			Legerete\Spa\KendoScheduler\Model: %appDir%/../vendor-dev
 
 services:
 	router: App\Router\RouterFactory::createRouter
