@@ -599,6 +599,10 @@ $(function () {
 					dataSource: {
 						data: multiSelectDataSource
 					},
+					change: function (e) {
+						let uid = e.sender.wrapper.closest('tr').data('uid');
+						grid.dataSource.getByUid(uid).set('edited', true);
+					}
 				}).data('kendoMultiSelect').open();
 		},
 
