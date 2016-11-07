@@ -138,7 +138,7 @@ $(function () {
 			var that = this;
 			var appContent = $('#app-content');
 
-			appContent.fadeOut(150, function () {
+			appContent.fadeOut(75, function () {
 				appContent.html('');
 				var viewTemplate = $(panel.view);
 				if (viewTemplate.length === 0) {
@@ -146,7 +146,7 @@ $(function () {
 				}
 
 				var newView = new kendo.View(viewTemplate.html(), {model: panel.viewModel, show: function () {
-					appContent.fadeIn(100);
+					appContent.fadeIn(125);
 				}});
 				var view = newView.render('#app-content');
 				that.trigger('spa.afterPanelViewChange');
