@@ -48,10 +48,9 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	/**
 	 * @ORM\ManyToMany(targetEntity="RoleEntity")
 	 * @ORM\JoinTable(name="acl_role_parent",
-	 * 		joinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id")},
-	 * 		inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")}
+	 * 		joinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")},
+	 * 		inverseJoinColumns={@ORM\JoinColumn(name="parent_id", referencedColumnName="id")}
 	 * )
-	 * @var Collection $parents
 	 */
 	protected $parents;
 
@@ -64,6 +63,8 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	{
 		$this->title = $title;
 		$this->name = $name;
+
+		$this->parents = new ArrayCollection();
 	}
 
 	/**
@@ -100,6 +101,14 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	}
 
 	/**
+	 * @return Collection
+	 */
+	public function getParents(): Collection
+	{
+		return $this->parents;
+	}
+
+	/**
 	 * ************************************* Setters ***************************************
 	 */
 
@@ -121,21 +130,17 @@ class RoleEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 		return $this;
 	}
 
-	public function setParents($parents = [])
+	public function setParents(ArrayCollection $parents)
 	{
 		foreach ($this->parents as $parent) {
-			if ($parent) // @todo hledani v doslych rodicich
-			{
-				$this->parents->removeElement($parent);
-			}
+			$this->parents->removeElement($parent);
 		}
 
 		foreach ($parents as $parent) {
-			if (! $this->parents->contains($parent)) {
-				$this->parents->add($parent);
+			if (! $this->getParents()->contains($parent)) {
+				$this->getParents()->add($parent);
 			}
 		}
-
 	}
 
 	/**

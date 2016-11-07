@@ -17,6 +17,7 @@ use Legerete\Security\Model\Entity\ResourceEntity;
 use Legerete\Security\Model\Entity\RoleEntity;
 use Legerete\Security\Permission;
 use Nette\Security\IAuthorizator;
+use Nette\Utils\Arrays;
 use Nette\Utils\Random;
 use Nette\Utils\Strings;
 
@@ -55,9 +56,11 @@ class AclModelService
 	private function prepareReadRoleQuery()
 	{
 		return $this->roleRepository()->createQueryBuilder('r')
-			->select('r, p, res')
-			->leftJoin('r.privileges', 'p')
-			->leftJoin('p.resource', 'res');
+			->select('r, privileges, resources, parents')
+			->leftJoin('r.privileges', 'privileges')
+			->leftJoin('privileges.resource', 'resources')
+			->leftJoin('r.parents', 'parents')
+			->orderBy('r.title');
 	}
 
 	/**
@@ -161,6 +164,7 @@ class AclModelService
 				'id' => $roleData['id'],
 				'name' => $roleData['name'],
 				'title' => $roleData['title'],
+				'parents' => $roleData['parents'],
 				'resources' => [],
 			];
 
@@ -198,17 +202,35 @@ class AclModelService
 		foreach ($roles as $role) {
 			$newRoles[] = $this->createRole($role, $returnWithResources);
 		}
+
+		foreach ($newRoles as $key => $role) {
+			$parents = Arrays::get($roles[$key], 'parents', []);
+			$this->setRoleParents($role, $parents);
+		}
+
+		$this->em->flush();
 		$this->em->commit();
 
-		return $newRoles;
+		$result = [];
+		foreach ($newRoles as $role) {
+			if ($returnWithResources) {
+				$result[] = $this->readRoleWithResources($role->id);
+			} else {
+				$result[] = $this->readRole($role->id);
+			}
+		}
+
+
+
+		return $result;
 	}
 
 	/**
 	 * @param array $role
 	 * @param bool $returnWithResources
-	 * @return array
+	 * @return RoleEntity
 	 */
-	public function createRole(array $role, $returnWithResources = false) : array
+	public function createRole(array $role, $returnWithResources = false) : RoleEntity
 	{
 		$roleName = $this->generateUniqueRoleName($role['title']);
 
@@ -219,12 +241,10 @@ class AclModelService
 		$rolePrivileges = $this->createPrivileges($roleEntity, $role['resources']);
 		$roleEntity->setPrivileges($rolePrivileges);
 
+		$this->em->flush();
 		$this->em->commit();
 
-		if ($returnWithResources) {
-			return $this->readRoleWithResources($roleEntity->id);
-		}
-		return $this->readRole($roleEntity->id);
+		return $roleEntity;
 	}
 
 	/**
@@ -271,6 +291,7 @@ class AclModelService
 		foreach ($roles as $role) {
 			$updatedRoles[] = $this->updateRole($role, $returnWithResources);
 		}
+		$this->em->flush();
 		$this->em->commit();
 
 		return $updatedRoles;
@@ -287,10 +308,12 @@ class AclModelService
 		 * @var RoleEntity $role
 		 */
 		$role = $this->roleRepository()->find($roleData['id']);
+		$parents = Arrays::get($roleData, 'parents', []);
 
 		$role->setTitle($roleData['title']);
 		$this->createPrivileges($role, $roleData['resources']);
-		$this->setRoleParents($role, $roleData['parents']);
+		$this->setRoleParents($role, $parents);
+		$this->em->flush();
 
 		if ($returnWithResources) {
 			return $this->readRoleWithResources($roleData['id']);
@@ -299,23 +322,26 @@ class AclModelService
 		}
 	}
 
-	private function setRoleParents(RoleEntity $role, $parents)
+	private function setRoleParents(RoleEntity $role, $parents = [])
 	{
 		$parentsCollection = new ArrayCollection();
 
 		foreach ($parents as $parent) {
 			if (isset($parent['id']) && ! empty($parent['id'])) {
-				$parentEntity = $this->roleRepository()->find($parent['id']);
+				$parentEntity = $this->em->getReference(RoleEntity::class, $parent['id']);
 			} else {
-				$parentEntity = new RoleEntity($parent['title'], $this->generateUniqueRoleName($parent['title']));
+				$parentEntity = $this->roleRepository()->findOneBy(['title' => $parent['title']]);
+
+				if (!$parentEntity) {
+					$parentEntity = new RoleEntity($parent['title'], $this->generateUniqueRoleName($parent['title']));
+				}
 				$this->em->persist($parentEntity);
 			}
 
 			$parentsCollection->add($parentEntity);
 		}
 
-		$role->setParents($parents);
-
+		$role->setParents($parentsCollection);
 	}
 
 	/**
