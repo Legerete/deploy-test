@@ -8,19 +8,19 @@
 
 namespace Legerete\Spa\KendoUser\Model\Service;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\Internal\Hydration\ArrayHydrator;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Doctrine\EntityRepository;
-use Legerete\Spa\KendoScheduler\Model\Entity\SchedulerEventEntity;
+use Legerete\Security\Model\Entity\RoleEntity;
+use Legerete\Security\Model\Entity\UserEntity;
 use Legerete\Spa\KendoUser\Model\Exception\UserNotFoundException;
-use Legerete\User\Model\Entity\UserEntity;
 use Nette\Application\BadRequestException;
 use Nette\Security\User;
 
 class UserModelService
 {
-	const PARTIAL_USER_SELECT = 'id, username, name, surname, email, phone, degree, roles, status, avatar';
+	const PARTIAL_USER_SELECT = 'id, username, name, surname, email, phone, degree, status, avatar';
 
 	/**
 	 * @var User $user
@@ -55,7 +55,7 @@ class UserModelService
 				$userData['name'],
 				$userData['surname'],
 				$userData['email'],
-				[] // @todo user roles
+				$this->createRolesCollection($userData['roles'])
 			);
 
 			$user->setPhone($userData['phone']);
@@ -73,7 +73,8 @@ class UserModelService
 	public function readUsers() : array
 	{
 		return $this->userRepository()->createQueryBuilder('u')
-			->select('partial u.{'.self::PARTIAL_USER_SELECT.'}')
+			->select('partial u.{'.self::PARTIAL_USER_SELECT.'}, roles')
+			->leftJoin('u.roles', 'roles')
 			->getQuery()
 			->getArrayResult();
 	}
@@ -81,10 +82,10 @@ class UserModelService
 	public function readUser($id)
 	{
 		return $this->userRepository()->createQueryBuilder('u')
-			->select('partial u.{'.self::PARTIAL_USER_SELECT.'}')
+			->select('partial u.{'.self::PARTIAL_USER_SELECT.'}, roles')
+			->leftJoin('u.roles', 'roles')
 			->where('u.id = :id')
 			->setParameter('id', $id)
-			->setMaxResults(1)
 			->getQuery()
 			->getSingleResult(AbstractQuery::HYDRATE_ARRAY);
 	}
@@ -102,7 +103,12 @@ class UserModelService
 
 		foreach ($data as $key => $value) {
 			if (method_exists($user, $method = 'set'.ucfirst($key))) {
-				$user->$method($value);
+
+				if ($method === 'setRoles') {
+					$user->setRoles($this->createRolesCollection($data['roles']));
+				} else {
+					$user->$method($value);
+				}
 			}
 		}
 
@@ -129,6 +135,41 @@ class UserModelService
 		}
 
 		return $user;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getAvailableRoles()
+	{
+		return $this->roleRepository()->createQueryBuilder('r')
+			->select('r')
+			->orderBy('r.title', 'ASC')
+			->getQuery()
+			->getArrayResult();
+	}
+
+	/**
+	 * @param array $roles
+	 * @return ArrayCollection
+	 */
+	private function createRolesCollection(array $roles = [])
+	{
+		$rolesCollection = new ArrayCollection();
+
+		foreach ($roles as $roleId) {
+			$rolesCollection->add($this->em->getReference(RoleEntity::class, (int) $roleId));
+		}
+
+		return $rolesCollection;
+	}
+
+	/**
+	 * @return EntityRepository
+	 */
+	private function roleRepository() : EntityRepository
+	{
+		return $this->em->getRepository(RoleEntity::class);
 	}
 
 	/**

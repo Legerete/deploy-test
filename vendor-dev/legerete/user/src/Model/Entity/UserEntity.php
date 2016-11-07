@@ -8,14 +8,12 @@
 
 namespace Legerete\User\Model\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Table;
 use Nette\Security\Passwords;
-use Nette\Utils\Json;
 
 /**
- * @ORM\Entity
- * @Table(name="user")
+ * @ORM\MappedSuperclass
  * @ORM\HasLifecycleCallbacks
  */
 class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
@@ -104,12 +102,6 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	protected $verificationHash;
 
 	/**
-	 * @ORM\Column(type="string")
-	 * @var string $roles
-	 */
-	protected $roles;
-
-	/**
 	 * @ORM\Column(type="datetime")
 	 * @var \DateTime $registerNotificationSent
 	 */
@@ -128,15 +120,15 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	 * @param string $name
 	 * @param string $surname
 	 * @param string $email
-	 * @param array $roles
 	 */
-	public function __construct($username, $name, $surname, $email, $roles)
+	public function __construct($username, $name, $surname, $email)
 	{
+		$this->roles = new ArrayCollection();
+
 		$this->setUsername($username)
 			->setName($name)
 			->setSurname($surname)
-			->setEmail($email)
-			->setRoles($roles);
+			->setEmail($email);
 	}
 
 	/**
@@ -226,14 +218,6 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	public function getVerificationHash()
 	{
 		return $this->verificationHash;
-	}
-
-	/**
-	 * @return array
-	 */
-	public function getRoles()
-	{
-		return Json::decode($this->roles);
 	}
 
 	/**
@@ -352,12 +336,6 @@ class UserEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	{
 		$this->verificationHash = $verificationHash;
 
-		return $this;
-	}
-
-	public function setRoles($roles)
-	{
-		$this->roles = Json::encode($roles);
 		return $this;
 	}
 

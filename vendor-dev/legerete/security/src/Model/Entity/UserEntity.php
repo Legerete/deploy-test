@@ -8,13 +8,15 @@
 
 namespace Legerete\Security\Model\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
 use Legerete\User\Model\Entity\UserEntity as BaseUserEntity;
 
 /**
  * @ORM\Entity
- * @Table(name="acl_role")
+ * @Table(name="user")
  * @ORM\HasLifecycleCallbacks
  */
 class UserEntity extends BaseUserEntity
@@ -30,12 +32,30 @@ class UserEntity extends BaseUserEntity
 	protected $roles;
 
 	/**
+	 * UserEntity constructor.
+	 *
+	 * @param string $username
+	 * @param string $name
+	 * @param string $surname
+	 * @param string $email
+	 * @param ArrayCollection $roles
+	 */
+	public function __construct($username, $name, $surname, $email, ArrayCollection $roles)
+	{
+		parent::__construct($username, $name, $surname, $email);
+
+		$this->roles = new ArrayCollection();
+
+		$this->setRoles($roles);
+	}
+
+	/**
 	 * ************************************* Getters ***************************************
 	 */
 
 
 	/**
-	 * @return array
+	 * @return Collection
 	 */
 	public function getRoles()
 	{
@@ -47,4 +67,17 @@ class UserEntity extends BaseUserEntity
 	 * ************************************* Setters ***************************************
 	 */
 
+	/**
+	 * @param ArrayCollection $roles
+	 */
+	public function setRoles(ArrayCollection $roles)
+	{
+		foreach ($this->roles as $role) {
+			$this->roles->removeElement($role);
+		}
+
+		foreach ($roles as $role) {
+			$this->roles->add($role);
+		}
+	}
 }

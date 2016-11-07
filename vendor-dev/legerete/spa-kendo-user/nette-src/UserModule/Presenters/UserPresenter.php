@@ -123,6 +123,11 @@ class UserPresenter extends SecuredPresenter
 //		}
 	}
 
+	public function handleReadAvailableRoles()
+	{
+		$this->sendJson($this->modelService->getAvailableRoles());
+	}
+
 	private function getUserAvatars(&$user)
 	{
 		$user['avatarBig'] = $this->imageStorage->fromIdentifier([$user['avatar'], UserEntity::AVATAR_DIMENSIONS_LARGE])->createLink();

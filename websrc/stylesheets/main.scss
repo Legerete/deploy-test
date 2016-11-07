@@ -165,6 +165,7 @@ html {
       a {
         padding-right: 30px;
         border-radius: 0;
+        transition: background-color 0.5s;
       }
 
       i {
@@ -174,6 +175,10 @@ html {
           top: 0;
         }
       }
+    }
+
+    a {
+      transition: background-color 0.5s;
     }
   }
 }
@@ -259,6 +264,46 @@ html {
   }
 }
 
+.k-multiselect {
+  border-radius: 3px;
+
+  &.k-header {
+    border: 1px solid #dfe8f1;
+
+    &.k-state-focused {
+      box-shadow: none;
+      border-color: $color-focus;
+
+      &.k-state-hover {
+        border-color: $color-focus;
+      }
+    }
+
+    &.k-state-hover {
+      border-color: #dfe8f1;
+    }
+  }
+
+  .k-button {
+    background-color: $color-active;
+    border: 0;
+    border-radius: 2px;
+    font-size: 80%;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-indent: 0;
+    margin-top: 3px;
+
+    &:hover {
+      background-color: $color-hover;
+      color: $color-text-hover;
+    }
+  }
+}
+
+.k-multiselect-wrap {
+  box-shadow: none;
+}
 
 #app-content {
   .k-grid {
@@ -273,19 +318,14 @@ html {
     }
 
     .k-multiselect {
+      border-color: #dfe8f1;
+      border-radius: 3px;
+
       .k-button {
-        background-color: $color-active;
-        border: 0;
-        border-radius: 2px;
-        font-size: 80%;
-        font-weight: bold;
         margin-top: 8px;
         margin-bottom: -6px;
-        text-transform: uppercase;
-        text-indent: 0;
       }
     }
-
   }
 
   .content-box {
@@ -362,6 +402,28 @@ html {
 #acl-roles-grid {
   .table-cell {
     transition: background-color 0.25s linear;
+  }
+}
+
+.form-horizontal {
+  .form-group {
+    .form-control {
+      &.k-textbox {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.form-control {
+  &.k-textbox {
+    border: 1px solid #dfe8f1;
+    border-radius: 3px;
+
+    &:focus {
+      box-shadow: none;
+      border-color: $color-focus;
+    }
   }
 }
 

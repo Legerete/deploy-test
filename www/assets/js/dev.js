@@ -425,7 +425,7 @@ $(function () {
 			phone: '',
 			email: '@',
 			degree: '',
-			role: [],
+			roles: [],
 			edited: false,
 			avatarSmall: '',
 			avatarBig: '',
@@ -439,12 +439,22 @@ $(function () {
 			var createUrl = view.data('source-create');
 			var readUrl = view.data('source-read');
 			var updateUrl = view.data('source-update');
+			var readAvailableRolesUrl = view.data('source-read-available-roles');
 			var userId = $(event).data('user-id');
 			var avatarBigNoImage = view.data('avatar-big-no-image');
 			var avatarLoadImage = view.data('avatar-load-image');
 			var that = this;
 
 			this.settings.viewModel = kendo.observable({
+				rolesDataSource: new kendo.data.DataSource({
+					transport: {
+						read: {
+							type: 'json',
+							url: readAvailableRolesUrl
+						}
+					}
+				}),
+
 				/**
 				 * Prepare user data for storing
 				 */
@@ -492,6 +502,8 @@ $(function () {
 					$.post(createUrl, user, function (responseData) {
 						vm.createUserModel(responseData);
 						SPA.trigger('user-edit.created', responseData);
+					}).success(function () {
+						noty({text: 'New user was saved.',type: 'success', timeout:2500});
 					});
 				},
 				updateUser: function (user) {
@@ -499,6 +511,8 @@ $(function () {
 					$.post(updateUrl, user, function (responseData) {
 						vm.createUserModel(responseData);
 						SPA.trigger('user-edit.updated', responseData);
+					}).success(function () {
+						noty({text: 'User was updated.', type: 'success', timeout:2500});
 					});
 				},
 				isDirty: function () {

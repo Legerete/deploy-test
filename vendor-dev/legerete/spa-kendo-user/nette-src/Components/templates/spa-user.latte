@@ -44,8 +44,9 @@
 		data-source-read="{plink LeSpaUser:User:User:}?do=read&id="
 		data-source-update="{plink LeSpaUser:User:User:}?do=update"
 		data-source-uploadAvatar="{plink LeSpaUser:User:User:}?do=uploadAvatar"
-        data-avatar-big-no-image="{$avatarBigNoImage}"
-        data-avatar-load-image="{$avatarLoad}"
+		data-source-read-available-roles="{plink LeSpaUser:User:User:}?do=readAvailableRoles"
+		data-avatar-big-no-image="{$avatarBigNoImage}"
+		data-avatar-load-image="{$avatarLoad}"
 >
 	<div class="content-box" id="user-edit">
 		<h3 class="content-box-header">{_users.user.h1}
@@ -56,99 +57,143 @@
 			</div>
 		</h3>
 		<div class="row">
-			<div class="col-lg-4">
-				<div class="panel-layout">
-					<div class="panel-box">
-
-						<div class="panel-content image-box user-photo-drop-zone">
-							<input type="file"
-									data-role="upload"
-									data-show-file-list="false"
-									data-multiple="false"
-									data-validation="{ allowedExtensions: ['.jpg', '.png']}"
-									data-async="{ saveUrl: '{plink LeSpaUser:User:User:}?do=avatar', autoUpload: true }"
-									data-bind="events: { success: uploadAvatarComplete, upload: uploadAvatarStart}"
-									data-drop-zone=".image-box.user-photo-drop-zone"
-									name="user-avatar">
-							<div class="ribbon">
-								<div class="bg-primary">{_users.user.current-user}</div>
-							</div>
-							<div class="image-content font-white">
-								<div class="meta-box meta-box-bottom">
-								</div>
-							</div>
-							{*
-							 * @todo Nahradit no-image za generovanou url pro no-image
-							 *}
-							<img data-bind="attr: { src: avatarBig}" src="/{$avatarLoad}" />
-						</div>
+			<div class="col-lg-12">
+				<div class="row">
+					<div class="col-lg-12">
+						<ul class="list-group row list-group-icons">
+							<li class="col-md-3 active">
+								<a href="#user-personal-informations" data-toggle="tab" class="list-group-item">
+									<i class="glyph-icon font-red icon-tty"></i>
+									{_users.user.personal-informations}
+								</a>
+							</li>
+							<li class="col-md-3">
+								<a href="#user-security" data-toggle="tab" class="list-group-item">
+									<i class="glyph-icon icon-lock"></i>
+									{_users.user.security}
+								</a>
+							</li>
+							<li class="col-md-3">
+								<a href="#user-application-settings" data-toggle="tab" class="list-group-item">
+									<i class="glyph-icon icon-sliders"></i>
+									{_users.user.application-settings}
+								</a>
+							</li>
+						</ul>
 					</div>
 				</div>
-			</div>
-			<div class="col-lg-8">
-				<ul class="list-group row list-group-icons">
-					<li class="col-md-3 active">
-						<a href="#user-personal-informations" data-toggle="tab" class="list-group-item">
-							<i class="glyph-icon font-red icon-tty"></i>
-							{_users.user.personal-informations}
-						</a>
-					</li>
-					<li class="col-md-3">
-						<a href="#user-application-settings" data-toggle="tab" class="list-group-item">
-							<i class="glyph-icon icon-sliders"></i>
-							{_users.user.application-settings}
-						</a>
-					</li>
-				</ul>
-				<div class="tab-content">
-					<div class="tab-pane pad0A fade active in" id="user-personal-informations">
-						<div class="content-box">
-							<form class="form-horizontal bordered-row">
-								<div class="form-group remove-border">
-									<label class="col-sm-3 control-label">{_users.user.username}:</label>
-									<div class="col-sm-6">
-										<input data-bind="value: user.username" type="text" class="form-control" placeholder="{_users.user.username}...">
-									</div>
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="tab-pane fade active in" id="user-personal-informations">
+							<div class="content-box row pad0A">
+								<div class="col-lg-4 pad15A">
+									<form class="form-horizontal bordered-row">
+										<div class="row">
+											<div class="col-lg-12">
+												<div class="panel-content image-box user-photo-drop-zone pad0A">
+													<input type="file"
+													       data-role="upload"
+													       data-show-file-list="false"
+													       data-multiple="false"
+													       data-validation="{ allowedExtensions: ['.jpg', '.png']}"
+													       data-async="{ saveUrl: '{plink LeSpaUser:User:User:}?do=avatar', autoUpload: true }"
+													       data-bind="events: { success: uploadAvatarComplete, upload: uploadAvatarStart}"
+													       data-drop-zone=".image-box.user-photo-drop-zone"
+													       name="user-avatar">
+													<div class="ribbon">
+														<div class="bg-primary">
+															{_users.user.current-user}
+														</div>
+													</div>
+													<div class="image-content font-white">
+														<div class="meta-box meta-box-bottom">
+														</div>
+													</div>
+													{*
+													 * @todo Nahradit no-image za generovanou url pro no-image
+													 *}
+													<img width="100%" data-bind="attr: { src: avatarBig}" src="/{$avatarLoad}"/>
+												</div>
+											</div>
+										</div>
+										<div class="divider"></div>
+										<div class="row">
+											<div class="col-lg-12">
+												<div class="form-group remove-border">
+													<label class="col-sm-4 control-label">{_users.user.roles}:</label>
+													<div class="col-sm-8">
+														<select data-role="multiselect"
+														        data-placeholder="Type a role e.g. Admin"
+														        data-value-primitive="true"
+														        data-text-field="title"
+														        data-value-field="id"
+														        data-clear-button="false"
+														        data-bind="value: user.roles,
+																source: rolesDataSource"
+														>
+														</select>
+													</div>
+												</div>
+											</div>
+										</div>
+									</form>
 								</div>
-								<div class="form-group remove-border">
-									<label class="col-sm-3 control-label">{_users.user.first-name}:</label>
-									<div class="col-sm-6">
-										<input data-bind="value: user.name" type="text" class="form-control" placeholder="{_users.user.first-name}...">
-									</div>
+								<div class="col-lg-8">
+									<form class="form-horizontal bordered-row">
+										<div class="form-group remove-border">
+											<label class="col-sm-3 control-label">{_users.user.username}:</label>
+											<div class="col-sm-6">
+												<input data-bind="value: user.username" type="text" class="form-control" placeholder="{_users.user.username}...">
+											</div>
+										</div>
+										<div class="form-group remove-border">
+											<label class="col-sm-3 control-label">{_users.user.first-name}:</label>
+											<div class="col-sm-6">
+												<input data-bind="value: user.name" type="text" class="form-control" placeholder="{_users.user.first-name}...">
+											</div>
+										</div>
+										<div class="form-group remove-border">
+											<label class="col-sm-3 control-label">{_users.user.last-name}:</label>
+											<div class="col-sm-6">
+												<input data-bind="value: user.surname" type="text" class="form-control" placeholder="{_users.user.last-name}...">
+											</div>
+										</div>
+										<div class="form-group remove-border">
+											<label class="col-sm-3 control-label">{_users.user.degree}:</label>
+											<div class="col-sm-6">
+												<input data-bind="value: user.degree" type="text" class="form-control" placeholder="{_users.user.degree}...">
+											</div>
+										</div>
+										<div class="form-group remove-border">
+											<label class="col-sm-3 control-label">{_users.user.email}:</label>
+											<div class="col-sm-6">
+												<input data-bind="value: user.email" type="email" class="form-control" placeholder="{_users.user.email}...">
+											</div>
+										</div>
+										<div class="form-group remove-border">
+											<label class="col-sm-3 control-label">{_users.user.phone}:</label>
+											<div class="col-sm-6">
+												<input
+														data-role="maskedtextbox"
+														data-bind="value: user.phone"
+														data-mask="+999 000 000 000"
+														type="text" class="form-control" placeholder="{_users.user.phone}...">
+											</div>
+										</div>
+									</form>
 								</div>
-								<div class="form-group remove-border">
-									<label class="col-sm-3 control-label">{_users.user.last-name}:</label>
-									<div class="col-sm-6">
-										<input data-bind="value: user.surname" type="text" class="form-control" placeholder="{_users.user.last-name}...">
-									</div>
-								</div>
-								<div class="form-group remove-border">
-									<label class="col-sm-3 control-label">{_users.user.degree}:</label>
-									<div class="col-sm-6">
-										<input data-bind="value: user.degree" type="text" class="form-control" placeholder="{_users.user.degree}...">
-									</div>
-								</div>
-								<div class="form-group remove-border">
-									<label class="col-sm-3 control-label">{_users.user.email}:</label>
-									<div class="col-sm-6">
-										<input data-bind="value: user.email" type="email" class="form-control" placeholder="{_users.user.email}...">
-									</div>
-								</div>
-								<div class="form-group remove-border">
-									<label class="col-sm-3 control-label">{_users.user.phone}:</label>
-									<div class="col-sm-6">
-										<input
-												data-role="maskedtextbox"
-												data-bind="value: user.phone"
-												data-mask="+999 000 000 000"
-												type="text" class="form-control" placeholder="{_users.user.phone}...">
-									</div>
-								</div>
-							</form>
+							</div>
 						</div>
-					</div>
-					<div class="tab-pane fade" id="user-application-settings">
-						tab 2
+						<div class="tab-pane fade" id="user-application-settings">
+							<div class="content-box row">
+								tab 2
+							</div>
+						</div>
+						<div class="tab-pane fade" id="user-security">
+							<div class="content-box row">
+								tab 2
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
