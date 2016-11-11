@@ -112,6 +112,9 @@
 @import 'kendo/kendo.common-bootstrap.core.min';
 @import 'kendo/kendo.common-bootstrap.min';
 
+@import 'kendo-integration';
+@import 'kendo-icons';
+@import 'users';
 
 #loading {
   .svg-icon-loader {
@@ -222,114 +225,28 @@ html {
   }
 }
 
-.k-scheduler-views {
-  .k-state-default {
-    &.k-state-selected {
-        background-color: $color-active;
-        border-color: $color-active;
-    }
-  }
-}
-
-.k-widget {
-  &.k-grid {
-    border-width: 0;
-
-    .k-grid-header-wrap {
-      border-width: 0;
-    }
-
-  }
-}
-
 #page-content {
   padding: 0;
-}
 
-.k-list-container {
-  border-color: #6c6c6c;
+  #page-panels-tabs-wrapper {
+    margin: 0;
+    border-bottom: 1px solid $color-divider;
 
-  .k-list-scroller {
-    overflow: scroll;
-
-    .k-state-selected {
-      background-color: $color-active;
-      border: 0;
-      margin-bottom: 1px;
-
-      &:hover {
-        color: #fff;
-      }
+    ul[data-role="listview"] {
+      padding: 0;
     }
   }
-}
-
-.k-multiselect {
-  border-radius: 3px;
-
-  &.k-header {
-    border: 1px solid #dfe8f1;
-
-    &.k-state-focused {
-      box-shadow: none;
-      border-color: $color-focus;
-
-      &.k-state-hover {
-        border-color: $color-focus;
-      }
-    }
-
-    &.k-state-hover {
-      border-color: #dfe8f1;
-    }
-  }
-
-  .k-button {
-    background-color: $color-active;
-    border: 0;
-    border-radius: 2px;
-    font-size: 80%;
-    font-weight: bold;
-    text-transform: uppercase;
-    text-indent: 0;
-    margin-top: 3px;
-
-    &:hover {
-      background-color: $color-hover;
-      color: $color-text-hover;
-    }
-  }
-}
-
-.k-multiselect-wrap {
-  box-shadow: none;
 }
 
 #app-content {
-  .k-grid {
-    border-color: #EBEEF5;
+  overflow-y: scroll;
 
-    .k-header {
-      background-color: #f9fafe;
-    }
 
-    .k-alt {
-      background-color: #f9fafe;
-    }
-
-    .k-multiselect {
-      border-color: #dfe8f1;
-      border-radius: 3px;
-
-      .k-button {
-        margin-top: 8px;
-        margin-bottom: -6px;
-      }
-    }
-  }
-
-  .content-box {
+  &>.content-box {
     padding: 15px;
+    margin-bottom: 0;
+    border-radius: 0;
+    border-top: 0;
 
     h3 {
       margin-top: -15px;
@@ -405,86 +322,59 @@ html {
   }
 }
 
-.form-horizontal {
-  .form-group {
-    .form-control {
-      &.k-textbox {
-        width: 100%;
+.tooltip {
+  &.in {
+    opacity: 1;
+  }
+}
+
+#page-sidebar {
+  width: 240px;
+}
+
+#page-content {
+  margin-left: 240px;
+}
+
+#page-header {
+  padding-left: 240px;
+}
+
+#header-nav-left {
+  a {
+    &>img {
+      border-radius: 2px;
+      height: 35px;
+      position: relative;
+      top: -3px;
+    }
+  }
+}
+
+.login-box {
+  .user-info {
+    .user-name {
+      span {
+        display: inline-block;
       }
     }
   }
-}
 
-.form-control {
-  &.k-textbox {
-    border: 1px solid #dfe8f1;
-    border-radius: 3px;
+  .user-img {
+    text-align: center;
+    overflow: hidden;
 
-    &:focus {
-      box-shadow: none;
-      border-color: $color-focus;
-    }
-  }
-}
-
-.k-state-focused {
-  border-color: #FBD2E0;
-}
-
-.k-list-container {
-  border-color: #cccccc;
-
-
-  &.k-state-border-up {
-    border-radius: 0 0 2px 2px;
-    border-top-width: 0;
-  }
-
-  &.k-state-border-down {
-    border-radius: 2px 2px 0 0;
-    border-bottom-width: 0;
-  }
-}
-
-.k-grid-content {
-
-  td[role='gridcell'] {
-    .k-multiselect {
-      border: 0;
-      border-radius: 0;
-
-      &.k-header {
-        &.k-state-focused {
-          box-shadow: none;
-        }
-      }
-    }
-
-    input[type='text'],
-    div.k-multiselect-wrap
-    {
-      border-radius: 0;
-      border-width: 0 0 0 5px;
-      border-left-color: $color-active;
-      padding-left: 0;
-      background-color: #FBD2E0;
-      box-shadow: none;
-      text-indent: 5px;
-      outline: none;
-      min-height: 2.3em;
-    }
-
-    div.k-multiselect-wrap {
-      padding-bottom: 4px;
-
-      input.k-input {
-        margin-top: 7px;
-        margin-bottom: -3px;
-      }
-    }
-
-    &.k-edit-cell {
-      padding: 0;
+    img {
+      width: auto;
+      display: block;
+      position: absolute;
+      margin: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin-left: -50%;
+      margin-right: 50%;
     }
   }
 }

@@ -1,3 +1,12 @@
+resizeAppContent = function () {
+	let pageContentHeight = $('#page-content').height();
+	let pageHeaderHeight = $('#page-header').height();
+	let pagePanelsTabsWrapperHeight = $('#page-panels-tabs-wrapper').height();
+
+	let appContentHeight = pageContentHeight -  pageHeaderHeight - pagePanelsTabsWrapperHeight;
+	$('#app-content').height(appContentHeight);
+};
+
 $(function () {
 	// var WebSocketConnection;
 	// window.WebSocketConnection = WebSocketConnection = new WebSocket('ws://localhost:8006');
@@ -126,14 +135,10 @@ $(function () {
 			// @todo bug workaround, pri prepnuti existujiciho tabu se nereflektuje stav v zalozkach
 			this.panelsList().refresh();
 
-			var view = this.changeActiveView(panel);
-			if (typeof panel.wakeUp === 'function')
-			{
-				panel.wakeUp(view);
-			}
+			var view = this.changeActiveView(panel, panel.wakeUp);
 		},
 
-		changeActiveView: function (panel) {
+		changeActiveView: function (panel, callback) {
 			this.trigger('spa.beforePanelViewChange');
 			var that = this;
 			var appContent = $('#app-content');
@@ -149,10 +154,15 @@ $(function () {
 					appContent.fadeIn(125);
 				}});
 				var view = newView.render('#app-content');
+				appContent.find('>div').addClass('content-box').css('min-height', appContent.height());
 				that.trigger('spa.afterPanelViewChange');
-				return view[0];
-			});
 
+				if (typeof callback === 'function')
+				{
+					callback = callback.bind(panel);
+					callback(view.get(0));
+				}
+			});
 		},
 
 		panelsDataSource: new kendo.data.DataSource({}),
@@ -295,6 +305,10 @@ $(function () {
 		clickOnSearch: function (e) {
 			console.log('event triggered [search]');
 			this.trigger('clickOnSearch');
+		},
+
+		data: {
+			avatar: null,
 		}
 	});
 
@@ -340,8 +354,12 @@ $(function () {
 		);
 	});
 
-	$(SPA).on('spa.afterInit', function () {
-		console.log('test trigger');
+	window.SPA.bind('spa.afterInit', function (context) {
+		var dataElement = $('body#spa-application');
+		context.set('data.name', dataElement.data('user-name'));
+		context.set('data.surname', dataElement.data('user-surname'));
+		context.set('data.email', dataElement.data('user-email'));
+		context.set('data.avatar', dataElement.data('user-avatar'));
 	});
 
 	/**
@@ -441,6 +459,7 @@ $(function () {
 			var updateUrl = view.data('source-update');
 			var readAvailableRolesUrl = view.data('source-read-available-roles');
 			var userId = $(event).data('user-id');
+			var currentUserId = view.data('user-id');
 			var avatarBigNoImage = view.data('avatar-big-no-image');
 			var avatarLoadImage = view.data('avatar-load-image');
 			var that = this;
@@ -454,6 +473,10 @@ $(function () {
 						}
 					}
 				}),
+
+				isCurrentUser: function () {
+					return userId === currentUserId;
+				},
 
 				/**
 				 * Prepare user data for storing
@@ -495,7 +518,7 @@ $(function () {
 				},
 				uploadAvatarComplete: function (e) {
 					this.set('user.avatarBig', e.response['big-image']);
-					this.set('user.newAvatar', '/' + e.response['original']);
+					this.set('user.avatar', '/' + e.response['original']);
 				},
 				createUser: function (user) {
 					var vm = this;
@@ -818,8 +841,12 @@ $(function () {
 			type: 'scheduler',
 			view: '#spa-view-scheduler',
 			wakeUp: function(view) {
+				view = $(view).closest('#app-content');
+				var viewHeight = view.height();
+				view.find('div[data-role="scheduler"]').css('height', (viewHeight - 31));
+
 				if (this.viewModel.get('navigateDate') && view) {
-					var scheduler = $(view).find('div[data-role="scheduler"]').data('kendoScheduler');
+					var scheduler = view.find('div[data-role="scheduler"]').data('kendoScheduler');
 					scheduler.date(this.viewModel.get('navigateDate'));
 				}
 			}

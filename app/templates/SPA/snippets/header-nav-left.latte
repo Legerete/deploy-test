@@ -4,23 +4,24 @@
 	</a>
 	<div class="user-account-btn dropdown">
 		<a href="#" title="My Account" class="user-profile clearfix" data-toggle="dropdown">
-			<img width="28" src="../../assets/image-resources/gravatar.jpg" alt="Profile image">
-			<span>Marek Bartes</span>
+			<img class="user-img" data-bind="attr: { src: data.avatar}" src="" alt="Profile image">
+			<span>
+				<span data-bind="text: data.name"></span>
+				<span data-bind="text: data.surname"></span>
+			</span>
 			<i class="glyph-icon icon-angle-down"></i>
 		</a>
 		<div class="dropdown-menu float-right">
 			<div class="box-sm">
 				<div class="login-box clearfix">
 					<div class="user-img">
-						<a href="#" title="" class="change-img">Change photo</a>
-						<img src="../../assets/image-resources/gravatar.jpg" alt="">
+						<img data-bind="attr: { src: data.avatar}" src="" alt="">
 					</div>
 					<div class="user-info">
-                            <span>
-                                Marek Bartes
-                                <i>Admin</i>
-                            </span>
-						<a data-bind="click: openPanel" data-panel-type="user-edit" data-user-id="1" title="Edit profile">Edit profile</a>
+						<span class="user-name">
+							<span data-bind="text: data.name"></span> <span data-bind="text: data.surname"></span>
+						</span>
+						<a data-bind="click: openPanel" data-panel-type="user-edit" data-user-id="{$user->getId()}" title="Edit profile">Edit profile</a>
 						<a href="#" title="View notifications">View notifications</a>
 					</div>
 				</div>

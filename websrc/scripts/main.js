@@ -1,4 +1,5 @@
 import './libs/nette.ajax.js';
+import './libs/netteForms.js';
 
 import './libs/js-core/jquery-ui-core.js';
 import './libs/js-core/jquery-ui-widget.js';
@@ -37,7 +38,7 @@ $('form a[data-show]').on('click', function (e) {
 			history.pushState({}, $el.attr('title'), $el.attr('href'));
 		}
 
-		$('#' + $el.data('hide')).fadeOut(300, function () {
+		$('#' + $el.data('hide')).fadeOut(100, function () {
 			$('#' + $el.data('show')).fadeIn();
 		});
 	}

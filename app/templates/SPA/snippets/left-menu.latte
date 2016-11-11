@@ -1,53 +1,53 @@
 <ul id="sidebar-menu">
-	<li class="header"><span>{_left-menu.admin}</span></li>
 	<li>
-		<a data-bind="click: openPanel" data-panel-type="dashboard" href="#" title="{_left-menu.dashboard}">
+		<a data-bind="click: openPanel" data-panel-type="dashboard" href="#">
 			<i class="glyph-icon icon-linecons-tv"></i>
 			<span>{_left-menu.dashboard}</span>
 		</a>
 	</li>
-	<li>
-		<a data-bind="click: openPanel" data-panel-type="users" href="#"  title="{_left-menu.users}">
+	<li class="header"><span>{_left-menu.admin}</span></li>
+	<li n:if="$user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'readAll')">
+		<a data-bind="click: openPanel" data-panel-type="users" href="#">
 			<i class="glyph-icon icon-user"></i>
 			<span>{_left-menu.users}</span>
 		</a>
 	</li>
 	<li>
-		<a data-bind="click: openPanel" data-panel-type="acl" href="#"  title="{_left-menu.acl}">
+		<a data-bind="click: openPanel" data-panel-type="acl" href="#">
 			<i class="glyph-icon icon-key"></i>
 			<span>{_left-menu.acl}</span>
 		</a>
 	</li>
-	<li class="header"><span>{_left-menu.list}</span></li>
+	<li class="header"><span>{_left-menu.bussiness}</span></li>
 	<li>
-		<a href="#" title="{_left-menu.offer}">
+		<a href="#">
 			<i class="glyph-icon icon-home"></i>
 			<span>{_left-menu.offer}</span>
 		</a>
 	</li>
 	<li>
-		<a href="#" title="{_left-menu.request}">
+		<a href="#">
 			<i class="glyph-icon icon-home"></i>
 			<span>{_left-menu.request}</span>
 		</a>
 	</li>
 	<li>
-		<a href="#" title="{_left-menu.clients}">
+		<a href="#">
 			<i class="glyph-icon icon-group"></i>
 			<span>{_left-menu.clients}</span>
 		</a>
 	</li>
 	<li class="header"><span>{_left-menu.planning}</span></li>
 	<li>
-		<a data-bind="click: openPanel" data-panel-type="scheduler" href="#" title="{_left-menu.calendar}">
+		<a data-bind="click: openPanel" data-panel-type="scheduler" href="#">
 			<i class="glyph-icon icon-calendar"></i>
-			<span>{_left-menu.calendar}</span>
+			<span>{_left-menu.calendar} <span data-toggle="tooltip" data-placement="top" title="{_left-menu.upcoming-events}" class="bs-badge badge-info" data-bind="text: data.todosCount, visible: data.todosCount">0</span></span>
 		</a>
 	</li>
 	<li>
-		<a href="#" title="{_left-menu.todos}">
+		<a href="#">
 			<i class="glyph-icon icon-check-square-o"></i>
-			<span>{_left-menu.todos}</span>
+			<span>{_left-menu.todos}</span><span data-toggle="tooltip" data-placement="top" title="{_left-menu.unresolved-todos}" class="bs-badge badge-info" data-bind="text: data.todosCount, visible: data.todosCount">0</span>
 		</a>
 	</li>
 </ul>

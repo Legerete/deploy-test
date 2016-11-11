@@ -23,16 +23,16 @@ $(window).on('resize', function() {
 });
 
 function body_sizer() {
-
-
         var windowHeight = $(window).height();
         var headerHeight = $('#page-header').height();
         var contentHeight = windowHeight - headerHeight;
+        var pagePanelsTabsWrapperHeight = $('#page-panels-tabs-wrapper').height();
+        var appContentHeight = contentHeight - pagePanelsTabsWrapperHeight - 35;
 
         $('#page-sidebar').css('height', windowHeight);
         $('.scroll-sidebar').css('height', contentHeight);
         $('#page-content').css('min-height', contentHeight);
-
+        $('#app-content').css('height', appContentHeight);
 };
 
 function pageTransitions() {

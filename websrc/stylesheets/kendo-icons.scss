@@ -1,0 +1,30 @@
+.k-window-titlebar {
+  .k-icon {
+    &:before {
+      font-family: FontAwesome;
+      font-size: 13px;
+      line-height: 18px;
+      position: relative;
+      top: 0;
+      left: 0;
+      width: 18px;
+      height: 18px;
+      opacity: .60;
+    }
+
+    &.k-i-close {
+      background: none;
+      &:before {
+        content: '\f00d';
+      }
+    }
+  }
+
+  .k-window-action {
+    .k-icon {
+      position: relative;
+      top: -1px;
+      left: -1px;
+    }
+  }
+}

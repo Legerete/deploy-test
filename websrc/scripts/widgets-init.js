@@ -81,7 +81,7 @@ $(function () {
 
 $(function () {
 	'use strict';
-	$('.tooltip-button').tooltip({
+	$('[data-toggle="tooltip"]').tooltip({
 		container: 'body'
 	});
 });

@@ -4,10 +4,10 @@
 {capture $avatarBigNoImage}data/images/noimage/03/no-image.350x350.fit.q100.png{/capture}
 {capture $avatarLoad}assets/images/svg-loaders/bars.svg{/capture}
 
-<script id="spa-view-users" type="text/x-kendo-template" data-source-read="{plink LeSpaUser:User:User:}?do=read">
-	<div class="content-box">
-		<h3 class="content-box-header">{_users.users.h1}
-		</h3>
+<script id="spa-view-users" type="text/x-kendo-template"
+        data-source-read="{plink LeSpaUser:User:User:}?do=read"
+>
+	{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'readAll')}
 		<div data-role="grid"
 				data-editable="{ mode: 'popup'}"
 				data-toolbar="[
@@ -24,7 +24,7 @@
 						'template': '<div class=\'btn btn-warning btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'#=id#\'><i class=\'glyph-icon icon-pencil\'></i></div>',
 						width: 50
 					},
-					{ 'field': 'name', title:' ', template: '<img src=\'/#=avatarSmall#\' alt=\'\' class=\'img-circle\' height=\'25\' width=\'30\'>', width: 40 },
+					{ title:' ', template: '<img src=\'/#=avatarSmall#\' alt=\'\' class=\'avatar\' height=\'30\' width=\'30\'>', width: 45 },
 					{ 'field': 'name', title:'{_users.users.name}', 'width': 270 },
 					{ 'field': 'surname', title:'{_users.users.surname}' },
 					{ 'field': 'phone', title:'{_users.users.phone}' },
@@ -36,7 +36,7 @@
 				}"
 				style="height: 600px">
 		</div>
-	</div>
+	{/if}
 </script>
 
 <script id="spa-view-user" type="text/x-kendo-template"
