@@ -185,7 +185,7 @@
       line-height: 1.5;
       height: 30px;
       padding: 5px 10px;
-      border-radius: 3px;
+      border-radius: 2px;
   }
   select.input-sm {
       line-height: 30px;
@@ -199,7 +199,7 @@
       line-height: 1.33;
       height: 45px;
       padding: 10px 16px;
-      border-radius: 6px;
+      border-radius: 2px;
   }
   select.input-lg {
       line-height: 45px;
@@ -298,7 +298,7 @@
       line-height: 1.33;
       height: 45px;
       padding: 10px 16px;
-      border-radius: 6px;
+      border-radius: 2px;
   }
   select.input-group-lg > .form-control,
   select.input-group-lg > .input-group-addon,
@@ -318,7 +318,7 @@
       line-height: 1.5;
       height: 30px;
       padding: 5px 10px;
-      border-radius: 3px;
+      border-radius: 2px;
   }
   select.input-group-sm > .form-control,
   select.input-group-sm > .input-group-addon,
@@ -392,12 +392,12 @@
   .input-group-addon.input-sm {
       font-size: 12px;
       padding: 5px 10px;
-      border-radius: 3px;
+      border-radius: 2px;
   }
   .input-group-addon.input-lg {
       font-size: 18px;
       padding: 10px 16px;
-      border-radius: 6px;
+      border-radius: 2px;
   }
   .input-group-addon input[type='radio'],
   .input-group-addon input[type='checkbox'] {

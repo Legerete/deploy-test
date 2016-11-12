@@ -42,9 +42,6 @@
 @import '../template/elements/tables';
 @import '../template/elements/tile-box';
 @import '../template/elements/timeline';
-@import '../template/icons/fontawesome/fontawesome';
-@import '../template/icons/linecons/linecons';
-@import '../template/icons/spinnericon/spinnericon';
 @import '../template/widgets/accordion-ui/accordion';
 @import '../template/widgets/calendar/calendar';
 @import '../template/widgets/carousel/carousel';
@@ -87,7 +84,7 @@
 @import '../template/widgets/tocify/tocify';
 @import '../template/widgets/tooltip/tooltip';
 @import '../template/widgets/touchspin/touchspin';
-@import '../template/widgets/uniform/uniform';
+@import '../template/widgets/uniform/uniform.scss';
 @import '../template/widgets/wizard/wizard';
 @import '../template/widgets/xeditable/xeditable';
 @import '../template/snippets/chat';
@@ -115,6 +112,12 @@
 @import 'kendo-integration';
 @import 'kendo-icons';
 @import 'users';
+
+@import '../template/icons/fontawesome/fontawesome';
+@import '../template/icons/linecons/linecons';
+@import '../template/icons/spinnericon/spinnericon';
+
+@import '../template/icons/iconic/iconic';
 
 #loading {
   .svg-icon-loader {
@@ -154,6 +157,67 @@ html {
 
   }
 }
+
+.modal-dialog {
+  box-shadow: none !important;
+
+  .modal-content {
+    border-radius: 2px;
+    box-shadow: none;
+
+    .modal-header {
+      border-bottom-color: $color-divider;
+      padding: 10px;
+      padding-top: 15px;
+      margin-left: 10px;
+      margin-right: 10px;
+
+      button {
+        border: 1px solid $color-border;
+        border-radius: 2px;
+        width: 15px;
+        height: 15px;
+        padding: 2px;
+        opacity: .7;
+        box-sizing: content-box;
+        margin-top: 0;
+        margin-right: -5px;
+
+        &>span{
+          position: relative;
+          top: -5px;
+          left: 0;
+          color: #222222;
+          opacity: .6;
+        }
+
+        &>i {
+          font-size: 13px;
+          position: relative;
+          top: -6px;
+          left: 0;
+          color: #222222;
+          opacity: .6;
+        }
+
+        &:hover {
+          border-color: $color-border;
+          opacity: 1;
+        }
+      }
+
+      h4 {
+        font-weight: normal;
+        font-size: 13px;
+      }
+    }
+
+    .modal-footer {
+      border-top-color: $color-divider;
+    }
+  }
+}
+
 
 // SPA
 .nav-responsive.nav.nav-tabs {

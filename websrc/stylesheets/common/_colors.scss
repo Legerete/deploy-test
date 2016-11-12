@@ -9,7 +9,16 @@ $color-text-hover: #000;
 $color-success: #4CAF50;
 $color-success-darken: darken($color-success, 10%);
 $color-bg-primary: #FFFFFF;
-$color-overlay-default: #272634;
+$color-overlay-default: #000000;
 $color-widgets-bg-secondary: #f5f5f5;
+
+// Buttons
+$color-button-text-default: #555a60;
+$color-button-text-light: #FFFFFF;
+$color-button-danger-bg: #F44336;
+$color-button-danger-border: darken($color-button-danger-bg, 10%);
+$color-button-danger-color: $color-button-text-light;
+
+$color-input-border: #dfe8f1;
 
 $resource-version: 1

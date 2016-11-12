@@ -27,7 +27,7 @@ function body_sizer() {
         var headerHeight = $('#page-header').height();
         var contentHeight = windowHeight - headerHeight;
         var pagePanelsTabsWrapperHeight = $('#page-panels-tabs-wrapper').height();
-        var appContentHeight = contentHeight - pagePanelsTabsWrapperHeight - 35;
+        var appContentHeight = contentHeight - 36;
 
         $('#page-sidebar').css('height', windowHeight);
         $('.scroll-sidebar').css('height', contentHeight);

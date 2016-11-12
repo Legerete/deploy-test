@@ -1,5 +1,15 @@
 .k-button {
   border-radius: 2px;
+  font-family: Montserrat,sans-serif;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: $color-button-text-default;
+  font-size: 12px;
+  border-color: rgba(158,173,195,.16);
+
+  &:focus {
+    box-shadow: none;
+  }
 
   &:hover {
     box-shadow: 0 6px 10px rgba(0,0,0,.23),0 10px 30px rgba(0,0,0,.19);
@@ -8,6 +18,13 @@
   &.k-primary {
     background-color: $color-success;
     border-color: $color-success-darken;
+    color: #FFFFFF;
+  }
+
+  &.k-scheduler-delete, &.k-primary.k-scheduler-delete {
+    background-color: $color-button-danger-bg;
+    color: $color-button-text-light;
+    border-color: $color-button-danger-border;
   }
 }
 
@@ -37,16 +54,26 @@
 
 .k-overlay {
   background-color: $color-overlay-default;
-  opacity: .6 !important;
+  opacity: .5 !important;
 }
 
-.k-window {
+div.k-window {
+  border-radius: 2px;
+  border: none;
+
   &>div {
     &.k-popup-edit-form {
       margin-top: 20px;
 
       .k-edit-buttons {
         border-top-color: $color-divider;
+        padding: 15px;
+
+        .k-button {
+          &+.k-button {
+            margin-left: 5px;
+          }
+        }
       }
     }
   }
@@ -63,6 +90,10 @@
         border-bottom: 1px solid $color-divider;
         padding: 15px 10px 10px 10px;
         font-size: 13px;
+        font-family: Montserrat,sans-serif;
+        font-weight: 400;
+        margin-left: 5px;
+        margin-right: 5px;
       }
       .k-window-actions {
         padding: 10px;
@@ -73,6 +104,7 @@
           width: 15px;
           height: 15px;
           color: #222222;
+          border-radius: 2px;
 
           &.k-state-hover {
             background-color: $color-bg-primary;
@@ -264,6 +296,40 @@
     &.k-edit-cell {
       padding: 0;
     }
+  }
+}
+
+.k-picker-wrap, .k-dropdown-wrap, .k-numeric-wrap {
+  border-radius: 2px;
+  border-color: $color-input-border;
+  box-shadow: none;
+
+  &.k-state-default {
+    border-color: $color-input-border;
+
+    .k-input {
+      box-shadow: none;
+    }
+  }
+
+  &.k-state-focused {
+    box-shadow: none;
+    border-color: $color-focus;
+  }
+
+  .k-input {
+    box-shadow: none;
+  }
+}
+
+.k-input, .k-textbox {
+  box-shadow: none;
+  border-radius: 2px;
+  border-color: $color-input-border;
+
+  &:focus {
+    border-color: $color-focus;
+    box-shadow: none;
   }
 }
 
