@@ -19,6 +19,7 @@ class Permission extends \Nette\Security\Permission
 	const PRIVILEGE_CREATE = 'create';
 	const PRIVILEGE_UPDATE = 'update';
 	const PRIVILEGE_DESTROY = 'destroy';
+	const PRIVILEGE_MANAGE = 'manage';
 
 	/**
 	 * @var array $resourcePrivileges

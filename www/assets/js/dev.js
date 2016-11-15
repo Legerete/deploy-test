@@ -8,6 +8,13 @@ resizeAppContent = function () {
 };
 
 $(function () {
+	// resizeAppContent();
+
+	// $('#page-content').resize(function () {
+	// 	resizeAppContent();
+	// 	console.log('resize');
+	// });
+
 	// var WebSocketConnection;
 	// window.WebSocketConnection = WebSocketConnection = new WebSocket('ws://localhost:8006');
 	// WebSocketConnection.onopen = function (e) {
@@ -131,9 +138,6 @@ $(function () {
 				item.set('active', false);
 			});
 			panel.set('active', true);
-
-			// @todo bug workaround, pri prepnuti existujiciho tabu se nereflektuje stav v zalozkach
-			this.panelsList().refresh();
 
 			var view = this.changeActiveView(panel, panel.wakeUp);
 		},
@@ -356,6 +360,7 @@ $(function () {
 
 	window.SPA.bind('spa.afterInit', function (context) {
 		var dataElement = $('body#spa-application');
+		context.set('data.id', dataElement.data('user-id'));
 		context.set('data.name', dataElement.data('user-name'));
 		context.set('data.surname', dataElement.data('user-surname'));
 		context.set('data.email', dataElement.data('user-email'));
@@ -373,7 +378,6 @@ $(function () {
 
 	window.SPA.init();
 
-
 	/**
 	 * Register users panel
 	 */
@@ -385,16 +389,47 @@ $(function () {
 			type: 'users',
 			view: '#spa-view-users'
 		},
+
 		create: function (event, context) {
 			var view = $(this.settings.view);
 			var readUrl = view.data('source-read');
+			var blockUserUrl = view.data('source-block-user');
+			var unblockUserUrl = view.data('source-unblock-user');
 			var viewModel = kendo.observable({
 				isVisible: true,
 				editUser: function (e) {
 					var uid = $(e.target).closest('tr').data('uid');
 					var model = this.products.getByUid(uid);
-					console.log(model);
 				},
+
+				blockUser: function (e) {
+					var model = e.data;
+					var modal = $('#spa-view-user-confirm-block').modal('show');
+					kendo.bind(modal, model);
+					kendo.bind(modal.find('.modal-footer'), this);
+				},
+
+				confirmBlockUser: function (e) {
+					var uid = $(e.target).closest('.modal-content').data('uid');
+					var model = this.users.getByUid(uid);
+
+					$.post(blockUserUrl, { id: model.get('id')}).success(function () {
+						model.set('status', 'blocked');
+						$('#spa-view-user-confirm-block').modal('hide');
+						noty({text: 'User was blocked.',type: 'success', timeout:2500});
+					});
+				},
+
+				unblockUser: function (e) {
+					var uid = e.data.uid;
+					var model = this.users.getByUid(uid);
+
+					$.post(unblockUserUrl, { id: model.get('id')}).success(function () {
+						model.set('status', 'ok');
+						noty({text: 'User was unblocked.',type: 'success', timeout:2500});
+					});
+				},
+
 				users: new kendo.data.DataSource({
 					schema: {
 						model: {
@@ -416,10 +451,10 @@ $(function () {
 		},
 		registerListeners: function (viewModel) {
 			SPA.bind('user-edit.updated', function (user) {
-				viewModel.users.read();
+				// viewModel.users.read();
 			});
 			SPA.bind('user-edit.created', function (user) {
-				viewModel.users.read();
+				// viewModel.users.read();
 			});
 		}
 	});
@@ -435,8 +470,12 @@ $(function () {
 			type: 'user-edit',
 			view: '#spa-view-user'
 		},
+
 		user: {
 			id: null,
+			isAdmin: false,
+			isNew: true,
+			otp: null,
 			username: '',
 			name: '',
 			surname: '',
@@ -462,6 +501,8 @@ $(function () {
 			var currentUserId = view.data('user-id');
 			var avatarBigNoImage = view.data('avatar-big-no-image');
 			var avatarLoadImage = view.data('avatar-load-image');
+			var dataSourceCheckUsernameUrl = view.data('source-check-username');
+			var dataSourceCheckEmailUrl = view.data('source-check-email');
 			var that = this;
 
 			this.settings.viewModel = kendo.observable({
@@ -563,6 +604,60 @@ $(function () {
 					});
 					this.setUserModel(user);
 					return user;
+				},
+				isUsernameAvailable: function (e) {
+					var target = $(e.target);
+					var errorMessage = 'Username ' + e.target.value + ' is not available.';
+					this.validateInput(target, e.target.value, dataSourceCheckUsernameUrl, errorMessage);
+				},
+				isEmailAvailable: function (e) {
+					var target = $(e.target);
+					var errorMessage = 'Email ' + e.target.value + ' is not available.';
+					this.validateInput(target, e.target.value, dataSourceCheckEmailUrl, errorMessage);
+				},
+				validatePassword: function (e) {
+					let value = e.target.value;
+					let valid = true;
+
+					if (value.length < 8) {
+						valid = false;
+						noty({text: 'Password must have min. 8 chars.', type: 'warning', timeout:2500});
+					}
+					this.setInputValidateStatus($(e.target), valid);
+				},
+				validatePasswordRe: function (e) {
+					let value = e.target.value;
+					let password = $(e.target).closest('form').find('input[name="password"]').val();
+					let valid = true;
+					if (value !== password) {
+						valid = false;
+						noty({text: 'PasswordRe must be equal to password.', type: 'warning', timeout:2500});
+					}
+					this.setInputValidateStatus($(e.target), valid);
+
+					if (valid) {
+						this.set('user.password', value);
+					}
+				},
+				validateInput: function (target, value, validatingUrl, errorMessage) {
+					var viewModel = this;
+					target.addClass('validating');
+
+					$.get(validatingUrl + value, function (response) {
+						if (! response.available) {
+							noty({text: errorMessage, type: 'warning', timeout:2500});
+						}
+
+						viewModel.setInputValidateStatus(target, response.available);
+						target.removeClass('validating');
+					});
+				},
+				setInputValidateStatus($element, valid) {
+					if (valid) {
+						$element.removeClass('validate-error');
+					} else {
+						$element.addClass('validate-error');
+					}
 				}
 			});
 

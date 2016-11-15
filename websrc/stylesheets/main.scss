@@ -158,6 +158,39 @@ html {
   }
 }
 
+.form-control {
+  &.validate-error {
+    border-color: $color-danger;
+  }
+
+  &.validating {
+    background-image: url('/assets/images/svg-loaders/bars.svg');
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: right 10px top 6px;
+  }
+}
+
+#activation-setup-otp {
+  #sign-in-otp-form-container, #set-up-password-form-container {
+    .content-box.modal-content {
+      box-shadow: none;
+      border: 0;
+    }
+
+    .content-box-header {
+      display: none;
+    }
+  }
+
+  #qr-code {
+    [data-role="surface"] {
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
+}
+
 .modal-dialog {
   box-shadow: none !important;
 

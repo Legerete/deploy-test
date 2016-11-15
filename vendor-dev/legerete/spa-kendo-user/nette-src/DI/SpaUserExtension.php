@@ -53,13 +53,12 @@ class SpaUserExtension extends CompilerExtension
 		$authorizator->addSetup('addResourcePrivileges', ['LeSpaUser:User:User', [
 			Permission::PRIVILEGE_SHOW,
 			Permission::PRIVILEGE_READ_ALL,
+			Permission::PRIVILEGE_READ_MY,
 			Permission::PRIVILEGE_CREATE,
 			Permission::PRIVILEGE_UPDATE,
 			Permission::PRIVILEGE_DESTROY,
+			Permission::PRIVILEGE_MANAGE,
 		]]);
-
-		// @todo DEVELOP TEMPORARY! Delete Me!
-		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSpaUser:User:User']);
 
 //		// Add mapping to doctrine
 		$this->registerDoctrineEntityAnnotationDriver(__DIR__.'/../Model/Entity', 'Legerete\Spa\KendoUser\Model\Entity');

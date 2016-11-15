@@ -13,6 +13,17 @@ in:
 			invalidCredentials: Entered credentials not correct.
 			forgetPassword: 'Did you <a href="%s">forget the password</a>'
 
+inOtp:
+	form:
+		header: One Time Password verification
+		headerSmall: Enter Your OTP token
+		inputToken: OTP token
+		buttonSignIn: Verify Token
+		error:
+			invalidToken: Invalid OTP token
+			badTokenFormat: OTP token must be 6 digits
+			tokenNotFilled: 'Please, enter Your OTP token'
+
 forgotPassword:
 	form:
 		header: Password reset
@@ -23,3 +34,9 @@ forgotPassword:
 		error:
 			fillEmailInCorrectFormat: Fill E-mail in correct format.
 			emailNotFilled: 'Please, fill your e-mail.'
+
+setupPassword:
+	form:
+		password: Password
+		passwordRe: Password again
+		buttonSetPassword: Set password

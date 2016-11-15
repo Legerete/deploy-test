@@ -8,11 +8,18 @@
 
 namespace App\Presenters;
 
+use Legerete\Security\Presenters\SecuredPresenter;
 use Legerete\Spa\Collection\SpaTemplatesControlsCollection;
 use Nette\Security\IAuthorizator;
 use Ublaboo\ImageStorage\ImageStorage;
 
-class SPAPresenter extends BasePresenter
+/**
+ * Class SPAPresenter
+ * @package App\Presenters
+ * @resource SPA
+ * @privileges show
+ */
+class SPAPresenter extends SecuredPresenter
 {
 	/**
 	 * @var ImageStorage
@@ -32,12 +39,22 @@ class SPAPresenter extends BasePresenter
 	 */
 	public $spaTemplates;
 
+	public function checkRequirements($element)
+	{
+		parent::checkRequirements($element);
+	}
+
 	public function startup()
 	{
 		parent::startup();
 		$this->getTemplate()->imageStorage = $this->imageStorage;
 		$this->getTemplate()->templatesControls = $this->spaTemplates->getKeys();
 	}
+
+	/**
+	 * @privileges show
+	 */
+	public function renderDefault() {}
 
 	public function createComponent($name)
 	{

@@ -6,9 +6,12 @@
  * @package     Legerete\SignInExtension
  */
 
-namespace Legerete\Presenters;
+namespace Legerete\Security\Presenters;
 
+use Legerete\Presenters\BasePresenter;
+use Nette\DI\PhpReflection;
 use Nette\Http\IRequest;
+use Nette\Http\Response;
 use Nette\Security\AuthenticationException;
 use App;
 
@@ -17,6 +20,10 @@ use App;
  */
 class SecuredPresenter extends BasePresenter
 {
+	/**
+	 * @internal
+	 */
+	public $resource;
 
 	/**
 	 * @inject
@@ -34,18 +41,45 @@ class SecuredPresenter extends BasePresenter
 	{
 		parent::checkRequirements($element);
 
-		if (! $this->getUser()->isAllowed($this->getName(), $this->action)) {
-			if (! $this->getUser()->isLoggedIn()) {
-				if ($this instanceof App\PrivateModule\PrivatePresenter) {
-					$this->redirect(':Private:Users:Sign:in', ['backlink' => $this->getPresenter()->storeRequest()]);
-				} else {
-					$this->redirect(':Public:Users:Sign:in', ['backlink' => $this->getPresenter()->storeRequest()]);
-				}
-			} else {
-				throw new AuthenticationException('Nemáte dostatečná práva pro tuto akci!');
-			}
+		$privilegesAnnotation = PhpReflection::parseAnnotation($element, 'privileges');
+		$privileges = explode('|', $privilegesAnnotation);
 
+		if ($element instanceof \Nette\Application\UI\ComponentReflection) {
+			$this->resource = PhpReflection::parseAnnotation($element, 'resource');
 		}
+
+		foreach ($privileges as $privilege) {
+			if ($this->getUser()->isAllowed($this->resource, $privilege))
+			{
+				return TRUE;
+			}
+		}
+
+		if ($this->getUser()->isAllowed($this->resource, $this->action)) {
+			return TRUE;
+		}
+
+		if (! $this->getUser()->isLoggedIn() && $this->action !== 'in') {
+			$this->redirect(':LeSignIn:UserSignIn:Sign:in', ['backlink' => $this->getPresenter()->storeRequest()]);
+		} elseif ($this->getUser()->isLoggedIn()) {
+			if ($this->isAjax())
+			{
+				$this->sendForbiddenResponse();
+			}
+			throw new AuthenticationException('Nemáte dostatečná práva pro tuto akci!');
+		}
+	}
+
+	/**
+	 * Send Json forbidden response
+	 */
+	public function sendForbiddenResponse()
+	{
+		$this->getHttpResponse()->setCode(Response::S403_FORBIDDEN);
+		$this->sendJson([
+			'status' => 'error',
+			'error' => 'You don\'t have permissions to process this request.'
+		]);
 	}
 
 

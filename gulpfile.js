@@ -248,10 +248,10 @@ gulp.task('sass-lint', function () {
         '!' + pathSass + '/kendo/*.*',
         '!' + pathSass + '/sprite.scss'];
 
-	return gulp.src(sassSources)
-		.pipe(sassLint({'config': '.sass-lint.yml'}))
-		.pipe(sassLint.format())
-		.pipe(sassLint.failOnError());
+	return gulp.src(sassSources);
+		// .pipe(sassLint({'config': '.sass-lint.yml'}))
+		// .pipe(sassLint.format())
+		// .pipe(sassLint.failOnError());
 });
 
 /**

@@ -50,8 +50,8 @@ extensions:
 	mailing: Ublaboo\Mailing\DI\MailingExtension
 	imageStorage: Ublaboo\ImageStorage\DI\ImageStorageExtension
 	core: Legerete\DI\CoreExtension
-	LeSpa: Legerete\Spa\DI\SpaExtension
 	LeSecurity: Legerete\Security\DI\SecurityExtension
+	LeSpa: Legerete\Spa\DI\SpaExtension
 	LeSpaAcl: Legerete\Spa\KendoAcl\DI\SpaAclExtension
 	LeSignIn: Legerete\UserSignInModule\DI\SignInExtension
 	LeSignInOtp: Legerete\UserSignInOtp\DI\SignInOtpExtension
@@ -82,10 +82,11 @@ core:
 		debug: %database.debug%
 
 LeSignIn:
+	enableOtp: TRUE
 	allowForgotPassword: TRUE
 	loginAfterAuthorization: off
-	loginRedirectPage: 'SPA:default'
-	logoutRedirectPage: ''
+	loginRedirectPage: ':SPA:default'
+	logoutRedirectPage: ':LeSignIn:UserSignIn:Sign:in'
 
 LeSecurity:
 	roles:
@@ -113,7 +114,7 @@ translation:
 #		- Kdyby\Monolog\Processor\PriorityProcessor
 
 mailing:
-	do: both # log|send|both
+	do: log # log|send|both
 	mails:
 		defaultSender: info@legerete.cz
 

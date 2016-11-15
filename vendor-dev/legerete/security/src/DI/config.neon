@@ -7,3 +7,5 @@ services:
 	#
 	- Legerete\Security\AuthorizatorFactory
 	authorizator: @Legerete\Security\AuthorizatorFactory::create
+
+	securedPresenter: Legerete\Security\Presenters\SecuredPresenter

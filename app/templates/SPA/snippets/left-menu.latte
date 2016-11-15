@@ -5,14 +5,14 @@
 			<span>{_left-menu.dashboard}</span>
 		</a>
 	</li>
-	<li class="header"><span>{_left-menu.admin}</span></li>
+	<li n:if="$user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'readAll') || $user->isAllowed('LeSpaAcl:Acl:Acl', 'manage')" class="header"><span>{_left-menu.admin}</span></li>
 	<li n:if="$user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'readAll')">
 		<a data-bind="click: openPanel" data-panel-type="users" href="#">
 			<i class="glyph-icon icon-user"></i>
 			<span>{_left-menu.users}</span>
 		</a>
 	</li>
-	<li>
+	<li n:if="$user->isAllowed('LeSpaAcl:Acl:Acl', 'manage')">
 		<a data-bind="click: openPanel" data-panel-type="acl" href="#">
 			<i class="glyph-icon icon-key"></i>
 			<span>{_left-menu.acl}</span>

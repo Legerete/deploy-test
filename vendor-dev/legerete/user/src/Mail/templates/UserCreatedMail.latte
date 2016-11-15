@@ -1,0 +1,4 @@
+{block content}
+Byl Vám vytvořen nový účet, nejprve jej musíte <a href="{link LeSignIn:UserSignIn:Activate: userId=>$userEntity->getId(), token=>$userEntity->getVerificationHash()}">aktivovat</a>. Pokud odkaz nelze otevřít tak zkopírujte následující do adresní řádky:
+
+<code>{link LeSignIn:UserSignIn:Activate: userId=>$userEntity->getId(), token=>$userEntity->getVerificationHash()}</code>

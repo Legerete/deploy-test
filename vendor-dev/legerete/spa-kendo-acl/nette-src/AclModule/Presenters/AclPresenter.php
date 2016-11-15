@@ -8,12 +8,18 @@
 
 namespace Legerete\Spa\KendoAcl\AclModule\Presenters;
 
-use Legerete\Presenters\SecuredPresenter;
+use Legerete\Security\Presenters\SecuredPresenter;
 use Legerete\Spa\KendoAcl\Model\Service\AclModelService;
 use Tracy\ILogger;
 use Ublaboo\ImageStorage\ImageStorage;
 
-class AclPresenter extends SecuredPresenter
+/**
+ * Class AclPresenter
+ * @package Legerete\Spa\KendoAcl\AclModule\Presenters
+ * @resource LeSpaAcl:Acl:Acl
+ * @privileges view|manage
+ */
+class AclPresenter extends \Legerete\Security\Presenters\SecuredPresenter
 {
 	/**
 	 * @var AclModelService
@@ -34,6 +40,11 @@ class AclPresenter extends SecuredPresenter
 
 	}
 
+	public function checkRequirements($element)
+	{
+		parent::checkRequirements($element);
+	}
+
 	public function startup()
 	{
 		parent::startup();
@@ -42,6 +53,7 @@ class AclPresenter extends SecuredPresenter
 	/**
 	 * If is render method called without parameter [do] (handle method),
 	 * then will send info about unsuported request.
+	 * @privileges view
 	 */
 	public function renderDefault()
 	{
@@ -68,6 +80,8 @@ class AclPresenter extends SecuredPresenter
 	 * 			],
 	 * 		],
 	 * ]
+	 *
+	 * @privileges manage|create
 	 */
 	public function handleCreate()
 	{
@@ -79,6 +93,8 @@ class AclPresenter extends SecuredPresenter
 	/**
 	 * Read roles info
 	 * @param null|integer $ignore If is set, query will ignore role with id [$ignore]
+	 *
+	 * @privileges manage|readAll
 	 */
 	public function handleRead($ignore = null)
 	{
@@ -103,6 +119,8 @@ class AclPresenter extends SecuredPresenter
 	 * 			],
 	 * 		],
 	 * ]
+	 *
+	 * @privileges manage|update
 	 */
 	public function handleUpdate()
 	{
@@ -113,6 +131,7 @@ class AclPresenter extends SecuredPresenter
 
 	/**
 	 * Process destroy of role
+	 * @privileges manage|destroy
 	 */
 	public function handleDestroy()
 	{

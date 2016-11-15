@@ -8,13 +8,18 @@
 
 namespace Legerete\Spa\KendoUser\UserModule\Presenters;
 
-use Legerete\Presenters\SecuredPresenter;
+use Legerete\Security\Presenters\SecuredPresenter;
 use Legerete\Spa\KendoUser\Model\Service\UserModelService;
 use Legerete\User\Model\Entity\UserEntity;
 use Tracy\ILogger;
 use Ublaboo\ImageStorage\ImageStorage;
-use Ublaboo\ImageStorage\ImageStoragePresenterTrait;
 
+/**
+ * Class UserPresenter
+ * @package Legerete\Spa\KendoUser\UserModule\Presenters
+ * @resource LeSpaUser:User:User
+ * @privileges show
+ */
 class UserPresenter extends SecuredPresenter
 {
 	/**
@@ -42,12 +47,20 @@ class UserPresenter extends SecuredPresenter
 		$this->imageStorage = $imageStorage;
 	}
 
+	public function checkRequirements($element)
+	{
+		parent::checkRequirements($element);
+	}
+
 	public function startup()
 	{
 		parent::startup();
 		$this->getTemplate()->imageStorage = $this->imageStorage;
 	}
 
+	/**
+	 * @privileges show
+	 */
 	public function renderDefault()
 	{
 		$this->getHttpResponse()->setCode(404);
@@ -57,6 +70,9 @@ class UserPresenter extends SecuredPresenter
 		]);
 	}
 
+	/**
+	 * @privileges manage|create
+	 */
 	public function handleCreate()
 	{
 		$data = $this->getHttpRequest()->getPost();
@@ -66,6 +82,10 @@ class UserPresenter extends SecuredPresenter
 		$this->sendJson($this->modelService->readUser($userEntity->getId()));
 	}
 
+	/**
+	 * @privileges manage|readAll|readMy
+	 * @param null $id
+	 **/
 	public function handleRead($id = null)
 	{
 		if (!$id) {
@@ -74,19 +94,33 @@ class UserPresenter extends SecuredPresenter
 				$this->getUserAvatars($user);
 			});
 		} else {
-			$users = $this->modelService->readUser($id);
-			$this->getUserAvatars($users);
+			if ($this->getUser()->isAllowed('LeSpaUser:User:User', 'manage') || $this->getUser()->isAllowed('LeSpaUser:User:User', 'readAll') || $this->getUser()->getId() == $id) {
+				$users = $this->modelService->readUser($id);
+				$this->getUserAvatars($users);
+			} else {
+				$this->sendForbiddenResponse();
+			}
 		}
 
 		$this->sendJson($users);
 	}
 
+	/**
+	 * @privileges manage|update
+	 */
 	public function handleUpdate()
 	{
 		$data = $this->getHttpRequest()->getPost();
 
+		$admin = FALSE;
+		if (! $admin = $this->getUser()->isAllowed('LeSpaUser:User:User', 'manage')) {
+			if ($data['id'] != $this->getUser()->getId()) {
+				$this->sendForbiddenResponse();
+			}
+		}
+
 		try {
-			$user = $this->modelService->updateUser($data);
+			$user = $this->modelService->updateUser($data, $admin);
 			$this->getUserAvatars($user);
 			$this->sendJson($user);
 		} catch (\InvalidArgumentException $e) {
@@ -95,6 +129,9 @@ class UserPresenter extends SecuredPresenter
 		}
 	}
 
+	/**
+	 * @privileges manage|destroy
+	 */
 	public function handleDestroy()
 	{
 		$data = $this->getHttpRequest()->getPost();
@@ -108,6 +145,9 @@ class UserPresenter extends SecuredPresenter
 		}
 	}
 
+	/**
+	 * @privileges update|manage
+	 */
 	public function handleAvatar()
 	{
 //		try {
@@ -123,9 +163,46 @@ class UserPresenter extends SecuredPresenter
 //		}
 	}
 
+	public function handleIsEmailAvailable($email)
+	{
+		$response = [
+			'available' => $this->modelService->isEmailAvailable($email),
+		];
+		$this->sendJson($response);
+	}
+
+	public function handleIsUsernameAvailable($username)
+	{
+		$response = [
+			'available' => $this->modelService->isUsernameAvailable($username),
+		];
+		$this->sendJson($response);
+	}
+
+	/**
+	 * @privileges manage|create|update
+	 */
 	public function handleReadAvailableRoles()
 	{
 		$this->sendJson($this->modelService->getAvailableRoles());
+	}
+
+	/**
+	 * @param $id
+	 * @privileges manage
+	 */
+	public function handleBlockUser($id)
+	{
+		$this->sendJson($this->modelService->blockUser($id));
+	}
+
+	/**
+	 * @param $id
+	 * @privileges manage
+	 */
+	public function handleUnblockUser($id)
+	{
+		$this->sendJson($this->modelService->unblockUser($id));
 	}
 
 	private function getUserAvatars(&$user)

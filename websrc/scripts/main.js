@@ -29,7 +29,7 @@ import './libs/template/themes/admin/layout.js';
 import './libs/nette.websocket';
 
 $('form a[data-show]').on('click', function (e) {
-	var $el = $(e.currentTarget);
+	let $el = $(e.currentTarget);
 
 	if ($el.data('show')) {
 		e.preventDefault();
@@ -44,3 +44,6 @@ $('form a[data-show]').on('click', function (e) {
 	}
 });
 
+$(function () {
+	$.nette.init();
+});

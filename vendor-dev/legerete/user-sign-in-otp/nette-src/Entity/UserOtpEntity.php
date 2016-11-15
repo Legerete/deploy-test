@@ -10,7 +10,7 @@ namespace Legerete\UserSignInOtp\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
-use Nette\Security\Passwords;
+use Legerete\User\Model\Entity\UserEntity;
 
 /**
  * @ORM\Entity
@@ -31,7 +31,7 @@ class UserOtpEntity extends \Kdyby\Doctrine\Entities\BaseEntity
 	protected $id;
 
 	/**
-	 * @ORM\OneToOne(targetEntity="User")
+	 * @ORM\OneToOne(targetEntity="UserEntity")
 	 */
 	protected $user;
 

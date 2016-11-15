@@ -32,7 +32,8 @@
 		"kdyby/translation": "dev-master",
 		"ublaboo/mailing": "^1.1",
 		"bazo/nette-ratchet-sessionprovider": "dev-master",
-		"ublaboo/image-storage": "^1.1"
+		"ublaboo/image-storage": "^1.1",
+		"spomky-labs/otphp": "^8.2"
 	},
 	"autoload": {
 		"psr-4": {

@@ -18,3 +18,8 @@ user:
 	email: E-mail
 	phone: Phone
 	save: Save
+	is-admin: Is user admin?
+	roles: User roles
+	security: Security
+	password: Password
+	passwordRe: Password repeat

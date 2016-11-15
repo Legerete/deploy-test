@@ -9,7 +9,9 @@
 
 namespace Legerete\Security;
 
-use Legerete\User\Entity\UserEntity;
+use Doctrine\ORM\NoResultException;
+use Legerete\Security\Model\Entity\UserEntity;
+use Nette\Localization\ITranslator;
 use Nette\Security\AuthenticationException;
 use Nette\InvalidArgumentException;
 use Kdyby\Doctrine\EntityManager;
@@ -22,23 +24,29 @@ final class DatabaseAuthenticator implements IDatabaseAuthenticator
 {
 
 	/**
-	 * @var EntityManager
+	 * @var EntityManager $em
 	 */
 	private $em;
 
 	/**
-	 * @var User
+	 * @var User $user
 	 */
 	private $user;
+
+	/**
+	 * @var ITranslator $translator
+	 */
+	private $translator;
 
 	/**
 	 * @param EntityManager $em
 	 * @param User $user
 	 */
-	public function __construct(EntityManager $em, User $user)
+	public function __construct(EntityManager $em, User $user, ITranslator $translator)
 	{
 		$this->em = $em;
 		$this->user = $user;
+		$this->translator = $translator;
 	}
 
 	/**
@@ -51,24 +59,44 @@ final class DatabaseAuthenticator implements IDatabaseAuthenticator
 	 */
 	public function authenticate($username, $password, $authenticateUser = TRUE)
 	{
-		$user = $this->userRespository()
-			->createQueryBuilder('u')
-			->select('u')
-			->where('u.username = :username')
-			->setParameter('username', $username)
-			->getQuery()
-			->getSingleResult();
+		try {
+			/**
+			 * @var UserEntity $user
+			 */
+			$user = $this->userRespository()
+				->createQueryBuilder('u')
+				->select('u')
+				->where('u.username = :username')
+				->setParameter('username', $username)
+				->getQuery()
+				->getSingleResult();
+		} catch (NoResultException $e) {
+			try {
+				/**
+				 * @var UserEntity $user
+				 */
+				$user = $this->userRespository()
+					->createQueryBuilder('u')
+					->select('u')
+					->where('u.email = :email')
+					->setParameter('email', $username)
+					->getQuery()
+					->getSingleResult();
+			} catch (NoResultException $e) {
+				$user = NULL;
+			}
+		}
 
-		if (!$user) {
+		if (! $user) {
 			throw new AuthenticationException(
-				'Špatné přihlašovací údaje.',
+				$this->translator->translate('security.user.invalid-credentials'),
 				IAuthenticator::INVALID_CREDENTIAL
 			);
 		}
 
-		if (!Passwords::verify($password, $user->password)) {
+		if (! Passwords::verify($password, $user->password)) {
 			throw new AuthenticationException(
-				'Špatné přihlašovací údaje.',
+				$this->translator->translate('security.user.invalid-credentials'),
 				IAuthenticator::INVALID_CREDENTIAL
 			);
 		}
@@ -76,21 +104,31 @@ final class DatabaseAuthenticator implements IDatabaseAuthenticator
 		if ($user->isDel())
 		{
 			throw new AuthenticationException(
-				'Uživatelský účet byl smazán.',
+				$this->translator->translate('security.user.account-deleted'),
 				IAuthenticator::IDENTITY_NOT_FOUND
 			);
 		}
 
-		if (is_null($user->role) or $user->role === '')
+		if (! $user->getRoles()->count())
 		{
-			throw new InvalidArgumentException('Uživatelský účet nemá nastavenou žádnou roli.');
+			throw new InvalidArgumentException($this->translator->translate('security.user.no-roles'));
 		}
 
-		$identity = new Identity($user->id, $user->role, [
+		$userRoles = [AuthorizatorFactory::ROLE_GUEST];
+		if ($user->getIsAdmin()){
+			$userRoles[] = AuthorizatorFactory::ROLE_ADMIN;
+		}
+
+		foreach ($user->getRoles() as $role) {
+			$userRoles[] = $role->name;
+		}
+
+		$identity = new Identity($user->id, $userRoles, [
 			'name' => $user->getName(),
 			'surname' => $user->getSurname(),
+			'otp' => $user->getOtp(),
 			'email' => $user->getEmail(),
-			'role' => $user->getRole()
+			'avatar' => $user->getAvatar()
 		]);
 
 		$this->user->login($identity);

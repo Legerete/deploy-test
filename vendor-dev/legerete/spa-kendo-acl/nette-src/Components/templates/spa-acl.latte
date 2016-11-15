@@ -1,10 +1,13 @@
 <script id="spa-view-acl" type="text/x-kendo-template"
+        {if $user->isAllowed('LeSpaAcl:Acl:Acl', 'manage')}
 		data-source-create="{plink LeSpaAcl:Acl:Acl:}?do=create"
 		data-source-read="{plink LeSpaAcl:Acl:Acl:}?do=read"
 		data-source-update="{plink LeSpaAcl:Acl:Acl:}?do=update"
 		data-source-destroy="{plink LeSpaAcl:Acl:Acl:}?do=destroy"
 		data-resources="{$allResourcesJson}"
+        {/if}
 >
+	{if $user->isAllowed('LeSpaAcl:Acl:Acl', 'manage')}
 	<h3 class="content-box-header">{_acl.h1}
 	</h3>
 	<div id="acl-roles-grid" data-role="grid"
@@ -34,11 +37,12 @@
 		data-bind="source: roles, events: { dataBound: gridDataBound, detailInit: detailInit, detailExpand: detailExpand, change: gridDataChanged, save: saveGridChanges, saveChanges: saveChanges}"
 		data-detail-template="spa-view-acl-role-detail"
 	>
-
 	</div>
+	{/if}
 </script>
 
 <script id="spa-view-acl-role-detail" type="text/x-kendo-template">
+	{if $user->isAllowed('LeSpaAcl:Acl:Acl', 'manage')}
 	<table class="acl-table">
 		<thead>
 			<tr>
@@ -64,4 +68,5 @@
 		{/foreach}
 		</tbody>
 	</table>
+	{/if}
 </script>

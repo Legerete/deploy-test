@@ -3,12 +3,12 @@
  *}
 {block content}
 <div id="sign-in-form-container">
-	<form n:name="signInForm">
+	<form n:name="signInOtpForm">
 		<div class="content-box modal-content">
 			<h3 class="content-box-header content-box-header-alt bg-default">
 				<span class="header-wrapper">
-					{_sign.in.form.header}
-					<small>{_sign.in.form.headerSmall}</small>
+					{_sign.inOtp.form.header}
+					<small>{_sign.inOtp.form.headerSmall}</small>
 				</span>
 			</h3>
 			<div class="content-box-wrapper">
@@ -24,24 +24,13 @@
 				{/foreach}
 				<div class="form-group">
 					<div class="input-group">
-						<input type="email" class="form-control" n:name="login" placeholder="{_sign.in.form.inputEmail}">
+						<input type="email" class="form-control" n:name="token" placeholder="{_sign.inOtp.form.inputToken}">
 						<span class="input-group-addon bg-blue">
 							<i class="glyph-icon icon-envelope-o"></i>
 						</span>
 					</div>
 				</div>
-				<div class="form-group">
-					<div class="input-group">
-						<input type="password" class="form-control" n:name="password" placeholder="{_sign.in.form.inputPassword}">
-						<span class="input-group-addon bg-blue">
-							<i class="glyph-icon icon-unlock-alt"></i>
-						</span>
-					</div>
-				</div>
-				<div class="form-group">
-					<a n:if="$allowForgotPassword" id="forgot-password-link" data-show="forgot-password-form-container" data-hide="sign-in-form-container" href="{plink :LeSignIn:UserSignIn:Sign:ForgotPassword}" title="Recover password">{_sign.in.form.forgotPassword}</a>
-				</div>
-				<button n:name="submit" class="btn btn-success btn-block">{_sign.in.form.buttonSignIn}</button>
+				<button n:name="submit" class="btn btn-success btn-block">{_sign.inOtp.form.buttonSignIn}</button>
 			</div>
 		</div>
 	</form>

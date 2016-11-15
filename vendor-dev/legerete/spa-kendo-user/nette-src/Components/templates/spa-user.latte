@@ -5,11 +5,16 @@
 {capture $avatarLoad}assets/images/svg-loaders/bars.svg{/capture}
 
 <script id="spa-view-users" type="text/x-kendo-template"
+        {if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'readAll')}
         data-source-read="{plink LeSpaUser:User:User:}?do=read"
+        data-source-block-user="{plink LeSpaUser:User:User:}?do=blockUser"
+        data-source-unblock-user="{plink LeSpaUser:User:User:}?do=unblockUser"
+        {/if}
 >
 	{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'readAll')}
 		<div data-role="grid"
 				data-editable="{ mode: 'popup'}"
+                {if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'create')}
 				data-toolbar="[
 					{
 						name: 'createUser',
@@ -17,41 +22,83 @@
 						template: '<div class=\'btn btn-success btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'\'><span class=\'glyph-icon icon-plus\'></span> {_users.users.create}</div>'
 					}
 				]"
+				{/if}
 				data-columns="[
+					{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'update')}
 					{
 						'field': 'customUserEdit',
 						'title': '{_users.users.edit}',
 						'template': '<div class=\'btn btn-warning btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'#=id#\'><i class=\'glyph-icon icon-pencil\'></i></div>',
 						width: 50
 					},
+					{/if}
 					{ title:' ', template: '<img src=\'/#=avatarSmall#\' alt=\'\' class=\'avatar\' height=\'30\' width=\'30\'>', width: 45 },
 					{ 'field': 'name', title:'{_users.users.name}', 'width': 270 },
 					{ 'field': 'surname', title:'{_users.users.surname}' },
 					{ 'field': 'phone', title:'{_users.users.phone}' },
+					{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'update')}
+					{
+						'title': '{_users.users.block}',
+						'template': '#if(SPA.data.id != id && status === \'ok\') { #'+
+								'<div class=\'btn btn-danger btn-xs block-user-action\' data-toggle=\'modal\' data-target=\'.block-user-modal\' data-bind=\'events: { click: blockUser }\'><span class=\'glyph-icon icon-iconic-block\'></span></div>'+
+							'#} else if (SPA.data.id != id && status === \'blocked\') { #'+
+								'<div class=\'btn btn-success btn-xs unblock-user-action\' data-bind=\'events: { click: unblockUser }\'><span class=\'glyph-icon icon-refresh\'></span></div>'+
+							'#}#',
+						width: 50
+					}
+					{/if}
 	            ]"
 				data-bind="source: users,
 					visible: isVisible,
 					events: {
 					save: onSave
 				}"
-				style="height: 600px">
+				class="users-grid">
 		</div>
+	{/if}
+	{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'update')}
+	<div class="modal fade" tabindex="-1" role="dialog" id="spa-view-user-confirm-block">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content" data-bind="attr: { data-uid: uid}">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><i aria-hidden="true" class="glyph-icon icon-remove"></i></button>
+					<h4 class="modal-title">{_users.user.block-user}</h4>
+				</div>
+				<div class="modal-body">
+					<p>
+						<span>{_users.user.block-user-question} <code><span data-bind="text: name"></span> <span data-bind="text: surname"></span></code>?</span>
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">{_cancel}</button>
+					<button type="button" class="btn btn-danger" data-bind="events: { click: confirmBlockUser}"><i class="glyph-icon icon-warning"></i> {_users.user.block}</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	{/if}
 </script>
 
 <script id="spa-view-user" type="text/x-kendo-template"
-		data-source-create="{plink LeSpaUser:User:User:}?do=create"
-		data-source-read="{plink LeSpaUser:User:User:}?do=read&id="
-		data-source-update="{plink LeSpaUser:User:User:}?do=update"
+        data-user-id="{$user->getId()}"
+		{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'create')}
+			data-source-create="{plink LeSpaUser:User:User:}?do=create"
+		{/if}
+			data-source-read="{plink LeSpaUser:User:User:}?do=read&id="
+		{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'update')}
+			data-source-update="{plink LeSpaUser:User:User:}?do=update"
+		{/if}
 		data-source-uploadAvatar="{plink LeSpaUser:User:User:}?do=uploadAvatar"
-		data-source-read-available-roles="{plink LeSpaUser:User:User:}?do=readAvailableRoles"
+		{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'update')}
+			data-source-read-available-roles="{plink LeSpaUser:User:User:}?do=readAvailableRoles"
+		{/if}
+		data-source-check-email="{plink LeSpaUser:User:User:}?do=isEmailAvailable&email="
+		data-source-check-username="{plink LeSpaUser:User:User:}?do=isUsernameAvailable&username="
 		data-avatar-big-no-image="{$avatarBigNoImage}"
 		data-avatar-load-image="{$avatarLoad}"
 >
-	<div class="content-box" id="user-edit">
-		<h3 class="content-box-header">{_users.user.h1}
-			<span data-bind="text: user.name"></span>
-			<span data-bind="text: user.surname"></span>
+	<div id="user-edit">
+		<h3 class="content-box-header">
 			<div class="header-buttons">
 				<a class="btn btn-success btn-xs" data-bind="click: saveUser, visible: isDirty"><span class="glyph-icon icon-save"></span> {_users.user.save}</a>
 			</div>
@@ -61,18 +108,30 @@
 				<div class="row">
 					<div class="col-lg-12">
 						<ul class="list-group row list-group-icons">
+
+							{*
+							 * User personsl informations panel tab
+							 *}
 							<li class="col-md-3 active">
 								<a href="#user-personal-informations" data-toggle="tab" class="list-group-item">
 									<i class="glyph-icon font-red icon-tty"></i>
 									{_users.user.personal-informations}
 								</a>
 							</li>
+
+							{*
+							 * Security panel tab
+							 *}
 							<li class="col-md-3">
 								<a href="#user-security" data-toggle="tab" class="list-group-item">
 									<i class="glyph-icon icon-lock"></i>
 									{_users.user.security}
 								</a>
 							</li>
+
+							{*
+							 * Application settings panel tab
+							 *}
 							<li class="col-md-3">
 								<a href="#user-application-settings" data-toggle="tab" class="list-group-item">
 									<i class="glyph-icon icon-sliders"></i>
@@ -84,10 +143,18 @@
 				</div>
 				<div class="row">
 					<div class="col-lg-12">
+
+						{*
+						 * User personal informations panel content
+						 *}
 						<div class="tab-pane fade active in" id="user-personal-informations">
-							<div class="content-box row pad0A">
+							<div class="row pad0A">
 								<div class="col-lg-4 pad15A">
 									<form class="form-horizontal bordered-row">
+
+										{*
+										 * Avatar settings
+										 *}
 										<div class="row">
 											<div class="col-lg-12">
 												<div class="panel-content image-box user-photo-drop-zone pad0A">
@@ -100,7 +167,7 @@
 													       data-bind="events: { success: uploadAvatarComplete, upload: uploadAvatarStart}"
 													       data-drop-zone=".image-box.user-photo-drop-zone"
 													       name="user-avatar">
-													<div class="ribbon">
+													<div class="ribbon" data-bind="visible: isCurrentUser">
 														<div class="bg-primary">
 															{_users.user.current-user}
 														</div>
@@ -117,14 +184,39 @@
 											</div>
 										</div>
 										<div class="divider"></div>
-										<div class="row">
+
+										{if $user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'update')}
+										{**
+										 * User admin settings
+										 *}
+										<div class="row" n:if="$user->isAllowed('LeSpaUser:User:User', 'manage')">
 											<div class="col-lg-12">
+												{**
+												 * User Admin settings
+												 *}
+												<div class="form-group remove-border">
+													<div class="form-group remove-border">
+														<label for="" class="col-sm-4">
+															{_users.user.is-admin}
+														</label>
+														<div class="col-sm-8">
+															<input type="checkbox" data-bind="checked: user.isAdmin, disabled: isCurrentUser">
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<div data-bind="invisible: user.isAdmin" class="row" n:if="$user->isAllowed('LeSpaUser:User:User', 'manage')">
+											<div class="col-lg-12">
+												{**
+												 * User roles setting
+												 *}
 												<div class="form-group remove-border">
 													<label class="col-sm-4 control-label">{_users.user.roles}:</label>
 													<div class="col-sm-8">
 														<select data-role="multiselect"
 														        data-placeholder="Type a role e.g. Admin"
-														        data-value-primitive="true"
 														        data-text-field="title"
 														        data-value-field="id"
 														        data-clear-button="false"
@@ -136,14 +228,19 @@
 												</div>
 											</div>
 										</div>
+										{/if}
 									</form>
 								</div>
+
+								{*
+								 * User basic informations
+								 *}
 								<div class="col-lg-8">
 									<form class="form-horizontal bordered-row">
 										<div class="form-group remove-border">
 											<label class="col-sm-3 control-label">{_users.user.username}:</label>
 											<div class="col-sm-6">
-												<input data-bind="value: user.username" type="text" class="form-control" placeholder="{_users.user.username}...">
+												<input data-bind="value: user.username, enabled: user.isNew, events: { change: isUsernameAvailable}" type="text" class="form-control " placeholder="{_users.user.username}...">
 											</div>
 										</div>
 										<div class="form-group remove-border">
@@ -167,7 +264,7 @@
 										<div class="form-group remove-border">
 											<label class="col-sm-3 control-label">{_users.user.email}:</label>
 											<div class="col-sm-6">
-												<input data-bind="value: user.email" type="email" class="form-control" placeholder="{_users.user.email}...">
+												<input data-bind="value: user.email, events: { change: isEmailAvailable}" type="email" class="form-control" placeholder="{_users.user.email}...">
 											</div>
 										</div>
 										<div class="form-group remove-border">
@@ -184,14 +281,44 @@
 								</div>
 							</div>
 						</div>
-						<div class="tab-pane fade" id="user-application-settings">
-							<div class="content-box row">
-								tab 2
-							</div>
-						</div>
+
+						{*
+						 * Security panel content
+						 *}
 						<div class="tab-pane fade" id="user-security">
 							<div class="content-box row">
-								tab 2
+								<div class="col-lg-4 pad15A">
+									<strong>{_users.user.otp.authorization}</strong>
+									<span data-role="qrcode"
+										data-bind="value: user.otp, invisible: user.isNew"
+									>
+									</span>
+								</div>
+								<div class="col-lg-8">
+									<form class="form-horizontal bordered-row">
+										<div class="form-group remove-border" data-bind="invisible: user.isNew">
+											<label class="col-sm-3 control-label">{_users.user.password}:</label>
+											<div class="col-sm-6">
+												<input name="password" data-bind="events: { change: validatePassword}" type="password" class="form-control" placeholder="{_users.user.password}...">
+											</div>
+										</div>
+										<div class="form-group remove-border" data-bind="invisible: user.isNew">
+											<label class="col-sm-3 control-label">{_users.user.passwordRe}:</label>
+											<div class="col-sm-6">
+												<input data-bind="events: { change: validatePasswordRe}" type="password" class="form-control" placeholder="{_users.user.passwordRe}...">
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+
+						{*
+						 * Application settings panel content
+						 *}
+						<div class="tab-pane fade" id="user-application-settings">
+							<div class="content-box row">
+
 							</div>
 						</div>
 					</div>

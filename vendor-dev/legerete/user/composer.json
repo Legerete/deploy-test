@@ -20,7 +20,8 @@
 	"require": {
 		"nette/di" : "^2.4",
 		"nette/application" : "^2.4",
-		"legerete/core" : "dev-master"
+		"legerete/core" : "dev-master",
+		"spomky-labs/otphp": "^8.2"
 	},
 	"minimum-stability": "dev",
 	"require-dev": {

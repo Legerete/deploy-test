@@ -14,7 +14,16 @@
 	{block head}{/block}
 </head>
 
-<body id="spa-application" data-ws-host="localhost" data-ws-port="8006" data-user-id="{$user->getId()}">
+<body id="spa-application"
+		data-ws-host="localhost"
+		data-ws-port="8006"
+		data-user-id="{$user->getId()}"
+		{*data-avatar="{$user->getIdentity()->avatar}"*}
+		data-user-avatar="/data/images/user-avatar/d2/dodge-challenger-2015-black-incredible.23.jpg"
+        data-user-name="{$user->getIdentity()->name}"
+        data-user-surname="{$user->getIdentity()->surname}"
+        data-user-email="{$user->getIdentity()->email}"
+>
 	{include ./SPA/kendo-templates/views/spa-dashboard.latte}
 
 	{foreach $templatesControls as $templateControl}

@@ -8,50 +8,71 @@
 
 namespace Legerete\UserSignInModule\Components\SignIn;
 
-use Kdyby\Doctrine\EntityManager,
-	Nette\Localization\ITranslator,
-	Legerete\UIForm\FormFactory,
-	Nette\Application\UI as UI,
-	Nette\Security as Security,
-	Tracy\ILogger,
-	Nette\Utils as Utils;
+use Nette\Application\UI\Control;
+use Nette\Localization\ITranslator;
+use Legerete\UIForm\FormFactory;
+use Nette\Security;
+use Nette\Security\AuthenticationException;
+use Nette\Utils\Arrays;
+use Tracy\ILogger;
 use Legerete\Security\IDatabaseAuthenticator;
-
-//	Nette\Utils\Arrays,
-//	Nette\Utils\ArrayHash;
+use Nette\Application\UI\Form;
+use Nette\Utils\ArrayHash;
 
 /**
  * Renderable component with Sign in form.
+ *
+ * @method callable onLogInSuccess
+ * @method callable onLogInFailed
  */
-class SignInControl extends UI\Control
+class SignInControl extends Control
 {
-	/** @var FormFactory */
+	/**
+	 * @var FormFactory
+	 */
 	private $formFactory;
 
-	/** @type ILogger */
+	/**
+	 * @type ILogger
+	 */
 	private $logger;
 
-	/** @var Security\User $user */
+	/**
+	 * @var Security\User $user
+	 */
 	private $user;
 
-	/** @var IDatabaseAuthenticator */
+	/**
+	 * @var IDatabaseAuthenticator
+	 */
 	private $authenticator;
 
-	/** @var ITranslator */
+	/**
+	 * @var ITranslator
+	 */
 	private $translator;
 
-	/** @var string|bool */
+	/**
+	 * @var string|bool
+	 */
 	private $forgotPasswordLink;
 
-	/** @var callback $loggedInSuccess */
+	/**
+	 * @var callback $loggedInSuccess
+	 */
 	public $onLogInSuccess = [];
 
-	/** @var callback $loggedInFailed */
+	/**
+	 * @var callback $loggedInFailed
+	 */
 	public $onLogInFailed = [];
 
-	/** @var array */
+	/**
+	 * @var array
+	 */
 	public $config = [
-		'allowForgotPassword' => TRUE
+		'allowForgotPassword' => TRUE,
+		'loginAfterAuthorization' => TRUE,
 	];
 
 	/**
@@ -63,17 +84,19 @@ class SignInControl extends UI\Control
 	 * @param Security\User $user
 	 * @param ITranslator $translator
 	 */
-	public function __construct(array $config,
-								FormFactory $formFactory,
-								IDatabaseAuthenticator $authenticator,
-								ILogger $logger,
-								Security\User $user,
-								ITranslator $translator)
+	public function __construct(
+		array $config,
+		FormFactory $formFactory,
+		IDatabaseAuthenticator $authenticator,
+		ILogger $logger,
+		Security\User $user,
+		ITranslator $translator
+	)
 	{
 		parent::__construct();
 
+		$this->config = array_merge($this->config, $config);
 		$this->authenticator = $authenticator;
-		$this->config = $config;
 		$this->formFactory = $formFactory;
 		$this->logger = $logger;
 		$this->user = $user;
@@ -87,19 +110,19 @@ class SignInControl extends UI\Control
 	{
 		$ds = DIRECTORY_SEPARATOR;
 		$this->getTemplate()->setFile(realpath(__DIR__ . $ds . 'templates') . $ds . 'SignInPage.latte');
-		$this->getTemplate()->allowForgotPassword = Utils\Arrays::get($this->config, 'allowForgotPassword', TRUE);
+		$this->getTemplate()->allowForgotPassword = Arrays::get($this->config, 'allowForgotPassword', TRUE);
 		$this->getTemplate()->render();
 	}
 
 	/**
-	 * @return UI\Form
+	 * @return Form
 	 */
-	public function createComponentSignInForm() : UI\Form
+	public function createComponentSignInForm() : Form
 	{
-		$form = new UI\Form;
+		$form = $this->formFactory->create();
 
 		$form->addText('login', $this->translator->translate('sign.in.form.inputEmail'))
-			->addRule(UI\Form::EMAIL,
+			->addRule(Form::EMAIL,
 				$this->translator->translate('sign.in.form.error.fillEmailInCorrectFormat')
 			)
 			->setRequired($this->translator->translate('sign.in.form.error.emailNotFilled'));
@@ -114,15 +137,19 @@ class SignInControl extends UI\Control
 	}
 
 	/**
-	 * @param UI\Form $form
-	 * @param Utils\ArrayHash $values
+	 * @param Form $form
+	 * @param ArrayHash $values
 	 */
-	public function processSignIn(UI\Form $form, Utils\ArrayHash $values)
+	public function processSignIn(Form $form, ArrayHash $values)
 	{
+		if ($form->getPresenter()->isAjax()) {
+			$this->redrawControl('flashes');
+		}
+
 		try {
-			$this->authenticator->authenticate([$values->login, $values->password]);
+			$this->authenticator->authenticate($values->login, $values->password, $this->config['loginAfterAuthorization']);
 		    $this->onLogInSuccess();
-		} catch (Security\AuthenticationException $e) {
+		} catch (AuthenticationException $e) {
 			$this->flashMessage($this->getFailedMessage());
 		    $this->onLogInFailed();
 		}
@@ -148,5 +175,15 @@ class SignInControl extends UI\Control
 	public function setForgotPasswordLink($link = FALSE)
 	{
 		$this->forgotPasswordLink = $link;
+		return $this;
+	}
+
+	/**
+	 * @var array $config
+	 */
+	public function setConfig($config)
+	{
+		$this->config = $config;
+		return $this;
 	}
 }

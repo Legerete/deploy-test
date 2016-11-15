@@ -1,0 +1,60 @@
+{var $robots = noindex}
+
+{block scripts}
+	{include parent}
+
+	<script>
+		$(function () {
+			$.nette.ext({
+				success: function (payload) {
+					var qrCodeElement = $("#qr-code");
+					qrCodeElement.html(false);
+					qrCodeElement.kendoQRCode({
+						value: {$otpLink},
+						size: 250
+					});
+				}
+			});
+		});
+	</script>
+{/block}
+
+{block content}
+<div id="loading">
+	<div class="svg-icon-loader">
+		<img src="{$basePath}/assets/images/svg-loaders/bars.svg" width="40" alt="">
+	</div>
+</div>
+
+<img src="{$basePath}/assets/images/blurred-bg/blurred-bg-3.jpg" class="login-img wow fadeIn" alt="">
+
+<div class="center-vertical">
+	<div id="activation-setup-otp" class="center-content">
+		<div class="col-md-3 center-margin">
+			<div n:snippet="contentBox" class="content-box">
+				<h3 class="content-box-header bg-primary">
+					<i class="glyph-icon icon-cog"></i>
+					Activate account {$step} / 2
+				</h3>
+				<div class="content-box-wrapper">
+					{if $step === 1}
+						<p>
+							Please, choose your password.
+						</p>
+						{control setUpPassword}
+					{/if}
+					{if $step === 2}
+						<p>
+							Scan this QR code in any authentication app<br>
+							e.g.: <code>GoogleAuthenticator</code> for <a href="https://itunes.apple.com/cz/app/google-authenticator/id388497605?mt=8">iOS</a> or <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">Android</a>.
+						</p><br>
+						<p>
+							<div id="qr-code"></div>
+						</p>
+						{control signInOtpForm}
+					{/if}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

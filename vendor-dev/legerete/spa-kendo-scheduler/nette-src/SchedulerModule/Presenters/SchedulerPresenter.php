@@ -8,10 +8,10 @@
 
 namespace Legerete\Spa\KendoScheduler\SchedulerModule\Presenters;
 
-use Legerete\Presenters\SecuredPresenter;
+use Legerete\Security\Presenters\SecuredPresenter;
 use Legerete\Spa\KendoScheduler\Model\Service\SchedulerModelService;
 
-class SchedulerPresenter extends SecuredPresenter
+class SchedulerPresenter extends \Legerete\Security\Presenters\SecuredPresenter
 {
 	/**
 	 * @var SchedulerModelService

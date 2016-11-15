@@ -6,9 +6,9 @@
  * @package     Legerete\SignInExtension
  */
 
-namespace Legerete\UserSignInOtp\Presenters;
+namespace Legerete\UserSignInOtpModule\Presenters;
 
-use Legerete\Presenters\SecuredPresenter;
+use Legerete\Security\Presenters\SecuredPresenter;
 use Legerete\UserSignInOtp\Components\SignInOtp\SignInOtpControl;
 use Legerete\UserSignInOtp\Components\SignInOtp\SignInOtpFactory;
 
@@ -18,22 +18,27 @@ use Legerete\UserSignInOtp\Components\SignInOtp\SignInOtpFactory;
 class SignOtpPresenter extends SecuredPresenter
 {
 	/**
-	 * @var SignInOtpFactory
+	 * @var SignInOtpFactory $signInOtpFormFactory
 	 */
-	private $signInFormFactory;
+	private $signInOtpFormFactory;
 
 	/**
 	 * @var array
 	 */
 	private $config;
 
+	/**
+	 * @var bool $mailConfirmed
+	 */
+	private $mailConfirmed = FALSE;
+
 	public function __construct(array $config = [], SignInOtpFactory $signInFactory)
 	{
 		parent::__construct();
 
-		$this->mailConfirmed = FALSE;
+//		$this->mailConfirmed = FALSE;
 		$this->config = $config;
-		$this->signInFormFactory = $signInFactory;
+		$this->signInOtpFormFactory = $signInFactory;
 	}
 
 	public function renderIn()
@@ -44,8 +49,8 @@ class SignOtpPresenter extends SecuredPresenter
 	/**
 	 * @return SignInOtpControl
 	 */
-	public function createComponentSignInForm() : SignInOtpControl
+	public function createComponentSignInOtpForm() : SignInOtpControl
 	{
-		return $this->signInFormFactory->create($this->config);
+		return $this->signInOtpFormFactory->create($this->config);
 	}
 }

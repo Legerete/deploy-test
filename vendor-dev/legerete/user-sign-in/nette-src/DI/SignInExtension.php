@@ -24,6 +24,7 @@ class SignInExtension extends CompilerExtension
 	 * @var array $defaults
 	 */
 	private $defaults = [
+		'enableOtp' => FALSE,
 		'allowForgotPassword' => TRUE,
 		'afterLoginRedirectPage' => '',
 		'afterLogoutRedirectPage' => '',
@@ -38,8 +39,9 @@ class SignInExtension extends CompilerExtension
 		// Load services definitions for extension
 		Compiler::loadDefinitions($builder, $this->loadFromFile(__DIR__ . '/SignInExtensionConfig.neon')['services'], $this->name);
 
-		// Inject config to SignPresenter
+		// Inject config to Presenters
 		$builder->getDefinition($this->prefix('SignPresenter'))->setArguments([$config]);
+		$builder->getDefinition($this->prefix('ActivatePresenter'))->setArguments([$config]);
 
 		$presenterFactory = $builder->getDefinition('application.presenterFactory');
 		$presenterFactory->addSetup('setMapping', [['LeSignIn' => 'Legerete\*Module\Presenters\*Presenter']]);
@@ -51,6 +53,12 @@ class SignInExtension extends CompilerExtension
 			'action' => 'default',
 			'alias' => 'LeSignIn'
 		]]);
+		$router->addSetup('$service->prepend(new Nette\Application\Routers\Route(?, ?));', ['activate/<userId>/<token>', [
+			'module' => 'LeSignIn:UserSignIn',
+			'presenter' => 'Activate',
+			'action' => 'default',
+			'alias' => 'LeAccountActivate'
+		]]);
 
 		// Add resources to authorizator
 		$authorizator = $builder->getDefinition($builder->getByType(IAuthorizator::class));
@@ -59,8 +67,9 @@ class SignInExtension extends CompilerExtension
 			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
 		}
 		$authorizator->addSetup('addResource', ['LeSignIn:UserSignIn:Sign']);
-		$authorizator->addSetup('addResourcePrivilege', ['LeSignIn:UserSignIn:Sign', Permission::PRIVILEGE_SHOW]);
+		$authorizator->addSetup('addResource', ['LeSignIn:UserSignIn:Activate']);
 		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSignIn:UserSignIn:Sign']);
+		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSignIn:UserSignIn:Activate']);
 	}
 
 	public function beforeCompile()

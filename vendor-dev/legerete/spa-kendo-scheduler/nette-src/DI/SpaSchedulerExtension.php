@@ -56,10 +56,10 @@ class SpaSchedulerExtension extends CompilerExtension
 		$authorizator->addSetup('addResourcePrivileges', [$resource, [
 			Permission::PRIVILEGE_SHOW,
 			Permission::PRIVILEGE_CREATE,
-			Permission::PRIVILEGE_READ_ALL,
 			Permission::PRIVILEGE_READ_MY,
 			Permission::PRIVILEGE_UPDATE,
 			Permission::PRIVILEGE_DESTROY,
+			Permission::PRIVILEGE_MANAGE,
 		]]);
 
 		// @todo DEVELOP TEMPORARY! Delete Me!

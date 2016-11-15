@@ -1,0 +1,37 @@
+{*
+ * @author Petr Besir Horáček <sirbesir@gmail.com>
+ *}
+{block content}
+<div id="sign-in-otp-form-container">
+	<form n:name="signInOtpForm" class="ajax">
+		<div class="content-box modal-content">
+			<h3 class="content-box-header content-box-header-alt bg-default">
+				<span class="header-wrapper">
+					{_sign.inOtp.form.header}
+					<small>{_sign.inOtp.form.headerSmall}</small>
+				</span>
+			</h3>
+			<div class="content-box-wrapper">
+				<div n:snippet="flashes">
+					<div n:foreach="$flashes as $flash" class="alert alert-{$flash->type}" role="alert">
+						<i class="glyphicon glyphicon-alert"></i> {$flash->message|noescape}
+					</div>
+				</div>
+				{foreach $form->errors as $error}
+					<div class="alert alert-danger" role="alert">
+						<i class="glyphicon glyphicon-alert"></i> {$error|noescape}
+					</div><br>
+				{/foreach}
+				<div class="form-group">
+					<div class="input-group">
+						<input type="number" class="form-control" n:name="token" placeholder="{_sign.inOtp.form.inputToken}">
+						<span class="input-group-addon bg-blue">
+							<i class="glyph-icon icon-clock-o"></i>
+						</span>
+					</div>
+				</div>
+				<button n:name="submit" class="btn btn-success btn-block">{_sign.inOtp.form.buttonSignIn}</button>
+			</div>
+		</div>
+	</form>
+</div>

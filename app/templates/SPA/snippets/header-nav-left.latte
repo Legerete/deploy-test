@@ -21,7 +21,7 @@
 						<span class="user-name">
 							<span data-bind="text: data.name"></span> <span data-bind="text: data.surname"></span>
 						</span>
-						<a data-bind="click: openPanel" data-panel-type="user-edit" data-user-id="{$user->getId()}" title="Edit profile">Edit profile</a>
+						<a n:if="$user->isAllowed('LeSpaUser:User:User', 'manage') || $user->isAllowed('LeSpaUser:User:User', 'readMy')" data-bind="click: openPanel" data-panel-type="user-edit" data-user-id="{$user->getId()}" title="Edit profile">Edit profile</a>
 						<a href="#" title="View notifications">View notifications</a>
 					</div>
 				</div>

@@ -12,14 +12,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Table;
-use Legerete\User\Model\Entity\UserEntity as BaseUserEntity;
+use Legerete\User\Model\SuperClass\UserSuperClass;
 
 /**
  * @ORM\Entity
  * @Table(name="user")
  * @ORM\HasLifecycleCallbacks
  */
-class UserEntity extends BaseUserEntity
+class UserEntity extends UserSuperClass
 {
 
 	/**
@@ -30,6 +30,11 @@ class UserEntity extends BaseUserEntity
 	 *		)
 	 */
 	protected $roles;
+
+	/**
+	 * @ORM\Column(type="boolean")
+	 */
+	protected $isAdmin = 0;
 
 	/**
 	 * UserEntity constructor.
@@ -62,6 +67,13 @@ class UserEntity extends BaseUserEntity
 		return $this->roles;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getIsAdmin()
+	{
+		return $this->isAdmin;
+	}
 
 	/**
 	 * ************************************* Setters ***************************************
@@ -80,4 +92,14 @@ class UserEntity extends BaseUserEntity
 			$this->roles->add($role);
 		}
 	}
+
+	/**
+	 * @var mixed $isAdmin
+	 */
+	public function setIsAdmin($isAdmin)
+	{
+		$this->isAdmin = (int) filter_var($isAdmin, FILTER_VALIDATE_BOOLEAN);
+		return $this;
+	}
+
 }

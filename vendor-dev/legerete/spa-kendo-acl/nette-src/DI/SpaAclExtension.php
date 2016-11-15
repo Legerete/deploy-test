@@ -51,14 +51,8 @@ class SpaAclExtension extends CompilerExtension
 		$authorizator->addSetup('addResource', ['LeSpaAcl:Acl:Acl']);
 		$authorizator->addSetup('addResourcePrivileges', ['LeSpaAcl:Acl:Acl', [
 			Permission::PRIVILEGE_SHOW,
-			Permission::PRIVILEGE_CREATE,
-			Permission::PRIVILEGE_READ_ALL,
-			Permission::PRIVILEGE_UPDATE,
-			Permission::PRIVILEGE_DESTROY,
+			Permission::PRIVILEGE_MANAGE
 		]]);
-
-		// @todo DEVELOP TEMPORARY! Delete Me!
-		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSpaAcl:Acl:Acl']);
 
 		$templatesCollection = $builder->getDefinition($builder->getByType(SpaTemplatesControlsCollection::class));
 		$templatesCollection->addSetup('set', ['aclTemplate', $this->prefix('@aclTemplate')]);

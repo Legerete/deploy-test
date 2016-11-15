@@ -1,1 +1,4 @@
 services:
+	UserCreatedListener:
+		class: Legerete\User\EventListener\UserCreatedListener
+		tags: [kdyby.subscriber]

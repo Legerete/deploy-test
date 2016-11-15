@@ -43,13 +43,13 @@ class SignInOtpExtension extends CompilerExtension
 
 		// Add extension mapping
 		$presenterFactory = $builder->getDefinition('application.presenterFactory');
-		$presenterFactory->addSetup('setMapping', [['LeSignIn' => 'Legerete\*Module\Presenters\*Presenter']]);
+		$presenterFactory->addSetup('setMapping', [['LeSignInOtp' => 'Legerete\*Module\Presenters\*Presenter']]);
 
 		// Add route for extension
 		$router = $builder->getDefinition('routing.router');
 		$router->addSetup('$service->prepend(new Nette\Application\Routers\Route(?, ?));', ['sign/otp[/<action>]', [
-			'module' => 'LeSignIn:UserSignInOtp',
-			'presenter' => 'Sign',
+			'module' => 'LeSignInOtp:UserSignInOtp',
+			'presenter' => 'SignOtp',
 			'action' => 'default',
 			'alias' => 'LeSignInOtp'
 		]]);
@@ -60,9 +60,9 @@ class SignInOtpExtension extends CompilerExtension
 		if (!$authorizator) {
 			throw new NotImplementedException('Class of type '.IAuthorizator::class.' not implemented. For use '.self::class.' is required.');
 		}
-		$authorizator->addSetup('addResource', ['LeSignIn:UserSignInOtp:Sign']);
-		$authorizator->addSetup('addResourcePrivilege', ['LeSignIn:UserSignInOtp:Sign', Permission::PRIVILEGE_SHOW]);
-		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSignIn:UserSignInOtp:Sign']);
+//		$authorizator->addSetup('addResource', ['LeSignIn:UserSignInOtp:SignOtp']);
+//		$authorizator->addSetup('addResourcePrivilege', ['LeSignIn:UserSignInOtp:SignOtp', Permission::PRIVILEGE_SHOW]);
+//		$authorizator->addSetup('allow', [AuthorizatorFactory::ROLE_GUEST, 'LeSignIn:UserSignInOtp:SignOtp']);
 
 		// Add Doctrine Entity mapping
 		$this->registerDoctrineEntityAnnotationDriver(__DIR__.'/../Entity', 'Legerete\UserSignInOtp\Entity');

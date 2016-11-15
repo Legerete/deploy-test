@@ -1,5 +1,9 @@
 services:
 	SignPresenter: Legerete\UserSignInModule\Presenters\SignPresenter
+	ActivatePresenter: Legerete\UserSignInModule\Presenters\ActivatePresenter
 	- Legerete\UserSignInModule\Components\ChooseNewPasswordFactory
 	- Legerete\UserSignInModule\Components\ForgotPasswordFactory
 	- Legerete\UserSignInModule\Components\SignIn\SignInFactory
+	- Legerete\UserSignInModule\Components\SignInOtp\SignInOtpFactory
+	- Legerete\UserSignInModule\Components\SetUpPassword\SetUpPasswordFactory
+	- Legerete\UserSignInModule\Model\Service\UserModelService

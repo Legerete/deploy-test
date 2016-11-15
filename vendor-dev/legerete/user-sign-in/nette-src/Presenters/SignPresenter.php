@@ -8,49 +8,111 @@
 
 namespace Legerete\UserSignInModule\Presenters;
 
-use Legerete\Presenters\SecuredPresenter,
-	Nette\Security\Identity,
-	Legerete\UserSignInModule\Components as Components;
+use Legerete\Security\IDatabaseAuthenticator;
+use Legerete\Security\Presenters\SecuredPresenter;
+use Legerete\UserSignInModule\Components\ChooseNewPasswordControl;
+use Legerete\UserSignInModule\Components\ChooseNewPasswordFactory;
+use Legerete\UserSignInModule\Components\ForgotPasswordControl;
+use Legerete\UserSignInModule\Components\ForgotPasswordFactory;
+use Legerete\UserSignInModule\Components\SignIn\SignInControl;
+use Legerete\UserSignInModule\Components\SignIn\SignInFactory;
+use Legerete\UserSignInModule\Components\SignInOtp\SignInOtpControl;
+use Legerete\UserSignInModule\Components\SignInOtp\SignInOtpFactory;
+use Nette\Localization\ITranslator;
+
 
 /**
  * Sign in/out presenter.
  * @author Petr Besir Horacek <sirbesir@gmail.com>
+ * @resource LeSignIn:UserSignIn:Sign
+ * @privileges show
  */
 class SignPresenter extends SecuredPresenter
 {
-	private
-		/** @var Components\SignIn\SignInFactory */
-		$signInFormFactory,
+	/**
+	 * @var SignInFactory $signInFormFactory
+	 */
+	private $signInFormFactory;
 
-		/** @var Components\ForgotPasswordFactory */
-		$forgotPasswordFactory,
+	/**
+	 * @var SignInOtpFactory $signInOtpFormFactory
+	 */
+	private $signInOtpFormFactory;
 
-		/** @var Components\ChooseNewPasswordFactory */
-		$chooseNewPasswordFactory,
+	/**
+	 * @var ForgotPasswordFactory $forgotPasswordFactory
+	 */
+	private $forgotPasswordFactory;
 
-		/** @var bool $mailConfirmed */
-		$mailConfirmed,
+	/**
+	 * @var ChooseNewPasswordFactory $chooseNewPasswordFactory
+	 */
+	private $chooseNewPasswordFactory;
 
-		/** @var array */
-		$config;
+	/**
+	 * @var bool $mailConfirmed
+	 */
+	private $mailConfirmed;
 
-	public function __construct(array $config = [],
-								Components\SignIn\SignInFactory $signInFactory,
-								Components\ForgotPasswordFactory $forgotPasswordFactory,
-								Components\ChooseNewPasswordFactory $chooseNewPasswordFactory)
+	/**
+	 * @var ITranslator $translator
+	 */
+	private $translator;
+
+	/**
+	 * @var IDatabaseAuthenticator $authenticator
+	 */
+	private $authenticator;
+
+	/**
+	 * @var string $loginRedirectPage
+	 */
+	private $loginRedirectPage;
+
+	/**
+	 * @var string $loginRedirectPage
+	 */
+	private $logoutRedirectPage;
+
+	/**
+	 * @var string $signInComponent;
+	 */
+	private $signInComponent = 'signInForm';
+
+	/**
+	 * @var array
+	 */
+	private $config = [
+		'enableOtp' => FALSE,
+		'loginRedirectPage' => 'this',
+	];
+
+	public function __construct(
+		array $config,
+		SignInFactory $signInFactory,
+		ForgotPasswordFactory $forgotPasswordFactory,
+		ChooseNewPasswordFactory $chooseNewPasswordFactory,
+		SignInOtpFactory $signInOtpFactory,
+		ITranslator $translator,
+		IDatabaseAuthenticator $authenticator
+	)
 	{
 		parent::__construct();
 
-		$this->mailConfirmed = FALSE;
-		$this->config = $config;
+		$this->config = array_merge($this->config, $config);
 		$this->signInFormFactory = $signInFactory;
 		$this->forgotPasswordFactory = $forgotPasswordFactory;
 		$this->chooseNewPasswordFactory = $chooseNewPasswordFactory;
+		$this->signInOtpFormFactory = $signInOtpFactory;
+		$this->translator = $translator;
+		$this->authenticator = $authenticator;
+		$this->mailConfirmed = FALSE;
 	}
 
 	public function renderIn()
 	{
 		$this->getTemplate()->pageClass = 'sign';
+		$this->getTemplate()->signInComponent = $this->signInComponent;
 	}
 
 	public function renderForgotPassword()
@@ -68,8 +130,8 @@ class SignPresenter extends SecuredPresenter
 		if ($user = $this->clientService->verifyRegisterEmail($email, $hash)) {
 			$this->mailConfirmed = TRUE;
 
-			$identity = new Identity($user->login, 'client', ['client' => $user]);
-			$this->user->login($identity);
+			$this->authenticator->authenticate($user->login, $user->password, TRUE);
+
 		}
 	}
 
@@ -87,37 +149,103 @@ class SignPresenter extends SecuredPresenter
 
 	/**
 	 * Sign out user
-	 * @TODO implement translation
 	 */
 	public function actionOut()
 	{
 		$this->getUser()->logout();
-		$this->flashMessage('Byl jste odhlášen.');
-		$this->redirect('in');
+		$this->flashMessage($this->translator->translate('security.user.signed-out'));
+		$this->redirect($this->getLogoutRedirectPage());
 	}
 
+	/* ********************************** Components ********************************** */
+
 	/**
-	 * @return Components\SignIn\SignInControl
+	 * @return SignInControl
 	 */
-	public function createComponentSignInForm() : Components\SignIn\SignInControl
+	public function createComponentSignInForm() : SignInControl
 	{
-		return $this->signInFormFactory->create($this->config);
+		$component = $this->signInFormFactory->create($this->config);
+
+		if ($this->config['enableOtp']) {
+			$component->onLogInSuccess[] = function () {
+				$this->signInComponent = 'signInOtpForm';
+				$this->redrawControl('signInForm');
+			};
+		} else {
+			$component->onLogInSuccess[] = function() {
+				$this->redirect($this->config['loginRedirectPage']);
+			};
+		}
+
+		return $component;
 	}
 
 	/**
-	 * @return Components\ForgotPasswordControl
+	 * @return ForgotPasswordControl
 	 */
-	protected function createComponentForgotPasswordForm() : Components\ForgotPasswordControl
+	protected function createComponentForgotPasswordForm() : ForgotPasswordControl
 	{
 		return $this->forgotPasswordFactory->create();
 	}
 
 	/**
-	 * @return Components\ChooseNewPasswordControl
+	 * @return ChooseNewPasswordControl
 	 */
-	protected function createComponentChooseNewPassword() : Components\ChooseNewPasswordControl
+	protected function createComponentChooseNewPassword() : ChooseNewPasswordControl
 	{
 		return $this->chooseNewPasswordFactory->create();
 	}
 
+	/**
+	 * @return SignInOtpControl
+	 */
+	public function createComponentSignInOtpForm() : SignInOtpControl
+	{
+		$component = $this->signInOtpFormFactory->create($this->config);
+
+		$component->onVerifySuccess[] = function() {
+			\Tracy\Debugger::barDump('verify success');
+			$this->redirect($this->config['loginRedirectPage']);
+		};
+
+		return $component;
+	}
+
+	/* ********************************** Getters ********************************** */
+
+	/**
+	 * @return string
+	 */
+	public function getLoginRedirectPage() : string
+	{
+		return $this->loginRedirectPage;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLogoutRedirectPage() : string
+	{
+		return $this->logoutRedirectPage ?: 'in';
+	}
+
+	/* ********************************** Setters ********************************** */
+
+	/**
+	 * @var string $loginRedirectPage
+	 */
+	public function setLoginRedirectPage($loginRedirectPage)
+	{
+		$this->loginRedirectPage = $loginRedirectPage;
+		return $this;
+	}
+
+	/**
+	 * @var string $logoutRedirectPage
+	 */
+	public function setLogoutRedirectPage($logoutRedirectPage)
+	{
+		$this->logoutRedirectPage = $logoutRedirectPage;
+		return $this;
+	}
 }

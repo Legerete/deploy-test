@@ -104,6 +104,7 @@ class SchedulerModelService
 			->orWhere('e.recurrenceRule != :empty')
 			->andWhere('e.recurrence is NULL')
 			->andWhere('e.status = :statusOk')
+//			->andWhere('e.userId = :userId')
 			->setParameters(['first' => $firstDay, 'last' => $lastDay, 'empty' => '', 'statusOk' => 'ok'])
 			->getQuery();
 
@@ -167,12 +168,12 @@ class SchedulerModelService
 	/**
 	 * @param integer $id
 	 */
-	public function destroyEvent(integer $id)
+	public function destroyEvent($id)
 	{
 		/**
 		 * @type SchedulerEventEntity $event
 		 */
-		$event = $this->getSchedulerEventsRepository()->find($id);
+		$event = $this->getSchedulerEventsRepository()->find((int) $id);
 			$event->destroy();
 
 		$this->em->flush();
