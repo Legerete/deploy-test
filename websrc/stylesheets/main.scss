@@ -432,6 +432,14 @@ html {
   }
 }
 
+#header-logo {
+  img {
+    max-width: 180px;
+    margin-top: 3px;
+    display: block;
+  }
+}
+
 #page-sidebar {
   width: 240px;
 }
