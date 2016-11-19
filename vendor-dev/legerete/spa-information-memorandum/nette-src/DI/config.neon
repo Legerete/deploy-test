@@ -1,0 +1,3 @@
+services:
+	- Legerete\Spa\KendoIm\Model\Service\ImModelService
+	imTemplate: Legerete\Spa\KendoIm\Components\ImTemplateControlFactory

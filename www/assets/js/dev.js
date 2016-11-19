@@ -715,6 +715,102 @@ $(function () {
 	});
 
 	/**
+	 * Register information memorandum panel
+	 */
+	SPA.addPanelType('information-memorandum-edit', {
+		settings: {
+			multiInstances: true,
+			closeable: true,
+			name: 'IM',
+			type: 'information-memorandum-edit',
+			view: '#spa-view-information-memorandum-edit'
+		},
+
+		im: {
+			id: null,
+			edited: false,
+			status: 'ok',
+		},
+		Im: kendo.data.Model.define(this.im),
+		create: function (event, context) {
+			this.registerListeners();
+			var view = $(this.settings.view);
+			var createUrl = view.data('source-create');
+			var readUrl = view.data('source-read');
+			var updateUrl = view.data('source-update');
+			var that = this;
+
+			this.settings.viewModel = kendo.observable({
+				isDirty: function () {
+					return this.get('im.edited');
+				},
+				setUserModel: function (model) {
+					this.set('user', model);
+				},
+				validateInput: function (target, value, validatingUrl, errorMessage) {
+					var viewModel = this;
+					target.addClass('validating');
+
+					$.get(validatingUrl + value, function (response) {
+						if (! response.available) {
+							noty({text: errorMessage, type: 'warning', timeout:2500});
+						}
+
+						viewModel.setInputValidateStatus(target, response.available);
+						target.removeClass('validating');
+					});
+				},
+				setInputValidateStatus($element, valid) {
+					if (valid) {
+						$element.removeClass('validate-error');
+					} else {
+						$element.addClass('validate-error');
+					}
+				},
+				setImModel: function (model) {
+					this.set('im', model);
+				},
+				readImModel: function () {
+					var viewModel = this;
+					return $.getJSON(readUrl+ImId, {}, function (data) {
+						var panel = SPA.panelsDataSource.getByUid(that.settings.panelUid);
+						panel.set('name', that.settings.name + ' - ' + data.name + ' ' + data.surname);
+						viewModel.createImModel(data);
+						// SPA.refreshPanels();
+					})
+				},
+				createNewImModel: function () {
+					this.createImModel(new that.Im(that.im));
+				},
+				createImModel: function (data) {
+					var im = new that.Im(data);
+					im.bind('change', function () {
+						this.set('edited', true);
+					});
+					this.setImModel(im);
+					return im;
+				},
+			});
+
+			// if (ImId) {
+			// 	this.settings.viewModel.readImModel();
+			// } else {
+				this.settings.viewModel.createNewImModel();
+			// }
+			return this.settings;
+		},
+		registerListeners: function () {
+			var that = this;
+			SPA.bind('spa.addedPanel', function (panel) {
+				that.settings.panelUid = panel.uid;
+			});
+
+			// @todo dopsat listener pro update uzivatele v případě shodnosti s updatovaným v jiném tabu,
+			// @todo NEBO vyresit kontrolu v tabech, zda uz tentyz jiny neexistuje
+		}
+	});
+
+	/**
 	 * Register acl panel
 	 */
 	SPA.addPanelType('acl', {

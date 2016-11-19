@@ -1,0 +1,67 @@
+{*
+ * @todo do konfigu
+ *}
+{capture $avatarBigNoImage}data/images/noimage/03/no-image.350x350.fit.q100.png{/capture}
+{capture $avatarLoad}assets/images/svg-loaders/bars.svg{/capture}
+
+<script id="spa-view-information-memorandums" type="text/x-kendo-template"
+        {if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'readAll')}
+        data-source-read="{plink LeSpaIm:Im:Im:}?do=read"
+        {/if}
+>
+	{if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'readAll') || $user->isAllowed('LeSpaIm:Im:Im', 'readMy')}
+		<div data-role="grid"
+                {if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'create')}
+				data-toolbar="[
+					{
+						name: 'createUser',
+						text: '{_im.list.create}',
+						template: '<div class=\'btn btn-success btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'\'><span class=\'glyph-icon icon-plus\'></span> {_users.users.create}</div>'
+					}
+				]"
+				{/if}
+				data-columns="[
+					{if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'update')}
+					{
+						'field': 'customImEdit',
+						'title': '{_im.list.edit}',
+						'template': '<div class=\'btn btn-warning btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'information-memorandum-edit\' data-im-id=\'#=id#\'><i class=\'glyph-icon icon-pencil\'></i></div>',
+						width: 50
+					}
+					{/if}
+	            ]"
+				data-bind="source: users,
+					visible: isVisible,
+					events: {
+					save: onSave
+				}"
+				class="information-memorandums-grid">
+		</div>
+	{/if}
+</script>
+
+<script id="spa-view-information-memorandum-edit" type="text/x-kendo-template"
+        data-user-id="{$user->getId()}"
+		{if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'create')}
+			data-source-create="{plink LeSpaIm:Im:Im:}?do=create"
+		{/if}
+			data-source-read="{plink LeSpaIm:Im:Im:}?do=read&id="
+		{if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'update')}
+			data-source-update="{plink LeSpaIm:Im:Im:}?do=update"
+		{/if}
+>
+	<div id="im-edit">
+		<h3 class="content-box-header">
+			<div class="header-buttons">
+				<a class="btn btn-success btn-xs" data-bind="click: saveIm, visible: isDirty"><span class="glyph-icon icon-save"></span> {_im.im.save}</a>
+			</div>
+		</h3>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="row">
+					IM
+				</div>
+			</div>
+		</div>
+	</div>
+</script>

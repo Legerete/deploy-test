@@ -58,6 +58,7 @@ extensions:
 	LeSpaScheduler: Legerete\Spa\KendoScheduler\DI\SpaSchedulerExtension
 	LeUser: Legerete\User\DI\UserExtension
 	LeSpaUser: Legerete\Spa\KendoUser\DI\SpaUserExtension
+	LeIm: Legerete\Spa\KendoIm\DI\SpaImExtension
 
 imageStorage:
 	data_path: %appDir%/../www/data/images
