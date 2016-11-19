@@ -1,14 +1,4 @@
-resizeAppContent = function () {
-	let pageContentHeight = $('#page-content').height();
-	let pageHeaderHeight = $('#page-header').height();
-	let pagePanelsTabsWrapperHeight = $('#page-panels-tabs-wrapper').height();
-
-	let appContentHeight = pageContentHeight -  pageHeaderHeight - pagePanelsTabsWrapperHeight;
-	$('#app-content').height(appContentHeight);
-};
-
 $(function () {
-	// resizeAppContent();
 
 	// $('#page-content').resize(function () {
 	// 	resizeAppContent();
