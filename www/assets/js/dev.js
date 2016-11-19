@@ -291,6 +291,51 @@ $(function () {
 			return panelCanBeCreated;
 		},
 
+		toggleFullScreen: function (e) {
+			let element = document.getElementById('spa-application');
+			let $element = $(element);
+			let $sender = $(e.target);
+			$('.glyph-icon', this).toggleClass('icon-outdent').toggleClass('icon-indent');
+
+			if (! this.isInFullScreen()) {
+				$element.addClass('closed-sidebar');
+				$sender.addClass('text-success');
+				$sender.removeClass('icon-iconic-resize-full').addClass('icon-iconic-resize-small');
+				this.requestFullScreen(element);
+			} else {
+				$element.removeClass('closed-sidebar');
+				$sender.removeClass('text-success');
+				$sender.removeClass('icon-iconic-resize-small').addClass('icon-iconic-resize-full');
+				this.exitFullScreen();
+			}
+		},
+
+		requestFullScreen: function (element) {
+			if(element.requestFullscreen) {
+				element.requestFullscreen();
+			} else if(element.mozRequestFullScreen) {
+				element.mozRequestFullScreen();
+			} else if(element.webkitRequestFullscreen) {
+				element.webkitRequestFullscreen();
+			} else if(element.msRequestFullscreen) {
+				element.msRequestFullscreen();
+			}
+		},
+
+		exitFullScreen: function () {
+			if(document.exitFullscreen) {
+				document.exitFullscreen();
+			} else if(document.mozCancelFullScreen) {
+				document.mozCancelFullScreen();
+			} else if(document.webkitExitFullscreen) {
+				document.webkitExitFullscreen();
+			}
+		},
+
+		isInFullScreen: function () {
+			return document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+		},
+
 		clickOnStatistics: function (e) {
 			console.log('event triggered [statistics]');
 			this.trigger('clickOnStatistics');

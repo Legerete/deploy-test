@@ -155,7 +155,14 @@ html {
     height: 100%;
     overflow: hidden;
 
+    width: 100%;
+    background-color: $color-bg-secondary;
   }
+
+}
+
+#sb-site {
+  background-color: $color-bg-secondary;
 }
 
 .form-control {
