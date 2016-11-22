@@ -103,11 +103,8 @@
 @import '../template/helpers/responsive-elements';
 @import '../template/helpers/admin-responsive';
 
-@import 'kendo/kendo.common.core.min';
-@import 'kendo/kendo.common.min';
-@import 'kendo/kendo.bootstrap.min';
-@import 'kendo/kendo.common-bootstrap.core.min';
 @import 'kendo/kendo.common-bootstrap.min';
+@import 'kendo/kendo.bootstrap.min';
 
 @import 'kendo-integration';
 @import 'kendo-icons';
@@ -491,3 +488,133 @@ html {
     }
   }
 }
+
+#im-edit {
+  .content-box-header {
+    position: fixed;
+    top: 111px;
+    z-index: 550;
+    right: 0;
+    width: 100%;
+    background: #fff;
+    height: 50px;
+  }
+
+  #pdf-export, #pdf-scroller {
+    border: 0;
+    font-family: Arial;
+    margin: 0;
+
+    div.page, div.new-page {
+      border: 0;
+      border-radius: 0;
+      width: 596px;
+      height: 842px;
+      float:left;
+      background: #fff0c8;
+
+      div[data-role="editor"] {
+        border: 0;
+        border-radius: 0;
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+
+        *[contenteditable="false"] {
+          cursor: default;
+        }
+      }
+    }
+
+    div.new-page {
+      margin-left: 9px;
+    }
+  }
+
+  #pdf-export-wrapper, #pdf-scroller-wrapper {
+    overflow: hidden;
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #pdf-export-wrapper {
+    height: 100%;
+    //margin-left: -8px;
+  }
+
+  #pdf-scroller-wrapper {
+    margin-top: 40px;
+    height: 168px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 10px;
+
+    .k-slider {
+      position: absolute;
+      bottom: 12px;
+      z-index: 500;
+      width: 100%;
+
+      .k-slider-buttons {
+        .k-slider-track {
+          width: 100%;
+          left: 0;
+        }
+      }
+    }
+
+    #pdf-scroller {
+      transform-origin: top left;
+      transform: scale(.2);
+    }
+
+    #scroller-scrollbar {
+      position: absolute;
+      width: 300px;
+      height: 25px;
+      background-color: $color-overlay-default;
+      left: 1px;
+      bottom: 0px;
+      z-index: 500;
+      opacity: .7;
+      transition: height .5s;
+      cursor: ew-resize;
+      border-radius: 2px;
+    }
+  }
+
+  .k-pdf-export {
+    font-family: "Arial";
+
+    #pdf-export {
+      .new-page {
+        margin-left: 0;
+      }
+    }
+  }
+  //
+  //.pdf-page {
+  //  font-family: "Arial";
+  //
+  //}
+}
+
+#scroller-scrollbar {
+  &.draggable {
+    position: absolute;
+    width: 300px;
+    height: 25px;
+    background-color: $color-overlay-default;
+    left: 1px;
+    bottom: 0px;
+    z-index: 500;
+    opacity: .7;
+    transition: height .5s;
+    cursor: ew-resize;
+    border-radius: 2px;
+  }
+}
+

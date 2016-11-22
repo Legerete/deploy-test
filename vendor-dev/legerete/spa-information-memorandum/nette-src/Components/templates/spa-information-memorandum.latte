@@ -53,15 +53,54 @@
 	<div id="im-edit">
 		<h3 class="content-box-header">
 			<div class="header-buttons">
+				<a class="btn btn-success btn-xs" data-bind="click: downloadPdf"><span class="glyph-icon icon-save"></span> {_im.im.downloadPdf}</a>
 				<a class="btn btn-success btn-xs" data-bind="click: saveIm, visible: isDirty"><span class="glyph-icon icon-save"></span> {_im.im.save}</a>
 			</div>
 		</h3>
 		<div class="row">
 			<div class="col-lg-12">
-				<div class="row">
-					IM
+				<div id="pdf-scroller-wrapper">
+					<div id="scroller-scrollbar" class="draggable"></div>
+					<div id="pdf-scroller"
+							data-role="listview"
+							data-template="im-pages-scroller"
+							data-bind="source: pagesDataSource, events: { dataBound: scrollerDataBound}"
+					>
+					</div>
+				</div>
+				<div id="pdf-export-wrapper">
+					<div id="pdf-export" class="row"
+							data-role="listview"
+							data-template="im-pages-template"
+							data-bind="source: pagesDataSource"
+					>
+					</div>
 				</div>
 			</div>
 		</div>
+	</div>
+</script>
+
+<script id="im-pages-template" type="text/x-kendo-template">
+	<div data-bind="css: { page: isFirst, new-page: isNotFirst}">
+		<div data-role="editor"
+			data-immutables="true"
+			data-tools="['bold',
+				'italic',
+				'underline',
+				'strikethrough',
+				'justifyLeft',
+				'justifyCenter',
+				'justifyRight',
+				'justifyFull']"
+		     data-bind="value: content"
+		>
+		</div>
+	</div>
+</script>
+
+<script id="im-pages-scroller" type="text/x-kendo-template">
+	<div data-bind="css: { page: isFirst, new-page: isNotFirst}">
+		<div data-bind="html: content"></div>
 	</div>
 </script>
