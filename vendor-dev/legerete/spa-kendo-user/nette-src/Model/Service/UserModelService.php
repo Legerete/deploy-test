@@ -23,7 +23,11 @@ use OTPHP\TOTP;
 
 class UserModelService
 {
-	const PARTIAL_USER_SELECT = 'id, username, name, surname, email, phone, degree, status, avatar, isAdmin';
+	const PARTIAL_USER_SELECT = 'id, username, name, surname, email, phone, degree, status, avatar, isAdmin, color';
+
+	const USER_ALLOWED_COLLORS = [
+		'#B1473A', '#90082D', '#7A0230', '#621045', '#4C175C', '#63065C', '#A12587', '#2167AC', '#017D8D', '#01596F', '#02456B', '#022F57', '#B19BC6', '#A2559B', '#059BD5', '#8DD9F5', '#A5B4CF', '#A9C5D0', '#8EBBBF', '#55BCC0', '#62ADA1', '#98D4C1', '#C2E1C4', '#CEE3A3', '#B0D46F', '#6C9351', '#06845A', '#03654F', '#FDF152', '#FFD449', '#FDAE42', '#FECF9D', '#FAB39F', '#F58E85', '#F2668D', '#BB1167', '#EE0788', '#EE0F52', '#ED142C', '#F0554F',  '#F58559', '#A2B5A3', '#A1A494', '#7B7D6A', '#63605C', '#4A3836', '#6D4740', '#997C62', '#231F20', '#58585A'
+	];
 
 	/**
 	 * @var User $user

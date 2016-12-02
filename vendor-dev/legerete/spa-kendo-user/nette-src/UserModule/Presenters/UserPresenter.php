@@ -112,11 +112,12 @@ class UserPresenter extends SecuredPresenter
 	{
 		$data = $this->getHttpRequest()->getPost();
 
-		$admin = FALSE;
 		if (! $admin = $this->getUser()->isAllowed('LeSpaUser:User:User', 'manage')) {
 			if ($data['id'] != $this->getUser()->getId()) {
 				$this->sendForbiddenResponse();
 			}
+
+			unset($data['color']);
 		}
 
 		try {

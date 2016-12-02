@@ -96,6 +96,7 @@
 		data-source-check-username="{plink LeSpaUser:User:User:}?do=isUsernameAvailable&username="
 		data-avatar-big-no-image="{$avatarBigNoImage}"
 		data-avatar-load-image="{$avatarLoad}"
+        data-user-allowed-collors='["{$userAllowedColors|implode,"\",\""|noescape|replace,'#',''}"]'
 >
 	<div id="user-edit">
 		<h3 class="content-box-header">
@@ -225,6 +226,20 @@
 														>
 														</select>
 													</div>
+												</div>
+											</div>
+										</div>
+										<div data-bind="invisible: user.isAdmin" class="row" n:if="$user->isAllowed('LeSpaUser:User:User', 'manage')">
+											<div class="col-lg-12">
+												<label class="col-sm-4 control-label">{_users.user.color}:</label>
+												<div class="col-sm-8">
+													<input
+													id="user-color-picker"
+													data-role="colorpicker"
+													data-bind="value: user.color"
+													data-palette="['{$userAllowedColors|implode,"','"|noescape}']"
+													class="form-control"
+													>
 												</div>
 											</div>
 										</div>

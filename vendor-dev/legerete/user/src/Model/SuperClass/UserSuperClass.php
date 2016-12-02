@@ -124,6 +124,12 @@ class UserSuperClass extends \Kdyby\Doctrine\Entities\BaseEntity
 
 	/**
 	 * @ORM\Column(type="string")
+	 * @var string $color
+	 */
+	protected $color = NULL;
+
+	/**
+	 * @ORM\Column(type="string")
 	 * @var string $status
 	 */
 	protected $status = 'new';
@@ -243,6 +249,14 @@ class UserSuperClass extends \Kdyby\Doctrine\Entities\BaseEntity
 	public function getVerificationHash()
 	{
 		return $this->verificationHash;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getColor(): string
+	{
+		return $this->color;
 	}
 
 	/**
@@ -374,6 +388,15 @@ class UserSuperClass extends \Kdyby\Doctrine\Entities\BaseEntity
 	{
 		$this->verificationHash = $verificationHash;
 
+		return $this;
+	}
+
+	/**
+	 * @var string $color
+	 */
+	public function setColor($color)
+	{
+		$this->color = $color;
 		return $this;
 	}
 

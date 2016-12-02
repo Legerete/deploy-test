@@ -490,6 +490,22 @@ html {
   }
 }
 
+#user-personal-informations {
+  .k-colorpicker {
+    width: 100%;
+    height: 26px;
+
+    .k-picker-wrap {
+      height: 26px;
+
+      .k-selected-color {
+        border-radius: 2px 0 0 2px;
+        width: 100%;
+      }
+    }
+  }
+}
+
 #im-edit {
   .content-box-header {
     position: fixed;

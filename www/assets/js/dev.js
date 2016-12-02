@@ -539,6 +539,7 @@ $(function () {
 			var avatarLoadImage = view.data('avatar-load-image');
 			var dataSourceCheckUsernameUrl = view.data('source-check-username');
 			var dataSourceCheckEmailUrl = view.data('source-check-email');
+			var userAllowedCollors = view.data('user-allowed-collors');
 			var that = this;
 
 			this.settings.viewModel = kendo.observable({
@@ -554,6 +555,8 @@ $(function () {
 				isCurrentUser: function () {
 					return userId === currentUserId;
 				},
+
+				userAllowedCollors: userAllowedCollors,
 
 				/**
 				 * Prepare user data for storing
@@ -631,7 +634,9 @@ $(function () {
 					})
 				},
 				createNewUserModel: function () {
-					this.createUserModel(new that.User(that.user));
+					let user = that.user;
+					user.color = '#' + userAllowedCollors[Math.floor(Math.random()*userAllowedCollors.length)];
+					this.createUserModel(new that.User(user));
 				},
 				createUserModel: function (data) {
 					var user = new that.User(data);
