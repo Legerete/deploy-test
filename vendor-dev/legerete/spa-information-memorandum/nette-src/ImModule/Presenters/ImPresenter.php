@@ -102,4 +102,34 @@ class ImPresenter extends SecuredPresenter
 	{
 		$data = $this->getHttpRequest()->getPost();
 	}
+
+	public function handleReadAvailablePages()
+	{
+		$this->sendJson([
+			[
+				'name' => 'foo',
+				'id' => 1
+			],
+			[
+				'name' => 'bar',
+				'id' => 2
+			],
+			[
+				'name' => 'baz',
+				'id' => 3
+			],
+			[
+				'name' => 'boo',
+				'id' => 4
+			],
+			[
+				'name' => 'doo',
+				'id' => 5
+			],
+			[
+				'name' => 'doo',
+				'id' => 5
+			],
+		]);
+	}
 }
