@@ -1,7 +1,7 @@
 version: '2'
 services:
   web:
-    image: legerete/nginx-php7-build:1.0.0
+    image: legerete/nginx-php7:develop
     container_name: porta-invest-crm-dev-web
     ports:
       - 40300:80
