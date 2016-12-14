@@ -14,6 +14,7 @@ use Doctrine\ORM\Events;
 use Kdyby\Doctrine\EntityManager;
 use Kdyby\Events\Subscriber;
 use Legerete\User\Mail\UserCreatedMail;
+use Legerete\User\Model\SuperClass\UserSuperClass;
 use Nette\Object;
 use Ublaboo\Mailing\MailFactory;
 
@@ -52,8 +53,10 @@ class UserCreatedListener extends Object implements Subscriber
 	public function sendRegisterEmail(LifecycleEventArgs $lifecycleEventArgs)
 	{
 		$entity = $lifecycleEventArgs->getEntity();
+		if (is_a($entity, UserSuperClass::class)) {
+			$mail = $this->mailFactory->createByType(UserCreatedMail::class, ['userEntity' => $entity]);
+			$mail->send();
+		}
 
-		$mail = $this->mailFactory->createByType(UserCreatedMail::class, ['userEntity' => $entity]);
-		$mail->send();
 	}
 }
