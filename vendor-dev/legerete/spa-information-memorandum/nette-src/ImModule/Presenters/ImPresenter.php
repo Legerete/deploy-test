@@ -9,6 +9,7 @@
 namespace Legerete\Spa\KendoIm\ImModule\Presenters;
 
 use Legerete\Security\Presenters\SecuredPresenter;
+use Legerete\Spa\KendoIm\Model\ImResponse;
 use Legerete\Spa\KendoIm\Model\Service\ImModelService;
 use Tracy\ILogger;
 use Ublaboo\ImageStorage\ImageStorage;
@@ -38,11 +39,9 @@ class ImPresenter extends SecuredPresenter
 	 */
 	public $imageStorage;
 
-	public function __construct(ImageStorage $imageStorage)
+	public function __construct()
 	{
 		parent::__construct();
-
-		$this->imageStorage = $imageStorage;
 	}
 
 	public function checkRequirements($element)
@@ -74,17 +73,42 @@ class ImPresenter extends SecuredPresenter
 	public function handleCreate()
 	{
 		$data = $this->getHttpRequest()->getPost();
+
+		$data = [
+			'pages' => [
+				'dajlskdj',
+				'dasjkdjhdkas',
+				'ydfysf adf sydf 9ysdf yasdfasdfhhdfaysfd98ysfd98aysf'
+			]
+		];
+
+		if (!isset($data['pages'])) {
+			$this->sendJson(
+				(new ImResponse)
+					->setError(TRUE)
+					->setMessage('Pages missing')
+			);
+		}
+
+		$this->sendJson($this->modelService->createInformationMemorandum($data));
 	}
 
 	/**
 	 * @privileges manage|readAll|readMy
 	 * @param null $id
 	 **/
-	public function handleRead($id = null)
+	public function handleRead($id = NULL)
 	{
-		$ims = [];
+		$id = 7;
+		$jsonResponse = new ImResponse;
 
-		$this->sendJson($ims);
+		if (empty($id)) {
+			$this->sendJson(
+				$jsonResponse->setError(FALSE)->setMessage('Missing ID of information memorandum')->toArray()
+			);
+		}
+
+		$this->sendJson($this->modelService->readInformationMemorandum($id));
 	}
 
 	/**
@@ -93,14 +117,39 @@ class ImPresenter extends SecuredPresenter
 	public function handleUpdate()
 	{
 		$data = $this->getHttpRequest()->getPost();
+		if (!isset($data['id'])) {
+			$this->sendJson(
+				(new ImResponse)
+					->setError(TRUE)
+					->setMessage('ID missing')
+			);
+		}
+		if (!isset($data['pages'])) {
+			$this->sendJson(
+				(new ImResponse)
+					->setError(TRUE)
+					->setMessage('Pages missing')
+			);
+		}
+
+		$this->sendJson($this->modelService->updateInformationMemorandum($data));
 	}
 
 	/**
 	 * @privileges manage|destroy
+	 * @param NULL|int $id
 	 */
-	public function handleDestroy()
+	public function handleDestroy($id = NULL)
 	{
-		$data = $this->getHttpRequest()->getPost();
+		$jsonResponse = new ImResponse;
+
+		if (empty($id)) {
+			$this->sendJson(
+				$jsonResponse->setError(FALSE)->setMessage('Missing ID of information memorandum')->toArray()
+			);
+		}
+
+		$this->sendJson($this->modelService->destroyInformationMemorandum((int)$id));
 	}
 
 	public function handleReadAvailablePages()
