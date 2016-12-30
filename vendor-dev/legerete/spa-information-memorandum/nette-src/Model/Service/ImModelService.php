@@ -48,14 +48,12 @@ class ImModelService
 		$this->entityManager->beginTransaction();
 		try {
 			$entityMemorandum = new Entity\InformationMemorandum;
-			$this->entityManager->persist($entityMemorandum);
-
 			foreach ($memorandum['pages'] as $page) {
 				$entityPage = (new Entity\Page)->setContent($page);
 				$entityMemorandum->addPage($entityPage);
-				$this->entityManager->persist($entityPage);
 			}
 
+			$this->entityManager->persist($entityMemorandum);
 			$this->entityManager->flush()->commit();
 		} catch (\Exception $e) {
 			$this->entityManager->rollback();

@@ -14,6 +14,8 @@ use Nette\Utils\DateTime;
 
 /**
  * @ORM\Entity
+ * @ORM\Table
+ * @ORM\HasLifecycleCallbacks
  * @package Legerete\Spa\KendoIm\Model\Entity
  */
 class Page
@@ -32,7 +34,7 @@ class Page
 		$id,
 
 		/**
-		 * @ORM\ManyToOne(targetEntity="\Legerete\Spa\KendoIm\Model\Entity\InformationMemorandum", inversedBy="pages", cascade={"persist", "remove"})
+		 * @ORM\ManyToOne(targetEntity="InformationMemorandum", inversedBy="pages")
 		 * @var InformationMemorandum
 		 */
 		$informationMemorandum,
@@ -61,13 +63,11 @@ class Page
 	}
 
 	/**
-	 * @ORM\PrePersist
+	 * @ORM\PreUpdate
 	 */
-	public function beforePersist()
+	public function preUpdate()
 	{
-		if (NULL !== $this->id) {
-			$this->modified = new DateTime;
-		}
+		$this->modified = new DateTime;
 	}
 
 	//<editor-fold defaultstate="collapsed" desc="Getters">
@@ -131,6 +131,17 @@ class Page
 	public function setContent(string $content): Page
 	{
 		$this->content = $content;
+
+		return $this;
+	}
+
+	/**
+	 * @param InformationMemorandum $informationMemorandum
+	 * @return Page
+	 */
+	public function setInformationMemorandum(InformationMemorandum $informationMemorandum): Page
+	{
+		$this->informationMemorandum = $informationMemorandum;
 
 		return $this;
 	}
