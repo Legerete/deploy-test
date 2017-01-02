@@ -23,39 +23,37 @@ class Page
 
 	use SmartObject;
 
-	private
+	/**
+	 * @ORM\Id
+	 * @ORM\Column(type="integer", options={"unsigned":true})
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 * @var int
+	 */
+	private $id;
 
-		/**
-		 * @ORM\Id
-		 * @ORM\Column(type="integer", options={"unsigned":true})
-		 * @ORM\GeneratedValue(strategy="AUTO")
-		 * @var int
-		 */
-		$id,
+	/**
+	 * @ORM\ManyToOne(targetEntity="InformationMemorandum", inversedBy="pages")
+	 * @var InformationMemorandum
+	 */
+	private $informationMemorandum;
 
-		/**
-		 * @ORM\ManyToOne(targetEntity="InformationMemorandum", inversedBy="pages")
-		 * @var InformationMemorandum
-		 */
-		$informationMemorandum,
+	/**
+	 * @ORM\Column(type="text")
+	 * @var string
+	 */
+	private $content;
 
-		/**
-		 * @ORM\Column(type="text")
-		 * @var string
-		 */
-		$content,
+	/**
+	 * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
+	 * @var DateTime
+	 */
+	private $created;
 
-		/**
-		 * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
-		 * @var DateTime
-		 */
-		$created,
-
-		/**
-		 * @ORM\Column(type="datetime", nullable=true)
-		 * @var DateTime
-		 */
-		$modified;
+	/**
+	 * @ORM\Column(type="datetime", nullable=true)
+	 * @var DateTime
+	 */
+	private $modified;
 
 	public function __construct()
 	{

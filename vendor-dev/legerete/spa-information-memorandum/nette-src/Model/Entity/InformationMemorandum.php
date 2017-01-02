@@ -24,33 +24,31 @@ class InformationMemorandum
 
 	use SmartObject;
 
-	private
+	/**
+	 * @ORM\Id
+	 * @ORM\Column(type="integer", options={"unsigned":true})
+	 * @ORM\GeneratedValue(strategy="AUTO")
+	 * @var int
+	 */
+	private	$id;
 
-		/**
-		 * @ORM\Id
-		 * @ORM\Column(type="integer", options={"unsigned":true})
-		 * @ORM\GeneratedValue(strategy="AUTO")
-		 * @var int
-		 */
-		$id,
+	/**
+	 * @ORM\OneToMany(targetEntity="Page", mappedBy="informationMemorandum", cascade={"persist", "remove"})
+	 * @var Page[]
+	 */
+	private $pages;
 
-		/**
-		 * @ORM\OneToMany(targetEntity="Page", mappedBy="informationMemorandum", cascade={"persist", "remove"})
-		 * @var Page[]
-		 */
-		$pages,
+	/**
+	 * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
+	 * @var DateTime
+	 */
+	private $created;
 
-		/**
-		 * @ORM\Column(type="datetime", options={"default":"CURRENT_TIMESTAMP"})
-		 * @var DateTime
-		 */
-		$created,
-
-		/**
-		 * @ORM\Column(type="datetime", nullable=true)
-		 * @var DateTime
-		 */
-		$modified;
+	/**
+	 * @ORM\Column(type="datetime", nullable=true)
+	 * @var DateTime
+	 */
+	private $modified;
 
 	public function __construct()
 	{
