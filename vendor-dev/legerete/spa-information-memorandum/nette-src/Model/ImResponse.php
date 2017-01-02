@@ -16,10 +16,9 @@ class ImResponse
 
 	use SmartObject;
 
-	private
-		$error,
-		$message,
-		$data;
+	private $error;
+	private $message;
+	private $data;
 
 	public function __construct()
 	{
