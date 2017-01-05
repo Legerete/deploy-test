@@ -103,8 +103,10 @@
 @import '../template/helpers/responsive-elements';
 @import '../template/helpers/admin-responsive';
 
+@import 'kendo/kendo.common-bootstrap.core.min';
 @import 'kendo/kendo.common-bootstrap.min';
 @import 'kendo/kendo.bootstrap.min';
+@import 'kendo/kendo.bootstrap.mobile.min';
 
 @import 'kendo-integration';
 @import 'kendo-icons';
@@ -506,21 +508,62 @@ html {
   }
 }
 
+#im-add-page-modal {
+  .modal-body {
+    overflow: auto;
+    min-height: 180px;
+    display: block;
+    background-color: $color-bg-dark;
+
+    .k-listview {
+      border: 0;
+
+      .k-content {
+        margin: 9px;
+        width: 151px;
+        height: 210px;
+        float: left;
+        border: 2px solid $color-bg-dark;
+        border-radius: 1px;
+        box-shadow: 1px 1px 5px #000;
+        cursor: pointer;
+        transition: border 0.2s;
+
+        &.k-state-selected {
+          border-color: $color-active;
+          background-color: $color-bg-primary;
+        }
+      }
+    }
+  }
+}
+
 #im-edit {
   .content-box-header {
     position: fixed;
     top: 111px;
     z-index: 550;
     right: 0;
-    width: 100%;
+    width: calc(100% - 240px);
     background: #fff;
     height: 50px;
+
+    .header-buttons {
+      position: relative;
+      top: -12px;
+      width: 100%;
+    }
+  }
+
+  &>.row>.col-lg-12 {
+    background-color: $color-bg-secondary;
   }
 
   #pdf-export, #pdf-scroller {
     border: 0;
     font-family: Arial;
     margin: 0;
+    background-color: $color-bg-secondary;
 
     div.page, div.new-page {
       border: 0;
@@ -528,7 +571,12 @@ html {
       width: 596px;
       height: 842px;
       float:left;
-      background: #fff0c8;
+      background-color: #fff;
+      position: relative;
+
+      &:not(:first-child) {
+        margin-left: 9px;
+      }
 
       div[data-role="editor"] {
         border: 0;
@@ -538,10 +586,6 @@ html {
         background: transparent;
         padding: 0;
         margin: 0;
-
-        *[contenteditable="false"] {
-          cursor: default;
-        }
       }
     }
 
@@ -555,6 +599,7 @@ html {
     display: block;
     width: 100%;
     max-width: 100%;
+    background-color: $color-bg-secondary;
   }
 
   #pdf-export-wrapper {
@@ -605,6 +650,11 @@ html {
 
   .k-pdf-export {
     font-family: "Arial";
+    font-size: 10px;
+
+    .k-table-resize-handle {
+      display: none;
+    }
 
     #pdf-export {
       .new-page {
@@ -612,11 +662,6 @@ html {
       }
     }
   }
-  //
-  //.pdf-page {
-  //  font-family: "Arial";
-  //
-  //}
 }
 
 #scroller-scrollbar {
@@ -635,3 +680,68 @@ html {
   }
 }
 
+.im-pagelayout-cover, .k-pdf-export .im-pagelayout-cover {
+  &.logo {
+    background-image: url('/assets/images/logo.png');
+    background-repeat: no-repeat;
+    width: 356px;
+    height: 67px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+  }
+
+  &.document-name {
+    color: $color-porta-gold;
+    position: absolute;
+    right: 20px;
+    top: 550px;
+    font-weight: bold;
+  }
+
+  &.offer-number {
+    position: absolute;
+    left: 20px;
+    font-weight: bold;
+    font-size: 20px;
+    top: 590px;
+  }
+
+  &.offer-address-street {
+    position: absolute;
+    left: 20px;
+    font-weight: bold;
+    font-size: 40px;
+    top: 620px;
+  }
+
+  &.offer-address {
+    position: absolute;
+    left: 20px;
+    font-weight: bold;
+    font-size: 23px;
+    top: 670px;
+  }
+}
+
+.im-pagelayout-table {
+  padding: 20px;
+
+  table {
+    border-spacing: 3px;
+    border-collapse: inherit;
+
+    tr {
+      td {
+        padding: 3px;
+        background-color: $color-porta-gold;
+      }
+    }
+
+    tr:nth-child(2n) {
+      td {
+        background-color: lighten($color-porta-gold, 10);
+      }
+    }
+  }
+}

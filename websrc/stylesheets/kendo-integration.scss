@@ -369,6 +369,12 @@ div.k-window {
       }
     }
 
+    .k-scheduler-navigation {
+      .k-nav-current {
+        display: none;
+      }
+    }
+
     .k-scheduler-footer {
       border-radius: 0 0 2px 2px;
 
@@ -386,6 +392,12 @@ div.k-window {
     .k-grid-pager {
       .k-link {
         border-radius: 2px;
+      }
+    }
+
+    .k-scheduler-layout {
+      .k-today {
+        border-color: #FFFFFF;
       }
     }
   }

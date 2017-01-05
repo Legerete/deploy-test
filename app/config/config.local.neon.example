@@ -5,12 +5,12 @@ parameters:
 		settings:
 			trace: true
 
-doctrine:
-	default:
-		host:
-		user:
-		password:
-		dbname:
-		charset: UTF8
-		driver: pdo_mysql
-		autoGenerateProxyClasses: true
+	database:
+		host: mysql
+		port: 3306
+		user: porta-invest-crm
+		password: 0f0y4D6&&J8@
+		database: porta-invest-crm
+		debug: on
+		metadata:
+			App: %appDir%

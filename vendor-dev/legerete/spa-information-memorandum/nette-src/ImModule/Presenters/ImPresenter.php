@@ -10,6 +10,7 @@ namespace Legerete\Spa\KendoIm\ImModule\Presenters;
 
 use Legerete\Security\Presenters\SecuredPresenter;
 use Legerete\Spa\KendoIm\Model\Service\ImModelService;
+use Nette\Http\Response;
 use Tracy\ILogger;
 use Ublaboo\ImageStorage\ImageStorage;
 
@@ -37,6 +38,11 @@ class ImPresenter extends SecuredPresenter
 	 * @inject
 	 */
 	public $imageStorage;
+
+	/**
+	 * @var string $pageLayoutPath
+	 */
+	private $pageLayoutPath;
 
 	public function __construct(ImageStorage $imageStorage)
 	{
@@ -105,31 +111,38 @@ class ImPresenter extends SecuredPresenter
 
 	public function handleReadAvailablePages()
 	{
-		$this->sendJson([
-			[
-				'name' => 'foo',
-				'id' => 1
-			],
-			[
-				'name' => 'bar',
-				'id' => 2
-			],
-			[
-				'name' => 'baz',
-				'id' => 3
-			],
-			[
-				'name' => 'boo',
-				'id' => 4
-			],
-			[
-				'name' => 'doo',
-				'id' => 5
-			],
-			[
-				'name' => 'doo',
-				'id' => 5
-			],
-		]);
+		$this->sendJson($this->modelService->readTemplates());
+	}
+
+	public function handleReadPageLayout()
+	{
+		$layoutName = $this->getHttpRequest()->getQuery('layout', FALSE);
+		
+		if (file_exists($this->pageLayoutPath . DIRECTORY_SEPARATOR . $layoutName)) {
+			$layout = $this->createTemplate();
+			$layout->setFile($this->pageLayoutPath . DIRECTORY_SEPARATOR . $layoutName);
+
+			$this->sendJson([
+				'status' => 'ok',
+				'layout' => (string) $layout,
+			]);
+		} else {
+			$this->getHttpResponse()->setCode(Response::S404_NOT_FOUND);
+			$this->sendJson([
+				'status' => 'error',
+				'errorText' => 'Layout not found'
+			]);
+		}
+
+
+	}
+
+	/**
+	 * @var string $pageLayoutPath
+	 */
+	public function setPageLayoutPath($pageLayoutPath)
+	{
+		$this->pageLayoutPath = $pageLayoutPath;
+		return $this;
 	}
 }

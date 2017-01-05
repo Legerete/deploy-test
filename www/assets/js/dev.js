@@ -1,5 +1,70 @@
 $(function () {
 
+	kendo.data.binders.oneWayHtml = kendo.data.Binder.extend({
+		refresh: function () {
+			// do nothing
+		},
+		init: function(element, bindings, options) {
+			//call the base constructor
+			kendo.data.Binder.fn.init.call(this, element, bindings, options);
+
+			var that = this;
+			var value = that.bindings["oneWayHtml"].get(); //get the value from the View-Model
+
+			$(that.element).html(value);
+
+			// listen for the change event of the element
+			$(that.element).on("change keyup click dragend", function() {
+				that.change(); //call the change function
+			});
+		},
+		change: function() {
+			var value = $(this.element).html();
+			this.bindings["oneWayHtml"].set(value); //update the View-Model
+		}
+	});
+
+	kendo.data.binders.imgFromHtml = kendo.data.Binder.extend({
+		refresh: function () {
+			// do nothing
+		},
+		init: function(element, bindings, options) {
+			//call the base constructor
+			kendo.data.Binder.fn.init.call(this, element, bindings, options);
+			var that = this;
+
+			let uid = $(that.element).parent().data('uid');
+			let originalElement = $('#pdf-export-wrapper').find('[data-uid="' + uid + '"]');
+
+			kendo.drawing.drawDOM(originalElement, {})
+				.then(function(group) {
+					return kendo.drawing.exportImage(group);
+				})
+				.done(function(data) {
+					$(that.element).attr('src', data);
+				});
+
+			// listen for the change event of the element
+			$(that.element).on("change keyup click dragend", function() {
+				that.change(); //call the change function
+			});
+		},
+		change: function() {
+			var that = this;
+
+			let uid = $(that.element).parent().data('uid');
+			let originalElement = $('#pdf-export-wrapper').find('[data-uid="' + uid + '"]');
+
+			kendo.drawing.drawDOM(originalElement, {})
+				.then(function(group) {
+					return kendo.drawing.exportImage(group);
+				})
+				.done(function(data) {
+					$(that.element).attr('src', data);
+				});
+		}
+	});
+
 	// $('#page-content').resize(function () {
 	// 	resizeAppContent();
 	// 	console.log('resize');
@@ -523,8 +588,10 @@ $(function () {
 			avatarSmall: '',
 			avatarBig: '',
 			newAvatar: false,
+			color: null,
 			status: 'ok',
 		},
+
 		User: kendo.data.Model.define(this.user),
 		create: function (event, context) {
 			this.registerListeners();
@@ -739,11 +806,18 @@ $(function () {
 			status: 'ok',
 		},
 		Im: kendo.data.Model.define(this.im),
+
+		insertLayout: function (e) {
+			console.log('top', e, this);
+		},
 		create: function (event, context) {
 			var view = $(this.settings.view);
 			var createUrl = view.data('source-create');
 			var readUrl = view.data('source-read');
 			var updateUrl = view.data('source-update');
+			var addPageDialog = $('#im-add-page-modal');
+			var availablePagesReadUrl = view.data('available-pages-source-read');
+			var readPageLayoutUrl = view.data('read-page-layout-url');
 			var that = this;
 
 			this.settings.viewModel = kendo.observable({
@@ -776,11 +850,12 @@ $(function () {
 				setImModel: function (model) {
 					this.set('im', model);
 				},
+
 				readImModel: function () {
 					var viewModel = this;
 					return $.getJSON(readUrl+ImId, {}, function (data) {
-						var panel = SPA.panelsDataSource.getByUid(that.settings.panelUid);
-						panel.set('name', that.settings.name + ' - ' + data.name + ' ' + data.surname);
+						// var panel = SPA.panelsDataSource.getByUid(that.settings.panelUid);
+						// panel.set('name', that.settings.name + ' - ' + data.name + ' ' + data.surname);
 						viewModel.createImModel(data);
 						// SPA.refreshPanels();
 					})
@@ -803,12 +878,21 @@ $(function () {
 					$('#pdf-scroller').css('transform', 'scaleY(.2) scaleX(' + scale + ')');
 				},
 				computeScrollerScale: function () {
-					let originWidth = $('#pdf-export').width();
-					let originWrapperWidth = $('#pdf-export-wrapper').innerWidth();
-					return originWrapperWidth / originWidth;
+					// let originWidth = $('#pdf-export').width();
+					let originWidth = this.get('$pdfExport').width();
+					// let originWrapperWidth = $('#pdf-export-wrapper').innerWidth();
+					let originWrapperWidth = this.get('$pdfExportWrapper').innerWidth();
+					let scale = originWrapperWidth / originWidth;
+
+					if (scale > 0.3859416) {
+						scale = 0.3859416;
+					}
+					this.set('scrollerScale', scale);
+					return scale;
 				},
 				changeScrollerWrapperWidth: function (width) {
-					$('#pdf-scroller').width(width);
+					this.get('$pdfScroller').width(width);
+					// $('#pdf-scroller').width(width);
 				},
 				changeScrollerWidth: function (scale) {
 					if (!scale) {
@@ -818,184 +902,152 @@ $(function () {
 					let scroller = $('#scroller-scrollbar').width(width * scale);
 				},
 				scrollerOffset: 0,
+				scrollerScale: 0,
 				pdfExportTranslateX: 0,
 				pdfExport: $('#pdf-export'),
 				changeExportWrapperWidth: function () {
 					let width = this.computeExportWrapperWidth();
-					$('#pdf-export').width(width);
+					this.get('$pdfExport').width(width);
+					// $('#pdf-export').width(width);
 					this.trigger('exportWrapperWidthChanged', width);
 				},
 				computeExportWrapperWidth: function () {
-					let items = $('#pdf-export').find('.page, .new-page');
-					let width = 0;
-					$.each(items, function (index, item) {
-						width += $(item).outerWidth(true);
-					});
-					return width;
+					let items = this.pagesDataSource.data();
+
+					// sirka zahardcodovana kvuli performance, zjistovani sirky kazdeho elementu je hrozne narocne
+					let width = items.length * 605;
+
+					return width - 9;
 				},
 				scrollerDataBound: function(e) {
 
 				},
-				pagesDataSource: [
-					{
-						id: 1,
-						content: 'Page One',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
+				pageModel: kendo.data.Model.define({
+					id: 0,
+					content: '',
+					isFirst: function (e) {
+						return this.uid === this.parent()[0].uid;
 					},
-					{
-						id: 2,
-						content: 'Page Two',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
+					isNotFirst: function (e) {
+						return this.uid !== this.parent()[0].uid;
+					}
+				}),
+				page: kendo.data.Model.define(this.pageModel),
+				insertLayout: function (e) {
+					console.log('vm', e, this);
+				},
+				pagesDataSource: new kendo.data.DataSource({
+					batch: true
+				}),
+
+				openAddPageDialog: function (e) {
+					addPageDialog.modal('show');
+				},
+
+				addSelectedPage: function () {
+					let availablePagesListView = addPageDialog.find('.k-listview').data('kendoListView');
+					let selectedItem = availablePagesListView.select();
+					let pageLayout = availablePagesListView.dataSource.getByUid(selectedItem.data('uid'));
+					var that = this;
+
+					$.get(readPageLayoutUrl, {
+							layout: pageLayout.file
 						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
+						function (response) {
+							let model = new that.pageModel({
+								content: response.layout
+							});
+
+							that.pagesDataSource.add(model);
+							that.changeExportWrapperWidth();
+
+							addPageDialog.modal('hide');
 						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
+					);
+				},
+
+				lastSelectedPage: null,
+
+				boundPages: function (e) {
+					e.preventDefault();
+					// console.log('bound pages', e);
+				},
+
+				bindPages: function (e) {
+					// if (e.index == 5) {
+					// 	e.preventDefault();
+					// }
+					// $(e.sender.wrapper).data('kendoListView').refresh();
+					console.log('bind pages', e, this);
+				},
+
+				changedPage: function (e) {
+					var that = this;
+					// console.log('changedPage', e);
+					let listView = $(e.sender.wrapper).data('kendoListView');
+					let item = $(listView.select());
+					let uid = item.data('uid');
+					let itemModel = this.pagesDataSource.getByUid(uid);
+					let pages = $(e.sender.wrapper).find('.page');
+
+					pages.each( function(index, page) {
+						console.log($(page).data('uid'), uid)
+						if ($(page).data('uid') !== uid) {
+							console.log(page);
+							kendo.destroy(page);
+							kendo.unbind(page);
+						} else if (that.get('lastSelectedPage') !== uid) {
+							kendo.bind(item, this.pagesDataSource);
 						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
-						}
-					},
-					{
-						id: 3,
-						content: 'Page Third',
-						isFirst: function (e) {
-							return this.id === this.parent()[0].id;
-						},
-						isNotFirst: function (e) {
-							return this.id !== this.parent()[0].id;
+					});
+
+					// if (this.get('lastSelectedPage') !== uid) {
+					// 	// kendo.destroy(item);
+					// 	// kendo.unbind(item);
+					// 	console.log('bind');
+					//
+					// 	let editors = item.find('[data-editor]');
+					// 	editors.each( function(index, editableItem) {
+					// 		let $editableItem = $(editableItem);
+					// 		// kendo.unbind($editableItem);
+					// 		// kendo.destroy($editableItem);
+					// 		$editableItem.attr('data-role', $editableItem.attr('data-editor'));
+					// 	});
+					// 	kendo.bind(item, this.pagesDataSource);
+					// 	this.set('lastSelectedPage', uid)
+					// }
+				},
+
+				addPage: function (e) {
+					let layout = $(e.target.getAttribute('data-layout'));
+					let model = new this.pageModel({
+						content: layout.html()
+					});
+
+					this.pagesDataSource.add(model);
+					this.changeExportWrapperWidth();
+				},
+
+				// availablePagesDataSource: [],
+
+				availablePagesDataSource: new kendo.data.DataSource({
+					transport: {
+						read: {
+							type: 'json',
+							url: availablePagesReadUrl
 						}
 					}
-				],
+				}),
+
 				downloadPdf: function () {
-					if (! (this.pagesDataSource.length % 4) !== 0) {
+					if (! ((this.pagesDataSource.data().length % 4) === 0)) {
 						noty({text: 'Number of pages must be divisible by four.', timeout:2500});
+						return;
 					}
 
 					// Convert the DOM element to a drawing using kendo.drawing.drawDOM
 					kendo.drawing.drawDOM($("#pdf-export"), {
-							forcePageBreak: ".new-page",
+							forcePageBreak: ".page:not(:first-child)",
 						})
 						.then(function(group) {
 							// Render the result as a PDF file
@@ -1015,6 +1067,7 @@ $(function () {
 				}
 			});
 			this.registerListeners();
+			kendo.bind(addPageDialog, this.settings.viewModel);
 
 			// if (ImId) {
 			// 	this.settings.viewModel.readImModel();
@@ -1027,18 +1080,36 @@ $(function () {
 			var that = this;
 
 			SPA.bind('spa.addedPanel', function (panel) {
+				if (panel.type === 'information-memorandum-edit') {
+					panel.viewModel.set('$pdfExport', $('#pdf-export'));
+					panel.viewModel.set('$pdfScroller', $('#pdf-scroller'));
+					panel.viewModel.set('$pdfExportWrapper', $('#pdf-export-wrapper'));
+					panel.viewModel.set('$pdfScrollerWrapper', $('#pdf-scroller-wrapper'));
+					panel.viewModel.set('$scrollerScrollBar', $('#scroller-scrollbar'));
+				}
+
 				that.settings.panelUid = panel.uid;
 			});
+
 			SPA.bind('spa.afterPanelViewChange', function (panel) {
+				that.settings.viewModel.set('$pdfExport', $('#pdf-export'));
+				that.settings.viewModel.set('$pdfScroller', $('#pdf-scroller'));
+				that.settings.viewModel.set('$pdfExportWrapper', $('#pdf-export-wrapper'));
+				that.settings.viewModel.set('$pdfScrollerWrapper', $('#pdf-scroller-wrapper'));
+				that.settings.viewModel.set('$scrollerScrollBar', $('#scroller-scrollbar'));
+
+
 				that.settings.viewModel.changeExportWrapperWidth();
-				let scale = that.settings.viewModel.computeScrollerScale();
 				let pdfExportWrapper = document.getElementById('pdf-export-wrapper');
-				const pdfExport = $('#pdf-export');
+				let $pdfExportWrapper = that.settings.viewModel.get('$pdfExportWrapper');
+				// const pdfExport = $('#pdf-export');
+				const $pdfExport = that.settings.viewModel.get('$pdfExport');
 
 				if (pdfExportWrapper) {
 					pdfExportWrapper.addEventListener("wheel", function (e) {
+						let scale = that.settings.viewModel.get('scrollerScale');
 						let currentTranslateX = that.settings.viewModel.get('pdfExportTranslateX');
-						let maxTranslateX = 0 - ($('#pdf-export').outerWidth() - $('#pdf-export-wrapper').outerWidth());
+						let maxTranslateX = 0 - ($pdfExport.outerWidth() - $pdfExportWrapper.outerWidth());
 
 						if (e.deltaX) {
 							e.preventDefault();
@@ -1049,6 +1120,7 @@ $(function () {
 							} else if (currentTranslateX < maxTranslateX) {
 								currentTranslateX = maxTranslateX;
 							}
+
 							that.settings.viewModel.set('pdfExportTranslateX', currentTranslateX);
 							that.settings.viewModel.set('scrollerOffset', 0 - (currentTranslateX * scale));
 						}
@@ -1058,9 +1130,9 @@ $(function () {
 
 			that.settings.viewModel.bind('exportWrapperWidthChanged', function(width) {
 				let scale = that.settings.viewModel.computeScrollerScale();
-				let pdfScrollerWrapper = $("#pdf-scroller-wrapper");
-				let scrollerScrollBar = $('#scroller-scrollbar');
-				let pdfExport = $('#pdf-export');
+				let scrollerScrollBar = that.settings.viewModel.get('$scrollerScrollBar');
+				let pdfScrollerWrapper = that.settings.viewModel.get('$pdfScrollerWrapper');
+				let pdfExport = that.settings.viewModel.get('$pdfExport');
 
 				that.settings.viewModel.changeScrollerWrapperWidth(width);
 				that.settings.viewModel.changeScrollerScale(scale);
@@ -1089,7 +1161,8 @@ $(function () {
 						$(e.initialTarget).removeClass("hidden");
 					},
 					drag: function (e) {
-						let offset = $(e.sender.hint).offset().left - pdfScrollerWrapper.offset().left;
+						let scale = that.settings.viewModel.get('scrollerScale');
+						let offset = $(e.sender.hint).offset().left - that.settings.viewModel.get('$pdfScrollerWrapper').offset().left;
 						let position = 0 - (offset / scale);
 						that.settings.viewModel.set('pdfExportTranslateX', position);
 					}
@@ -1101,7 +1174,7 @@ $(function () {
 					} else if (e.field === 'scrollerOffset') {
 						// @todo nejaky bug, chtelo by prozkoumat kvuli preneseni zateze na GPU
 						// scrollerScrollBar.css({transform: 'translateX(' + that.settings.viewModel.get('scrollerOffset') + 'px)'})
-						scrollerScrollBar.css({left: that.settings.viewModel.get('scrollerOffset')})
+						that.settings.viewModel.get('$scrollerScrollBar').css({left: that.settings.viewModel.get('scrollerOffset')})
 					}
 				});
 

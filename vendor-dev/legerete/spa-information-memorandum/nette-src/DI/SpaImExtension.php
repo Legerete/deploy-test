@@ -13,6 +13,7 @@ use Legerete\Security\Permission;
 use Legerete\Spa\Collection\SpaTemplatesControlsCollection;
 use Nette\DI\Compiler;
 use Nette\DI\CompilerExtension;
+use Nette\DI\ContainerBuilder;
 use Nette\NotImplementedException;
 use Nette\Security\IAuthorizator;
 
@@ -21,15 +22,23 @@ class SpaImExtension extends CompilerExtension
 	use DoctrineAnnotationDriverExtensionHelperTrait;
 
 	private $defaults = [
-		'timeZone' => null // date_default_timezone_get()
+		'templatesDir' => '%appDir%/templates/spa-information-memorandum',
+		'thumbnailsDir' => '/assets/spa-information-memorandum',
 	];
 
 	public function loadConfiguration()
 	{
+		/**
+		 * @var $builder ContainerBuilder
+		 */
 		$builder = $this->getContainerBuilder();
+		$config = $builder->expand($this->getConfig($this->defaults));
 
 		// Load services definitions for extension
 		Compiler::loadDefinitions($builder, $this->loadFromFile(__DIR__ . '/config.neon')['services'], $this->name);
+
+		$modelService = $builder->getDefinition($this->prefix('imModelService'));
+		$modelService->addSetup('setTemplatesDirectory', [$config['templatesDir']]);
 
 		$presenterFactory = $builder->getDefinition('application.presenterFactory');
 		$presenterFactory->addSetup('setMapping', [['LeSpaIm' => 'Legerete\Spa\KendoIm\*Module\Presenters\*Presenter']]);
@@ -64,6 +73,8 @@ class SpaImExtension extends CompilerExtension
 
 		$templatesCollection = $builder->getDefinition($builder->getByType(SpaTemplatesControlsCollection::class));
 		$templatesCollection->addSetup('set', ['imTemplate', $this->prefix('@imTemplate')]);
+
+		$builder->getDefinition($this->prefix('imPresenter'))->addSetup('setPageLayoutPath', [$config['templatesDir']]);
 	}
 
 	public function beforeCompile()

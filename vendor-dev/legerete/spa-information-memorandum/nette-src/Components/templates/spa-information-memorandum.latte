@@ -5,9 +5,9 @@
 {capture $avatarLoad}assets/images/svg-loaders/bars.svg{/capture}
 
 <script id="spa-view-information-memorandums" type="text/x-kendo-template"
-        {if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'readAll')}
-        data-source-read="{plink LeSpaIm:Im:Im:}?do=read"
-        {/if}
+		{if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'readAll')}
+		data-source-read="{plink LeSpaIm:Im:Im:}?do=read"
+		{/if}
 >
 	{if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'readAll') || $user->isAllowed('LeSpaIm:Im:Im', 'readMy')}
 		<div data-role="grid"
@@ -40,6 +40,54 @@
 	{/if}
 </script>
 
+{*
+ * Add page popup
+ *}
+<div class="modal fade" id="im-add-page-modal" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">{_im.addPageDialogTitle}</h4>
+			</div>
+			<div class="modal-body">
+				<div>
+				<div data-role="listview"
+					data-template="im-add-page-modal-item"
+					data-selectable="single"
+					data-bind="source: availablePagesDataSource">
+				</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-success" data-bind="events: { click: addSelectedPage}">{_im.addPage}</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+{*
+ * Add page modal item template
+ *}
+<script id="im-add-page-modal-item" type="text/x-kendo-template">
+	<div class="k-content">
+		<img src="/assets/spa-information-memorandum/#=name#.jpg" alt="#=name#">
+	</div>
+</script>
+
+{*
+ * Preview bar template
+ *}
+<script id="im-pages-template" type="text/x-kendo-template">
+	<div data-bind="{*css: { page: isFirst, new-page: isNotFirst}, *}events: { select: changedPage}"  class="page">
+		<div data-bind="oneWayHtml: content" class="k-content"></div>
+	</div>
+</script>
+
+{*
+ * Edit bar template
+ *}
 <script id="spa-view-information-memorandum-edit" type="text/x-kendo-template"
         data-user-id="{$user->getId()}"
 		{if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'create')}
@@ -48,13 +96,21 @@
 			data-source-read="{plink LeSpaIm:Im:Im:}?do=read&id="
 		{if $user->isAllowed('LeSpaIm:Im:Im', 'manage') || $user->isAllowed('LeSpaIm:Im:Im', 'update')}
 			data-source-update="{plink LeSpaIm:Im:Im:}?do=update"
+			data-available-pages-source-read="{plink LeSpaIm:Im:Im:}?do=readAvailablePages"
+			data-read-page-layout-url="{plink LeSpaIm:Im:Im:}?do=readPageLayout"
 		{/if}
 >
 	<div id="im-edit">
 		<h3 class="content-box-header">
 			<div class="header-buttons">
-				<a class="btn btn-success btn-xs" data-bind="click: downloadPdf"><span class="glyph-icon icon-save"></span> {_im.im.downloadPdf}</a>
-				<a class="btn btn-success btn-xs" data-bind="click: saveIm, visible: isDirty"><span class="glyph-icon icon-save"></span> {_im.im.save}</a>
+				<a class="btn btn-success btn-xs pull-left" data-bind="click: openAddPageDialog"><span class="glyph-icon icon-plus"></span> {_im.im.addPage}</a>
+
+				<a class="btn btn-success btn-xs pull-left" data-bind="click: addPage" data-layout="#im-pagelayout-cover"><span class="glyph-icon icon-plus"></span> {_im.im.addPageCover}</a>
+
+				<a class="btn btn-success btn-xs pull-left" data-bind="click: addPage" data-layout="#im-pagelayout-table"><span class="glyph-icon icon-plus"></span> {_im.im.addPageTable}</a>
+
+				<a class="btn btn-success btn-xs pull-right" data-bind="click: downloadPdf"><span class="glyph-icon icon-download"></span> {_im.im.downloadPdf}</a>
+				<a class="btn btn-success btn-xs pull-right" data-bind="click: saveIm, visible: isDirty"><span class="glyph-icon icon-save"></span> {_im.im.save}</a>
 			</div>
 		</h3>
 		<div class="row">
@@ -72,7 +128,8 @@
 					<div id="pdf-export" class="row"
 							data-role="listview"
 							data-template="im-pages-template"
-							data-bind="source: pagesDataSource"
+							data-bind="source: pagesDataSource, events: { change: changedPage, dataBound: boundPages, dataBinding: bindPages}"
+							data-selectable="single"
 					>
 					</div>
 				</div>
@@ -81,26 +138,49 @@
 	</div>
 </script>
 
-<script id="im-pages-template" type="text/x-kendo-template">
-	<div data-bind="css: { page: isFirst, new-page: isNotFirst}">
-		<div data-role="editor"
+<script id="im-pagelayout-table" type="text/x-kendo-template">
+	<div class="im-pagelayout-table">
+		<div
+			{*data-editable="true"*}
+			{*data-role="editor"*}
+			data-editor="editor"
 			data-immutables="true"
-			data-tools="['bold',
-				'italic',
-				'underline',
-				'strikethrough',
-				'justifyLeft',
-				'justifyCenter',
-				'justifyRight',
-				'justifyFull']"
-		     data-bind="value: content"
-		>
+			data-tools="['createTable', 'addRowAbove',
+						'addRowBelow',
+						'addColumnLeft',
+						'addColumnRight',
+						'deleteRow',
+						'deleteColumn']">
+			<table style="width: 100%">
+				<tbody>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</div>
 </script>
 
 <script id="im-pages-scroller" type="text/x-kendo-template">
-	<div data-bind="css: { page: isFirst, new-page: isNotFirst}">
+	<div {*data-bind="css: { page: isFirst, new-page: isNotFirst}"*} class="page">
 		<div data-bind="html: content"></div>
 	</div>
 </script>

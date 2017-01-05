@@ -254,9 +254,11 @@ class AclModelService
 	 */
 	private function createPrivileges(RoleEntity $role, array $privileges = []) : array
 	{
+			\Tracy\Debugger::barDump($privileges);
 		$privilegesEntities = [];
 
 		foreach ($privileges as $resourceName => $privilegeAction) {
+			\Tracy\Debugger::barDump($resourceName);
 			$resource = $this->resourceRepository()->findOneBy(['slug' => $resourceName]);
 
 			foreach ($privilegeAction as $privilegeName => $allowed) {
