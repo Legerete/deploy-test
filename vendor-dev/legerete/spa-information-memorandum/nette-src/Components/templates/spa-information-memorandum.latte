@@ -101,35 +101,39 @@
 		{/if}
 >
 	<div id="im-edit">
-		<h3 class="content-box-header">
-			<div class="header-buttons">
-				<a class="btn btn-success btn-xs pull-left" data-bind="click: openAddPageDialog"><span class="glyph-icon icon-plus"></span> {_im.im.addPage}</a>
-
-				<a class="btn btn-success btn-xs pull-left" data-bind="click: addPage" data-layout="#im-pagelayout-cover"><span class="glyph-icon icon-plus"></span> {_im.im.addPageCover}</a>
-
-				<a class="btn btn-success btn-xs pull-left" data-bind="click: addPage" data-layout="#im-pagelayout-table"><span class="glyph-icon icon-plus"></span> {_im.im.addPageTable}</a>
-
-				<a class="btn btn-success btn-xs pull-right" data-bind="click: downloadPdf"><span class="glyph-icon icon-download"></span> {_im.im.downloadPdf}</a>
-				<a class="btn btn-success btn-xs pull-right" data-bind="click: saveIm, visible: isDirty"><span class="glyph-icon icon-save"></span> {_im.im.save}</a>
-			</div>
-		</h3>
 		<div class="row">
-			<div class="col-lg-12">
-				<div id="pdf-scroller-wrapper">
-					<div id="scroller-scrollbar" class="draggable"></div>
-					<div id="pdf-scroller"
-							data-role="listview"
-							data-template="im-pages-scroller"
-							data-bind="source: pagesDataSource, events: { dataBound: scrollerDataBound}"
-					>
-					</div>
+			<div class="col-lg-8">
+				<div id="page-editor" class="page">
+
 				</div>
-				<div id="pdf-export-wrapper">
-					<div id="pdf-export" class="row"
-							data-role="listview"
-							data-template="im-pages-template"
-							data-bind="source: pagesDataSource, events: { change: changedPage, dataBound: boundPages, dataBinding: bindPages}"
-							data-selectable="single"
+				{*<div id="pdf-export-wrapper">*}
+					{*<div id="pdf-export" class="row"*}
+							{*data-role="listview"*}
+							{*data-template="im-pages-template"*}
+							{*data-bind="source: pagesDataSource, events: { change: changedPage, dataBound: boundPages, dataBinding: bindPages}"*}
+							{*data-selectable="single"*}
+					{*>*}
+					{*</div>*}
+				{*</div>*}
+			</div>
+			<div class="col-lg-4">
+				<div class="header-buttons">
+					<a class="btn btn-success btn-xs pull-left" data-bind="click: openAddPageDialog"><span class="glyph-icon icon-plus"></span> {_im.im.addPage}</a>
+
+					{*<a class="btn btn-success btn-xs pull-left" data-bind="click: addPage" data-layout="#im-pagelayout-cover"><span class="glyph-icon icon-plus"></span> {_im.im.addPageCover}</a>*}
+
+					{*<a class="btn btn-success btn-xs pull-left" data-bind="click: addPage" data-layout="#im-pagelayout-table"><span class="glyph-icon icon-plus"></span> {_im.im.addPageTable}</a>*}
+
+					<a class="btn btn-success btn-xs pull-right" data-bind="click: downloadPdf"><span class="glyph-icon icon-download"></span> {_im.im.downloadPdf}</a>
+					<a class="btn btn-success btn-xs pull-right" data-bind="click: saveIm, visible: isDirty"><span class="glyph-icon icon-save"></span> {_im.im.save}</a>
+				</div>
+
+				<div id="pdf-scroller-wrapper">
+					{*<div id="scroller-scrollbar" class="draggable"></div>*}
+					<div id="pdf-scroller"
+					     data-role="listview"
+					     data-template="im-pages-scroller"
+					     data-bind="source: pagesDataSource, events: { dataBound: scrollerDataBound}"
 					>
 					</div>
 				</div>
@@ -142,8 +146,8 @@
 	<div class="im-pagelayout-table">
 		<div
 			{*data-editable="true"*}
-			{*data-role="editor"*}
-			data-editor="editor"
+			data-role="editor"
+			{*data-editor="editor"*}
 			data-immutables="true"
 			data-tools="['createTable', 'addRowAbove',
 						'addRowBelow',

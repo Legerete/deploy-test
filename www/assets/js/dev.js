@@ -872,10 +872,10 @@ $(function () {
 					return im;
 				},
 				changeScrollerScale: function (scale) {
-					if (!scale) {
-						let scale = this.computeScrollerScale();
-					}
-					$('#pdf-scroller').css('transform', 'scaleY(.2) scaleX(' + scale + ')');
+					// if (!scale) {
+					// 	let scale = this.computeScrollerScale();
+					// }
+					// $('#pdf-scroller').css('transform', 'scaleY(.2) scaleX(' + scale + ')');
 				},
 				computeScrollerScale: function () {
 					// let originWidth = $('#pdf-export').width();
@@ -888,18 +888,18 @@ $(function () {
 						scale = 0.3859416;
 					}
 					this.set('scrollerScale', scale);
-					return scale;
+					return 0.2;
 				},
 				changeScrollerWrapperWidth: function (width) {
-					this.get('$pdfScroller').width(width);
+					// this.get('$pdfScroller').width(width);
 					// $('#pdf-scroller').width(width);
 				},
 				changeScrollerWidth: function (scale) {
-					if (!scale) {
-						let scale = this.computeScrollerScale();
-					}
-					let width = $('#pdf-export-wrapper').innerWidth();
-					let scroller = $('#scroller-scrollbar').width(width * scale);
+					// if (!scale) {
+					// 	let scale = this.computeScrollerScale();
+					// }
+					// let width = $('#pdf-export-wrapper').innerWidth();
+					// let scroller = $('#scroller-scrollbar').width(width * scale);
 				},
 				scrollerOffset: 0,
 				scrollerScale: 0,
@@ -950,20 +950,25 @@ $(function () {
 					let pageLayout = availablePagesListView.dataSource.getByUid(selectedItem.data('uid'));
 					var that = this;
 
-					$.get(readPageLayoutUrl, {
-							layout: pageLayout.file
-						},
-						function (response) {
-							let model = new that.pageModel({
-								content: response.layout
-							});
+					console.log(typeof pageLayout);
+					if (typeof pageLayout !== 'undefined') {
+							$.get(readPageLayoutUrl, {
+									layout: pageLayout.file
+								},
+								function (response) {
+									let model = new that.pageModel({
+										content: response.layout
+									});
 
-							that.pagesDataSource.add(model);
-							that.changeExportWrapperWidth();
+									that.pagesDataSource.add(model);
+									// that.changeExportWrapperWidth();
 
-							addPageDialog.modal('hide');
-						}
-					);
+									addPageDialog.modal('hide');
+								}
+							);
+					} else {
+						noty({text: 'Select any template.', timeout:2500});
+					}
 				},
 
 				lastSelectedPage: null,
@@ -978,7 +983,7 @@ $(function () {
 					// 	e.preventDefault();
 					// }
 					// $(e.sender.wrapper).data('kendoListView').refresh();
-					console.log('bind pages', e, this);
+					// console.log('bind pages', e, this);
 				},
 
 				changedPage: function (e) {
@@ -990,16 +995,16 @@ $(function () {
 					let itemModel = this.pagesDataSource.getByUid(uid);
 					let pages = $(e.sender.wrapper).find('.page');
 
-					pages.each( function(index, page) {
-						console.log($(page).data('uid'), uid)
-						if ($(page).data('uid') !== uid) {
-							console.log(page);
-							kendo.destroy(page);
-							kendo.unbind(page);
-						} else if (that.get('lastSelectedPage') !== uid) {
-							kendo.bind(item, this.pagesDataSource);
-						}
-					});
+					// pages.each( function(index, page) {
+						// console.log($(page).data('uid'), uid)
+						// if ($(page).data('uid') !== uid) {
+						// 	console.log(page);
+						// 	kendo.destroy(page);
+						// 	kendo.unbind(page);
+						// } else if (that.get('lastSelectedPage') !== uid) {
+						// 	kendo.bind(item, this.pagesDataSource);
+						// }
+					// });
 
 					// if (this.get('lastSelectedPage') !== uid) {
 					// 	// kendo.destroy(item);
@@ -1045,11 +1050,15 @@ $(function () {
 						return;
 					}
 
+
+
+					$('#pdf-scroller').css({ transform: 'none'});
 					// Convert the DOM element to a drawing using kendo.drawing.drawDOM
-					kendo.drawing.drawDOM($("#pdf-export"), {
+					kendo.drawing.drawDOM($("#pdf-scroller"), {
 							forcePageBreak: ".page:not(:first-child)",
 						})
 						.then(function(group) {
+							console.log('scale up');
 							// Render the result as a PDF file
 							return kendo.drawing.exportPDF(group, {
 								paperSize: "A4",
@@ -1063,7 +1072,9 @@ $(function () {
 								fileName: "IM.pdf"
 								// proxyURL: "//demos.telerik.com/kendo-ui/service/export"
 							});
+							$('#pdf-scroller').css({ transform: 'scaleY(0.2) scaleX(0.2)'});
 						});
+
 				}
 			});
 			this.registerListeners();
@@ -1081,104 +1092,108 @@ $(function () {
 
 			SPA.bind('spa.addedPanel', function (panel) {
 				if (panel.type === 'information-memorandum-edit') {
-					panel.viewModel.set('$pdfExport', $('#pdf-export'));
+					// panel.viewModel.set('$pdfExport', $('#pdf-export'));
 					panel.viewModel.set('$pdfScroller', $('#pdf-scroller'));
-					panel.viewModel.set('$pdfExportWrapper', $('#pdf-export-wrapper'));
+					// panel.viewModel.set('$pdfExportWrapper', $('#pdf-export-wrapper'));
 					panel.viewModel.set('$pdfScrollerWrapper', $('#pdf-scroller-wrapper'));
-					panel.viewModel.set('$scrollerScrollBar', $('#scroller-scrollbar'));
+					// panel.viewModel.set('$scrollerScrollBar', $('#scroller-scrollbar'));
 				}
 
 				that.settings.panelUid = panel.uid;
 			});
 
 			SPA.bind('spa.afterPanelViewChange', function (panel) {
-				that.settings.viewModel.set('$pdfExport', $('#pdf-export'));
-				that.settings.viewModel.set('$pdfScroller', $('#pdf-scroller'));
-				that.settings.viewModel.set('$pdfExportWrapper', $('#pdf-export-wrapper'));
-				that.settings.viewModel.set('$pdfScrollerWrapper', $('#pdf-scroller-wrapper'));
-				that.settings.viewModel.set('$scrollerScrollBar', $('#scroller-scrollbar'));
+				var height = $('#im-edit').height() - 55;
 
+				// $('#pdf-scroller-wrapper').animate({ 'height': height});
+				$('#pdf-scroller-wrapper').height(height);
+			// 	that.settings.viewModel.set('$pdfExport', $('#pdf-export'));
+			// 	that.settings.viewModel.set('$pdfScroller', $('#pdf-scroller'));
+			// 	that.settings.viewModel.set('$pdfExportWrapper', $('#pdf-export-wrapper'));
+			// 	that.settings.viewModel.set('$pdfScrollerWrapper', $('#pdf-scroller-wrapper'));
+			// 	that.settings.viewModel.set('$scrollerScrollBar', $('#scroller-scrollbar'));
+			//
+			//
+			// 	that.settings.viewModel.changeExportWrapperWidth();
+			// 	let pdfExportWrapper = document.getElementById('pdf-export-wrapper');
+			// 	let $pdfExportWrapper = that.settings.viewModel.get('$pdfExportWrapper');
+			// 	// const pdfExport = $('#pdf-export');
+			// 	const $pdfExport = that.settings.viewModel.get('$pdfExport');
 
-				that.settings.viewModel.changeExportWrapperWidth();
-				let pdfExportWrapper = document.getElementById('pdf-export-wrapper');
-				let $pdfExportWrapper = that.settings.viewModel.get('$pdfExportWrapper');
-				// const pdfExport = $('#pdf-export');
-				const $pdfExport = that.settings.viewModel.get('$pdfExport');
+				// if (pdfExportWrapper) {
+				// 	pdfExportWrapper.addEventListener("wheel", function (e) {
+				// 		let scale = that.settings.viewModel.get('scrollerScale');
+				// 		let currentTranslateX = that.settings.viewModel.get('pdfExportTranslateX');
+				// 		let maxTranslateX = 0 - ($pdfExport.outerWidth() - $pdfExportWrapper.outerWidth());
+				//
+				// 		if (e.deltaX) {
+				// 			e.preventDefault();
+				// 			currentTranslateX += e.wheelDeltaX;
+				//
+				// 			if (currentTranslateX > 0) {
+				// 				currentTranslateX = 0;
+				// 			} else if (currentTranslateX < maxTranslateX) {
+				// 				currentTranslateX = maxTranslateX;
+				// 			}
+				//
+				// 			that.settings.viewModel.set('pdfExportTranslateX', currentTranslateX);
+				// 			that.settings.viewModel.set('scrollerOffset', 0 - (currentTranslateX * scale));
+				// 		}
+				// 	});
+				// }
+			// });
 
-				if (pdfExportWrapper) {
-					pdfExportWrapper.addEventListener("wheel", function (e) {
-						let scale = that.settings.viewModel.get('scrollerScale');
-						let currentTranslateX = that.settings.viewModel.get('pdfExportTranslateX');
-						let maxTranslateX = 0 - ($pdfExport.outerWidth() - $pdfExportWrapper.outerWidth());
+			// that.settings.viewModel.bind('exportWrapperWidthChanged', function(width) {
+				// let scale = that.settings.viewModel.computeScrollerScale();
+				// let scrollerScrollBar = that.settings.viewModel.get('$scrollerScrollBar');
+				// let pdfScrollerWrapper = that.settings.viewModel.get('$pdfScrollerWrapper');
+				// let pdfExport = that.settings.viewModel.get('$pdfExport');
 
-						if (e.deltaX) {
-							e.preventDefault();
-							currentTranslateX += e.wheelDeltaX;
+				// that.settings.viewModel.changeScrollerWrapperWidth(width);
+				// that.settings.viewModel.changeScrollerScale(scale);
 
-							if (currentTranslateX > 0) {
-								currentTranslateX = 0;
-							} else if (currentTranslateX < maxTranslateX) {
-								currentTranslateX = maxTranslateX;
-							}
+				// $("#scroller-scrollbar.draggable").kendoDraggable({
+				// 	hint: function(element) {
+				// 		return element.clone();
+				// 	},
+				// 	axis: 'x',
+				// 	cursor: 'move',
+				// 	// autoScroll: true,
+				// 	container: pdfScrollerWrapper,
+				// 	dragstart: function (e) {
+				// 		$(e.initialTarget).addClass("hidden");
+				// 	},
+				// 	dragend: function (e) {
+				// 		let clone = $(e.sender.hint);
+				// 		let containerOffset = pdfScrollerWrapper.offset().left;
+				// 		let offsetScroller = clone.offset().left - containerOffset;
+				// 		clone.hide();
+				// 		if (offsetScroller < 0) {
+				// 			offsetScroller = 0;
+				// 		}
+				// 		that.settings.viewModel.set('scrollerOffset', offsetScroller);
+				//
+				// 		$(e.initialTarget).removeClass("hidden");
+				// 	},
+				// 	drag: function (e) {
+				// 		let scale = that.settings.viewModel.get('scrollerScale');
+				// 		let offset = $(e.sender.hint).offset().left - that.settings.viewModel.get('$pdfScrollerWrapper').offset().left;
+				// 		let position = 0 - (offset / scale);
+				// 		that.settings.viewModel.set('pdfExportTranslateX', position);
+				// 	}
+				// });
 
-							that.settings.viewModel.set('pdfExportTranslateX', currentTranslateX);
-							that.settings.viewModel.set('scrollerOffset', 0 - (currentTranslateX * scale));
-						}
-					});
-				}
-			});
+				// that.settings.viewModel.bind('change',  function (e) {
+				// 	if (e.field === 'pdfExportTranslateX') {
+				// 		pdfExport.css({transform: 'translateX(' + that.settings.viewModel.get('pdfExportTranslateX') + 'px)'});
+				// 	} else if (e.field === 'scrollerOffset') {
+				// 		// @todo nejaky bug, chtelo by prozkoumat kvuli preneseni zateze na GPU
+				// 		// scrollerScrollBar.css({transform: 'translateX(' + that.settings.viewModel.get('scrollerOffset') + 'px)'})
+				// 		that.settings.viewModel.get('$scrollerScrollBar').css({left: that.settings.viewModel.get('scrollerOffset')})
+				// 	}
+				// });
 
-			that.settings.viewModel.bind('exportWrapperWidthChanged', function(width) {
-				let scale = that.settings.viewModel.computeScrollerScale();
-				let scrollerScrollBar = that.settings.viewModel.get('$scrollerScrollBar');
-				let pdfScrollerWrapper = that.settings.viewModel.get('$pdfScrollerWrapper');
-				let pdfExport = that.settings.viewModel.get('$pdfExport');
-
-				that.settings.viewModel.changeScrollerWrapperWidth(width);
-				that.settings.viewModel.changeScrollerScale(scale);
-
-				$("#scroller-scrollbar.draggable").kendoDraggable({
-					hint: function(element) {
-						return element.clone();
-					},
-					axis: 'x',
-					cursor: 'move',
-					// autoScroll: true,
-					container: pdfScrollerWrapper,
-					dragstart: function (e) {
-						$(e.initialTarget).addClass("hidden");
-					},
-					dragend: function (e) {
-						let clone = $(e.sender.hint);
-						let containerOffset = pdfScrollerWrapper.offset().left;
-						let offsetScroller = clone.offset().left - containerOffset;
-						clone.hide();
-						if (offsetScroller < 0) {
-							offsetScroller = 0;
-						}
-						that.settings.viewModel.set('scrollerOffset', offsetScroller);
-
-						$(e.initialTarget).removeClass("hidden");
-					},
-					drag: function (e) {
-						let scale = that.settings.viewModel.get('scrollerScale');
-						let offset = $(e.sender.hint).offset().left - that.settings.viewModel.get('$pdfScrollerWrapper').offset().left;
-						let position = 0 - (offset / scale);
-						that.settings.viewModel.set('pdfExportTranslateX', position);
-					}
-				});
-
-				that.settings.viewModel.bind('change',  function (e) {
-					if (e.field === 'pdfExportTranslateX') {
-						pdfExport.css({transform: 'translateX(' + that.settings.viewModel.get('pdfExportTranslateX') + 'px)'});
-					} else if (e.field === 'scrollerOffset') {
-						// @todo nejaky bug, chtelo by prozkoumat kvuli preneseni zateze na GPU
-						// scrollerScrollBar.css({transform: 'translateX(' + that.settings.viewModel.get('scrollerOffset') + 'px)'})
-						that.settings.viewModel.get('$scrollerScrollBar').css({left: that.settings.viewModel.get('scrollerOffset')})
-					}
-				});
-
-				that.settings.viewModel.changeScrollerWidth(scale);
+				// that.settings.viewModel.changeScrollerWidth(scale);
 			});
 
 			// @todo dopsat listener pro update uzivatele v případě shodnosti s updatovaným v jiném tabu,

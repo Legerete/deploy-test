@@ -539,6 +539,20 @@ html {
 }
 
 #im-edit {
+
+  padding: 10px;
+  min-height: inherit;
+  height: inherit;
+  background-color: #666666;
+  margin: -15px;
+
+  #page-editor {
+    width: 596px;
+    height: 842px;
+    background: #ffffff;
+    box-shadow: 5px 5px 10px 5px #333;
+  }
+
   .content-box-header {
     position: fixed;
     top: 111px;
@@ -548,10 +562,19 @@ html {
     background: #fff;
     height: 50px;
 
-    .header-buttons {
-      position: relative;
-      top: -12px;
-      width: 100%;
+  }
+  
+  .header-buttons {
+    background-color: #fff;
+    height: 30px;
+    padding: 15px;
+    position: absolute;
+    top: -10px;
+    border-radius: 0 0 3px 3px;
+    width: auto;
+
+    .btn-xs {
+      top: -11px;
     }
   }
 
@@ -559,13 +582,13 @@ html {
     background-color: $color-bg-secondary;
   }
 
-  #pdf-export, #pdf-scroller {
+  #pdf-scroller {
     border: 0;
     font-family: Arial;
     margin: 0;
     background-color: $color-bg-secondary;
 
-    div.page, div.new-page {
+    div.page {
       border: 0;
       border-radius: 0;
       width: 596px;
@@ -573,9 +596,10 @@ html {
       float:left;
       background-color: #fff;
       position: relative;
+      margin-bottom: 20px;
 
-      &:not(:first-child) {
-        margin-left: 9px;
+      &:last-child {
+        border-bottom: 0;
       }
 
       div[data-role="editor"] {
@@ -588,31 +612,22 @@ html {
         margin: 0;
       }
     }
-
-    div.new-page {
-      margin-left: 9px;
-    }
-  }
-
-  #pdf-export-wrapper, #pdf-scroller-wrapper {
-    overflow: hidden;
-    display: block;
-    width: 100%;
-    max-width: 100%;
-    background-color: $color-bg-secondary;
-  }
-
-  #pdf-export-wrapper {
-    height: 100%;
-    //margin-left: -8px;
   }
 
   #pdf-scroller-wrapper {
+    background-color: $color-bg-secondary;
+    display: block;
+    max-width: 100%;
     margin-top: 40px;
-    height: 168px;
-    overflow: hidden;
-    position: relative;
+    height: 0;
+    overflow: auto;
+    position: absolute;
+    right: 10px;
+    width: 140px;
     margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 2px;
+    top: -10px;
 
     .k-slider {
       position: absolute;
