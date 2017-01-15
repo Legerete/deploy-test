@@ -9,7 +9,9 @@
 Nginx_Install_Dir=/usr/local/nginx
 DATA_DIR=/data/www
 
-set -e
+echo "MYSQL_USER={$MYSQL_USER}"  > /etc/environment
+
+#set -e
 chown -R www.www $DATA_DIR
 
 if [[ -n "$PROXY_WEB" ]]; then

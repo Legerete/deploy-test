@@ -2,6 +2,10 @@
 # WARNING: it is CRITICAL that this file & directory are NOT accessible directly via a web browser!
 # https://nette.org/security-warning
 #
+
+includes:
+	- primary-config.php
+
 parameters:
 	devel: true
 	sentry:
@@ -14,16 +18,6 @@ parameters:
 		password:
 		secure: 'ssl'
 		port: 465
-
-	database:
-		host: 127.0.0.1
-		port: 3308
-		user: root
-		password: 08802e9a2ade49e40a55ff00faec
-		database: porta-invest-crm
-		debug: on
-		metadata:
-			App: %appDir%
 
 latte:
 	macros:
@@ -83,9 +77,9 @@ core:
 		debug: %database.debug%
 
 LeSignIn:
-	enableOtp: TRUE
+	enableOtp: false
 	allowForgotPassword: TRUE
-	loginAfterAuthorization: off
+	loginAfterAuthorization: on
 	loginRedirectPage: ':SPA:default'
 	logoutRedirectPage: ':LeSignIn:UserSignIn:Sign:in'
 
