@@ -22,7 +22,7 @@ class SpaImExtension extends CompilerExtension
 	use DoctrineAnnotationDriverExtensionHelperTrait;
 
 	private $defaults = [
-		'templatesDir' => '%appDir%/templates/spa-information-memorandum',
+		'templatesDir' => '%appDir%/templates/spa-information-memorandum/templates',
 		'thumbnailsDir' => '/assets/spa-information-memorandum',
 	];
 

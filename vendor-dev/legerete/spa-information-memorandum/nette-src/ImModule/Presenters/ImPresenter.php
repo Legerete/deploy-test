@@ -11,6 +11,7 @@ namespace Legerete\Spa\KendoIm\ImModule\Presenters;
 use Legerete\Security\Presenters\SecuredPresenter;
 use Legerete\Spa\KendoIm\Model\Service\ImModelService;
 use Nette\Http\Response;
+use Nette\Utils\FileSystem;
 use Tracy\ILogger;
 use Ublaboo\ImageStorage\ImageStorage;
 
@@ -133,8 +134,19 @@ class ImPresenter extends SecuredPresenter
 				'errorText' => 'Layout not found'
 			]);
 		}
+	}
 
-
+	/**
+	 * @privileges update|manage
+	 */
+	public function handleUploadImage()
+	{
+		$file = $this->getHttpRequest()->getFile('im-image');
+		$savedFile = $this->imageStorage->saveUpload($file, 'im');
+		$bigImage = $this->imageStorage->fromIdentifier([$savedFile->identifier, '1112x2000', 'fit']);
+		$this->sendJson([
+			'original' => $bigImage->createLink(),
+		]);
 	}
 
 	/**

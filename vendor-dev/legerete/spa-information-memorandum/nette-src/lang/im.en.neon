@@ -1,25 +1,4 @@
-users:
-	h1: Users
-	create: Create new user
-	edit: Edit
-	name: Name
-	surname: Surname
-	phone: Phone
-
-user:
-	h1: User
-	current-user: It's You
-	personal-informations: Personal informations
-	application-settings: Application settings
-	username: User
-	first-name: Name
-	last-name: Surname
-	degree: Degree
-	email: E-mail
-	phone: Phone
-	save: Save
-	is-admin: Is user admin?
-	roles: User roles
-	security: Security
-	password: Password
-	passwordRe: Password repeat
+im:
+	addPage: Add page
+	downloadPdf: Download PDF
+	addPageDialogTitle: Add new page to IM

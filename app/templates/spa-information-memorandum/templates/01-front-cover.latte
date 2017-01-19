@@ -1,0 +1,29 @@
+<div class="im-pagelayout im-pagelayout-cover">
+	<div class="logo"></div>
+	<div style="clear: both"></div>
+	<div class="image-box cover-image-wrapper">
+		<input type="file"
+		       data-role="upload"
+		       data-show-file-list="false"
+		       data-multiple="false"
+		       data-validation="{ allowedExtensions: ['.jpg', '.png']}"
+		       data-async="{ saveUrl: '{plink :LeSpaIm:Im:Im:}?do=uploadImage', autoUpload: true }"
+		       data-bind="events: { success: uploadImImageComplete, upload: uploadImImageStart}"
+		       data-drop-zone=".im-pagelayout-cover .cover-image-wrapper"
+		       data-image-element=".cover-image-wrapper img"
+		       name="im-image">
+		<img src="" alt="">
+	</div>
+	<div class="document-name">
+		INFORMAČNÍ MEMORANDUM
+	</div>
+	<div class="offer-number">
+		<span>NABÍDKA Č.</span> <span contenteditable="true">N 12345</span>
+	</div>
+	<div class="offer-address-street" contenteditable="true">
+		Manesova 1517/67
+	</div>
+	<div class="offer-address" contenteditable="true">
+		120 00 Praha 2 - vinohrady
+	</div>
+</div>

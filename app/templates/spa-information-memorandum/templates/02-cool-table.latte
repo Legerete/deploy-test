@@ -1,0 +1,60 @@
+<div class="im-pagelayout im-pagelayout-table">
+	<div class="logo"></div>
+	<div style="clear: both"></div>
+	<div class="image-box before-table-image-wrapper">
+		<input type="file"
+		       data-role="upload"
+		       data-show-file-list="false"
+		       data-multiple="false"
+		       data-validation="{ allowedExtensions: ['.jpg', '.png']}"
+		       data-async="{ saveUrl: '{plink :LeSpaIm:Im:Im:}?do=uploadImage', autoUpload: true }"
+		       data-bind="events: { success: uploadImImageComplete, upload: uploadImImageStart}"
+		       data-drop-zone=".im-pagelayout-table .before-table-image-wrapper"
+		       data-image-element=".before-table-image-wrapper img"
+		       name="im-image">
+		<img src="" alt="">
+	</div>
+	<h2 contenteditable="true">PŘEHLED NÁJEMNÍKŮ</h2>
+	<div
+			data-role="editor"
+			data-immutables="true"
+			data-tools="['bold', 'italic', 'underline', 'strikethrough', 'justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull', 'foreColor', 'createTable', 'addRowAbove',
+						'addRowBelow',
+						'addColumnLeft',
+						'addColumnRight',
+						'deleteRow',
+						'deleteColumn']">
+		<table style="width: 100%">
+			<tbody>
+				<tr>
+					<td style="text-align: center;"><b>Jednotka</b></td>
+					<td style="text-align: center;"><b>Podlaží<b/></td>
+					<td style="text-align: center;"><b>Užití<b/></td>
+					<td style="text-align: center;"><b>Nájemník<b/></td>
+					<td style="text-align: center;"><b>Podlahová<br>plocha&nbsp;m<sup>2</sup></br></td>
+					<td style="text-align: center;"><b>Výnos / m<sup>2</sup></b></td>
+					<td style="text-align: center;"><b>Výnos p.m.</b></td>
+					<td style="text-align: center;"><b>Výnos p.a.</b></td>
+					<td style="text-align: center;"><b>Omezení<b/></td>
+					<td style="text-align: center;"><b>Ostatní<b/></td>
+				</tr>
+				{for $i = 1; $i <= 19; $i++}
+				<tr>
+					<td style="text-align: center;"><b>{$i}</b></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				{/for}
+			</tbody>
+		</table>
+	</div>
+
+	{include ../snippets/footer.latte}
+</div>

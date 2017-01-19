@@ -1050,15 +1050,12 @@ $(function () {
 						return;
 					}
 
-
-
 					$('#pdf-scroller').css({ transform: 'none'});
 					// Convert the DOM element to a drawing using kendo.drawing.drawDOM
 					kendo.drawing.drawDOM($("#pdf-scroller"), {
 							forcePageBreak: ".page:not(:first-child)",
 						})
 						.then(function(group) {
-							console.log('scale up');
 							// Render the result as a PDF file
 							return kendo.drawing.exportPDF(group, {
 								paperSize: "A4",
@@ -1072,10 +1069,95 @@ $(function () {
 								fileName: "IM.pdf"
 								// proxyURL: "//demos.telerik.com/kendo-ui/service/export"
 							});
-							$('#pdf-scroller').css({ transform: 'scaleY(0.2) scaleX(0.2)'});
+							$('#pdf-scroller').css({ transform: 'scale(0.2)'});
 						});
 
+				},
+
+				editedPageDefinition: {
+					content: '',
+					pageUid: null,
+					dirty: false,
+				},
+
+				EditedPageModelDefinition: kendo.data.Model.define(
+					this.editedPageDefinition
+				),
+
+				editedPage: {
+					content: ''
+				},
+
+				editPage: function (e) {
+					e.preventDefault();
+					let uid = $(e.currentTarget).parent().parent().data('uid');
+					this.setEditedPageByUid(uid);
+				},
+
+				setEditedPageByUid: function (uid) {
+					let model = this.pagesDataSource.getByUid(uid);
+					let content = model.content;
+
+					let editedPage = new this.EditedPageModelDefinition({
+						content: content.replace(/resizable/gi, ''),
+						pageUid: uid
+					})
+					this.set('editedPage', editedPage);
+
+					kendo.bind($('#page-editor .page'), this);
+				},
+
+				usePageContent: function (e) {
+					e.preventDefault();
+					var that = this;
+					let model = this.pagesDataSource.getByUid(this.get('editedPage.pageUid'));
+
+					var promiseFoo = new Promise(function (resolve) {
+						kendo.destroy('#page-editor .page');
+						kendo.unbind('#page-editor .page');
+
+						resolve();
+					});
+
+					promiseFoo.then(function () {
+						let newContent = $(e.currentTarget).parent().parent().find('.page').html();
+
+						model.set('content', newContent.replace(/resizable/gi, ''));
+						// @todo Muze byt performance issue, chtelo by vyresit proc se listViewSamo neprekresli
+						$('#pdf-scroller').data('kendoListView').refresh();
+						$('#page-editor .page').html(false);
+					}).then( function () {
+						that.setEditedPageByUid(that.get('editedPage.pageUid'));
+					});
+				},
+
+				revertPageContent: function (e) {
+					e.preventDefault();
+
+					kendo.unbind($('#page-editor .page, #page-editor .page .k-widget'));
+					kendo.destroy($('#page-editor .page, #page-editor .page .k-widget'));
+					$('#page-editor .page').html(false);
+					this.setEditedPageByUid(this.get('editedPage.pageUid'));
+				},
+
+				uploadImImageStart: function (e) {
+					console.log('start', e);
+				},
+
+				uploadImImageComplete: function (e) {
+					console.log(e);
+					let wrapper = $(e.sender.element);
+					console.log(wrapper);
+					let imageElement = wrapper.data('image-element');
+					console.log(imageElement);
+					let img = wrapper.closest('.im-pagelayout').find(imageElement);
+					img.attr('src', '/' + e.response.original);
+					console.log(img);
+
+					// console.log('complete', e);
+					// console.log(.clossest('.im-pagelayout'))
 				}
+
 			});
 			this.registerListeners();
 			kendo.bind(addPageDialog, this.settings.viewModel);

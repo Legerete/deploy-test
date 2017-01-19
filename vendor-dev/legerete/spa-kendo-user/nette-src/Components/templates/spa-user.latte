@@ -19,7 +19,7 @@
 					{
 						name: 'createUser',
 						text: '{_users.users.create}',
-						template: '<div class=\'btn btn-success btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'\'><span class=\'glyph-icon icon-plus\'></span> {_users.users.create}</div>'
+						template: '&lt;div class=\'btn btn-success btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'\'&gt;&lt;span class=\'glyph-icon icon-plus\'>&lt;/span&gt; {_users.users.create}&lt;/div&gt;'
 					}
 				]"
 				{/if}
@@ -28,11 +28,11 @@
 					{
 						'field': 'customUserEdit',
 						'title': '{_users.users.edit}',
-						'template': '<div class=\'btn btn-warning btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'#=id#\'><i class=\'glyph-icon icon-pencil\'></i></div>',
+						'template': '&lt;div class=\'btn btn-warning btn-xs\' onclick=\'SPA.openPanel(this)\' data-panel-type=\'user-edit\' data-user-id=\'#=id#\'&gt;&lt;i class=\'glyph-icon icon-pencil\'&gt;&lt;/i&gt;&lt;/div&gt;',
 						width: 50
 					},
 					{/if}
-					{ title:' ', template: '<img src=\'/#=avatarSmall#\' alt=\'\' class=\'avatar\' height=\'30\' width=\'30\'>', width: 45 },
+					{ title:' ', template: '&lt;img src=\'/#=avatarSmall#\' alt=\'\' class=\'avatar\' height=\'30\' width=\'30\'&gt;', width: 45 },
 					{ 'field': 'name', title:'{_users.users.name}', 'width': 270 },
 					{ 'field': 'surname', title:'{_users.users.surname}' },
 					{ 'field': 'phone', title:'{_users.users.phone}' },
@@ -40,9 +40,9 @@
 					{
 						'title': '{_users.users.block}',
 						'template': '#if(SPA.data.id != id && status === \'ok\') { #'+
-								'<div class=\'btn btn-danger btn-xs block-user-action\' data-toggle=\'modal\' data-target=\'.block-user-modal\' data-bind=\'events: { click: blockUser }\'><span class=\'glyph-icon icon-iconic-block\'></span></div>'+
+								'&lt;div class=\'btn btn-danger btn-xs block-user-action\' data-toggle=\'modal\' data-target=\'.block-user-modal\' data-bind=\'events: { click: blockUser }\'&gt;&lt;span class=\'glyph-icon icon-iconic-block\'&gt;&lt;/span&gt;&lt;/div&gt;'+
 							'#} else if (SPA.data.id != id && status === \'blocked\') { #'+
-								'<div class=\'btn btn-success btn-xs unblock-user-action\' data-bind=\'events: { click: unblockUser }\'><span class=\'glyph-icon icon-refresh\'></span></div>'+
+								'&lt;div class=\'btn btn-success btn-xs unblock-user-action\' data-bind=\'events: { click: unblockUser }\'&gt;&lt;span class=\'glyph-icon icon-refresh\'>&lt;/span&gt;&lt;/div&gt;'+
 							'#}#',
 						width: 50
 					}

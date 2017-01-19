@@ -48,7 +48,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title">{_im.addPageDialogTitle}</h4>
+				<h4 class="modal-title">{_im.im.addPageDialogTitle}</h4>
 			</div>
 			<div class="modal-body">
 				<div>
@@ -61,7 +61,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-success" data-bind="events: { click: addSelectedPage}">{_im.addPage}</button>
+				<button type="button" class="btn btn-success" data-bind="events: { click: addSelectedPage}">{_im.im.addPage}</button>
 			</div>
 		</div>
 	</div>
@@ -103,33 +103,29 @@
 	<div id="im-edit">
 		<div class="row">
 			<div class="col-lg-8">
-				<div id="page-editor" class="page">
+				<div id="page-editor">
+					<div class="toolbar">
+						<a href="#" data-toggle="tooltip" data-placement="top" title="{_ im.pageEditor.useChanges}" class="btn btn-success" data-bind="events: { click: usePageContent}">
+							<i class="glyph-icon icon-check"></i>
+						</a>
+						<a href="#" data-toggle="tooltip" data-placement="top" title="{_ im.pageEditor.revertChanges}"  class="btn btn-danger">
+							<i class="glyph-icon icon-refresh" data-bind="events: { click: revertPageContent}"></i>
+						</a>
+					</div>
+					<div class="page" data-bind="html: editedPage.content">
 
+					</div>
 				</div>
-				{*<div id="pdf-export-wrapper">*}
-					{*<div id="pdf-export" class="row"*}
-							{*data-role="listview"*}
-							{*data-template="im-pages-template"*}
-							{*data-bind="source: pagesDataSource, events: { change: changedPage, dataBound: boundPages, dataBinding: bindPages}"*}
-							{*data-selectable="single"*}
-					{*>*}
-					{*</div>*}
-				{*</div>*}
 			</div>
 			<div class="col-lg-4">
 				<div class="header-buttons">
 					<a class="btn btn-success btn-xs pull-left" data-bind="click: openAddPageDialog"><span class="glyph-icon icon-plus"></span> {_im.im.addPage}</a>
-
-					{*<a class="btn btn-success btn-xs pull-left" data-bind="click: addPage" data-layout="#im-pagelayout-cover"><span class="glyph-icon icon-plus"></span> {_im.im.addPageCover}</a>*}
-
-					{*<a class="btn btn-success btn-xs pull-left" data-bind="click: addPage" data-layout="#im-pagelayout-table"><span class="glyph-icon icon-plus"></span> {_im.im.addPageTable}</a>*}
 
 					<a class="btn btn-success btn-xs pull-right" data-bind="click: downloadPdf"><span class="glyph-icon icon-download"></span> {_im.im.downloadPdf}</a>
 					<a class="btn btn-success btn-xs pull-right" data-bind="click: saveIm, visible: isDirty"><span class="glyph-icon icon-save"></span> {_im.im.save}</a>
 				</div>
 
 				<div id="pdf-scroller-wrapper">
-					{*<div id="scroller-scrollbar" class="draggable"></div>*}
 					<div id="pdf-scroller"
 					     data-role="listview"
 					     data-template="im-pages-scroller"
@@ -142,49 +138,17 @@
 	</div>
 </script>
 
-<script id="im-pagelayout-table" type="text/x-kendo-template">
-	<div class="im-pagelayout-table">
-		<div
-			{*data-editable="true"*}
-			data-role="editor"
-			{*data-editor="editor"*}
-			data-immutables="true"
-			data-tools="['createTable', 'addRowAbove',
-						'addRowBelow',
-						'addColumnLeft',
-						'addColumnRight',
-						'deleteRow',
-						'deleteColumn']">
-			<table style="width: 100%">
-				<tbody>
-					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-						<td></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-</script>
-
 <script id="im-pages-scroller" type="text/x-kendo-template">
-	<div {*data-bind="css: { page: isFirst, new-page: isNotFirst}"*} class="page">
-		<div data-bind="html: content"></div>
+	<div class="page">
+		<div class="toolbar">
+			<a href="" class="btn btn-success btn-sm" data-bind="events: { click: editPage}">
+				<i class="glyph-icon icon-edit"></i>
+			</a>
+			<a href="" class="btn btn-danger btn-xs pull-right">
+				<i class="glyph-icon icon-trash"></i>
+			</a>
+		</div>
+		<div class="over"></div>
+		<div data-bind="oneWayHtml: content"></div>
 	</div>
 </script>
