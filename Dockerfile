@@ -1,4 +1,4 @@
-FROM legerete/nginx-php7:develop
+FROM legerete/nginx-php71:develop
 MAINTAINER Petr Besir Horacek <petr.horacek@legerete.cz>
 
 ADD www.conf /usr/local/php/etc/php-fpm.d/www.conf
